@@ -1,0 +1,21 @@
+// program.hex - Chương trình test cho 1 core RISC-V
+//
+// Addr  Hex         Assembly              Description
+// 0x00  00a00093    ADDI x1, x0, 10       x1 = 10
+// 0x04  01400113    ADDI x2, x0, 20       x2 = 20
+// 0x08  002081b3    ADD  x3, x1, x2       x3 = x1 + x2 = 30
+// 0x0C  00302023    SW   x3, 0(x0)        mem[0] = x3 = 30
+// 0x10  00002203    LW   x4, 0(x0)        x4 = mem[0] = 30
+// 0x14  00418463    BEQ  x3, x4, +8       if x3==x4, jump to 0x1C (skip FAIL)
+// 0x18  0000006f    JAL  x0, 0            FAIL: infinite loop
+// 0x1C  00100293    ADDI x5, x0, 1        x5 = 1 (PASS marker)
+// 0x20  0000006f    JAL  x0, 0            HALT: infinite loop
+00a00093
+01400113
+002081b3
+00302023
+00002203
+00418463
+0000006f
+00100293
+0000006f
