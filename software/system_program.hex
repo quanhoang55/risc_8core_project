@@ -1,0 +1,23 @@
+// system_program.hex - Chương trình test 8 core
+//
+// Mỗi core chạy cùng chương trình này:
+//   1. ADDI x1, x0, 42      → x1 = 42
+//   2. SW   x1, 0(x0)        → mem[0] = 42  (8 core tranh giành ghi qua bus)
+//   3. LW   x2, 0(x0)        → x2 = mem[0]  (đọc lại để xác nhận)
+//   4. ADDI x3, x0, 99       → x3 = 99 (marker: core đã chạy xong)
+//   5. SW   x3, 4(x0)        → mem[4] = 99  (ghi marker)
+//   6. JAL  x0, 0             → HALT (infinite loop)
+//
+// Addr  Hex         Assembly
+// 0x00  02a00093    ADDI x1, x0, 42
+// 0x04  00102023    SW   x1, 0(x0)
+// 0x08  00002103    LW   x2, 0(x0)
+// 0x0C  06300193    ADDI x3, x0, 99
+// 0x10  00302223    SW   x3, 4(x0)
+// 0x14  0000006f    JAL  x0, 0
+02a00093
+00102023
+00002103
+06300193
+00302223
+0000006f
