@@ -24,6 +24,10 @@ module control_unit (
     output reg         jalr,         // Là JALR? (jump target = rs1 + imm)
     output reg         lui,          // Là LUI?
     output reg         auipc,        // Là AUIPC?
+    output reg         mem_lr,       // Là lệnh Load-Reserved?
+    output reg         mem_sc,       // Là lệnh Store-Conditional?
+    output reg         mem_amo,      // Là lệnh AMO?
+    output reg  [3:0]  amo_op,       // Mã phép toán AMO
 
     // --- Immediate Generator ---
     output reg  [31:0] imm,          // Giá trị immediate (sign-extended)
@@ -40,6 +44,7 @@ module control_unit (
     wire [6:0] opcode = instruction[6:0];
     wire [2:0] funct3 = instruction[14:12];
     wire [6:0] funct7 = instruction[31:25];
+    wire [4:0] funct5 = instruction[31:27];
 
     assign rs1_addr = instruction[19:15];
     assign rs2_addr = instruction[24:20];
@@ -57,6 +62,7 @@ module control_unit (
     localparam OP_JALR    = 7'b1100111;  // JALR
     localparam OP_LUI     = 7'b0110111;  // LUI
     localparam OP_AUIPC   = 7'b0010111;  // AUIPC
+    localparam OP_AMO     = 7'b0101111;  // AMO (LR, SC, AMO)
 
     // =========================================================================
     // ALU control codes (khớp với alu.v)
@@ -79,6 +85,10 @@ module control_unit (
             // I-type: imm[11:0] = instruction[31:20]
             OP_I_TYPE, OP_LOAD, OP_JALR:
                 imm = {{20{instruction[31]}}, instruction[31:20]};
+
+            // AMO: Không dùng imm cho tính địa chỉ (imm = 0), rs1 chứa địa chỉ
+            OP_AMO:
+                imm = 32'd0;
 
             // S-type: imm[11:0] = {instruction[31:25], instruction[11:7]}
             OP_STORE:
@@ -120,6 +130,10 @@ module control_unit (
         jalr        = 1'b0;
         lui         = 1'b0;
         auipc       = 1'b0;
+        mem_lr      = 1'b0;
+        mem_sc      = 1'b0;
+        mem_amo     = 1'b0;
+        amo_op      = 4'd0;
 
         case (opcode)
             // =================================================================
@@ -223,6 +237,42 @@ module control_unit (
             OP_AUIPC: begin
                 reg_write = 1'b1;
                 auipc     = 1'b1;
+            end
+
+            // =================================================================
+            // Atomic (A-Extension): LR, SC, AMO
+            // =================================================================
+            OP_AMO: begin
+                alu_src     = 1'b1;   // ALU tính địa chỉ: rs1 + 0 (imm = 0)
+                alu_control = ALU_ADD;
+                
+                case (funct5)
+                    5'b00010: begin // LR.W
+                        mem_lr    = 1'b1;
+                        reg_write = 1'b1;
+                    end
+                    5'b00011: begin // SC.W
+                        mem_sc    = 1'b1;
+                        reg_write = 1'b1; // Kết quả SC (0 hoặc 1) ghi vào rd
+                    end
+                    default: begin  // Các lệnh AMO khác
+                        mem_amo   = 1'b1;
+                        reg_write = 1'b1; // Giá trị cũ ghi vào rd
+                        // Map funct5 sang amo_op cho bus_ctrl
+                        case (funct5)
+                            5'b00001: amo_op = 4'd0; // AMO_SWAP
+                            5'b00000: amo_op = 4'd1; // AMO_ADD
+                            5'b01100: amo_op = 4'd2; // AMO_AND
+                            5'b01010: amo_op = 4'd3; // AMO_OR
+                            5'b00100: amo_op = 4'd4; // AMO_XOR
+                            5'b10100: amo_op = 4'd5; // AMO_MAX
+                            5'b11100: amo_op = 4'd6; // AMO_MAXU
+                            5'b10000: amo_op = 4'd7; // AMO_MIN
+                            5'b11000: amo_op = 4'd8; // AMO_MINU
+                            default:  amo_op = 4'd0;
+                        endcase
+                    end
+                endcase
             end
 
             default: ; // NOP (tất cả outputs đã mặc định = 0)

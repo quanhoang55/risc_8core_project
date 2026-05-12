@@ -57,12 +57,6 @@ module top_8core #(
     // =========================================================================
     // Generate 8 cores
     // =========================================================================
-    // Tạm: LR/SC/AMO không kết nối từ core (core chỉ dùng LW/SW cơ bản)
-    // Trong tương lai, risc_core cần thêm output mem_lr, mem_sc, mem_amo
-    assign core_lr  = 8'b0;
-    assign core_sc  = 8'b0;
-    assign core_amo = 8'b0;
-
     genvar gi;
     generate
         for (gi = 0; gi < 8; gi = gi + 1) begin : gen_core
@@ -78,12 +72,14 @@ module top_8core #(
                 .mem_wdata (core_wdata[gi]),
                 .mem_we    (core_we[gi]),
                 .mem_re    (core_re[gi]),
+                .mem_lr    (core_lr[gi]),
+                .mem_sc    (core_sc[gi]),
+                .mem_amo   (core_amo[gi]),
+                .mem_amo_op(core_amo_op[gi]),
                 .mem_rdata (core_rdata[gi]),
-                .mem_ready (core_ready[gi])
+                .mem_ready (core_ready[gi]),
+                .mem_sc_result(core_sc_result[gi])
             );
-
-            // AMO op placeholder (không dùng bởi core hiện tại)
-            assign core_amo_op[gi] = 4'd0;
         end
     endgenerate
 

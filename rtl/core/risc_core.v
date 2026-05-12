@@ -28,9 +28,14 @@ module risc_core #(
     output reg  [31:0] mem_wdata,     // Dữ liệu ghi (SW)
     output reg         mem_we,        // Write enable
     output reg         mem_re,        // Read enable
+    output reg         mem_lr,        // Load-Reserved
+    output reg         mem_sc,        // Store-Conditional
+    output reg         mem_amo,       // AMO request
+    output reg  [3:0]  mem_amo_op,    // AMO operation type
 
     input  wire [31:0] mem_rdata,     // Dữ liệu đọc từ bus
-    input  wire        mem_ready      // Giao dịch hoàn thành
+    input  wire        mem_ready,     // Giao dịch hoàn thành
+    input  wire        mem_sc_result  // Kết quả SC (0 = success, 1 = fail)
 );
 
     // =========================================================================
@@ -73,6 +78,10 @@ module risc_core #(
     wire        cu_jalr;
     wire        cu_lui;
     wire        cu_auipc;
+    wire        cu_mem_lr;
+    wire        cu_mem_sc;
+    wire        cu_mem_amo;
+    wire [3:0]  cu_amo_op;
     wire [31:0] cu_imm;
     wire [4:0]  cu_rs1_addr;
     wire [4:0]  cu_rs2_addr;
@@ -102,6 +111,7 @@ module risc_core #(
     reg  [4:0]  saved_rd_addr;
     reg         saved_mem_to_reg;
     reg         saved_reg_write;
+    reg         saved_is_sc;
 
     // =========================================================================
     // Sub-module instantiation
@@ -140,6 +150,10 @@ module risc_core #(
         .jalr        (cu_jalr),
         .lui         (cu_lui),
         .auipc       (cu_auipc),
+        .mem_lr      (cu_mem_lr),
+        .mem_sc      (cu_mem_sc),
+        .mem_amo     (cu_mem_amo),
+        .amo_op      (cu_amo_op),
         .imm         (cu_imm),
         .rs1_addr    (cu_rs1_addr),
         .rs2_addr    (cu_rs2_addr),
@@ -219,10 +233,15 @@ module risc_core #(
             mem_wdata        <= 32'd0;
             mem_we           <= 1'b0;
             mem_re           <= 1'b0;
+            mem_lr           <= 1'b0;
+            mem_sc           <= 1'b0;
+            mem_amo          <= 1'b0;
+            mem_amo_op       <= 4'd0;
             saved_alu_result <= 32'd0;
             saved_rd_addr    <= 5'd0;
             saved_mem_to_reg <= 1'b0;
             saved_reg_write  <= 1'b0;
+            saved_is_sc      <= 1'b0;
             saved_pc         <= 32'd0;
         end
         else begin
@@ -246,8 +265,30 @@ module risc_core #(
                 // EXECUTE: Giải mã + ALU + quyết định
                 // =============================================================
                 S_EXECUTE: begin
+                    // --- Trường hợp MỚI: Atomic (LR, SC, AMO) ---
+                    if (cu_mem_lr || cu_mem_sc || cu_mem_amo) begin
+                        saved_alu_result <= alu_result;  // Địa chỉ = rs1 + 0
+                        saved_rd_addr    <= cu_rd_addr;
+                        saved_mem_to_reg <= 1'b1;        // Ghi mem_rdata vào rd (hoặc mem_sc_result)
+                        saved_reg_write  <= cu_reg_write;
+                        saved_is_sc      <= cu_mem_sc;
+                        
+                        mem_req    <= 1'b1;
+                        mem_addr   <= alu_result;
+                        mem_wdata  <= rs2_data;          // Data để SC hoặc AMO
+                        mem_lr     <= cu_mem_lr;
+                        mem_sc     <= cu_mem_sc;
+                        mem_amo    <= cu_mem_amo;
+                        mem_amo_op <= cu_amo_op;
+                        
+                        mem_re     <= cu_mem_lr || cu_mem_amo;
+                        mem_we     <= cu_mem_sc || cu_mem_amo;
+                        
+                        state      <= S_MEMORY;
+                    end
+
                     // --- Trường hợp 1: Load (LW) ---
-                    if (cu_mem_read) begin
+                    else if (cu_mem_read) begin
                         // Cần truy cập bus → chuyển MEMORY
                         saved_alu_result <= alu_result;  // Địa chỉ = rs1 + imm
                         saved_rd_addr    <= cu_rd_addr;
@@ -347,12 +388,19 @@ module risc_core #(
                         mem_req <= 1'b0;
                         mem_we  <= 1'b0;
                         mem_re  <= 1'b0;
+                        mem_lr  <= 1'b0;
+                        mem_sc  <= 1'b0;
+                        mem_amo <= 1'b0;
 
-                        // Load: ghi mem_rdata vào rd
+                        // Load / Atomic: ghi mem_rdata vào rd
                         if (saved_reg_write) begin
                             rf_write_en   <= 1'b1;
                             rf_rd_addr    <= saved_rd_addr;
-                            rf_write_data <= saved_mem_to_reg ? mem_rdata : saved_alu_result;
+                            if (saved_is_sc) begin
+                                rf_write_data <= {31'b0, mem_sc_result};
+                            end else begin
+                                rf_write_data <= saved_mem_to_reg ? mem_rdata : saved_alu_result;
+                            end
                         end
 
                         pc_stall <= 1'b0;    // Unstall PC → PC += 4

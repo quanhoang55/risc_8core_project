@@ -47,7 +47,7 @@ module system_tb;
         #25 reset = 0;
 
         $display("\n========================================");
-        $display("  BẮT ĐẦU MÔ PHỎNG HỆ THỐNG 8 LÕI");
+        $display("  BAT DAU MO PHONG HE THONG 8 LOI");
         $display("========================================");
 
         // Chạy tối đa 500 cycles (đủ cho chương trình ngắn)
@@ -64,33 +64,33 @@ module system_tb;
         // Kiểm tra kết quả trong Data Memory
         // =====================================================================
         $display("\n========================================");
-        $display("  KẾT QUẢ MÔ PHỎNG TẠI CYCLE %0d", cycle_count);
+        $display("  KET QUA MO PHONG TAI CYCLE %0d", cycle_count);
         $display("========================================");
 
         // Theo system_program.hex:
         // mem[0] phải bằng 42
         // mem[4] (word_addr 1) phải bằng 99 (marker chạy xong)
         
-        $display("  Kiểm tra mem[0] (Kỳ vọng: 42) = %0d", dut.u_data_mem.mem[0]);
+        $display("  Kiem tra mem[0] (Ky vong: 42) = %0d", dut.u_data_mem.mem[0]);
         if (dut.u_data_mem.mem[0] == 32'd42) begin
-            $display("    [PASS] Tất cả core đã ghi giá trị chính xác.");
+            $display("    [PASS] Tat ca core da ghi gia tri chinh xac.");
             test_pass = test_pass + 1;
         end else begin
-            $display("    [FAIL] Dữ liệu sai.");
+            $display("    [FAIL] Du lieu sai.");
             test_fail = test_fail + 1;
         end
 
-        $display("  Kiểm tra mem[1] addr 4 (Kỳ vọng: 99) = %0d", dut.u_data_mem.mem[1]);
+        $display("  Kiem tra mem[1] addr 4 (Ky vong: 99) = %0d", dut.u_data_mem.mem[1]);
         if (dut.u_data_mem.mem[1] == 32'd99) begin
-            $display("    [PASS] Hệ thống hoàn thành mà không bị deadlock.");
+            $display("    [PASS] He thong hoan thanh ma khong bi deadlock.");
             test_pass = test_pass + 1;
         end else begin
-            $display("    [FAIL] Các core chưa chạy đến lệnh ghi marker.");
+            $display("    [FAIL] Cac core chua chay den lenh ghi marker.");
             test_fail = test_fail + 1;
         end
 
         $display("\n==========================================");
-        $display("  TỔNG KẾT: %0d PASSED, %0d FAILED", test_pass, test_fail);
+        $display("  TONG KET: %0d PASSED, %0d FAILED", test_pass, test_fail);
         $display("==========================================\n");
 
         $finish;
