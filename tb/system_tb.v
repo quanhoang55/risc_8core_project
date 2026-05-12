@@ -19,7 +19,7 @@ module system_tb;
     // Khởi tạo Top Level (8 cores + Interconnect + Memory)
     // =========================================================================
     top_8core #(
-        .PROGRAM_FILE("system_program.hex")
+        .PROGRAM_FILE("../software/system_program.hex")
     ) dut (
         .clk(clk),
         .reset(reset)
