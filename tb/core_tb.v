@@ -40,7 +40,8 @@ module core_tb;
     // =========================================================================
     risc_core #(
         .CORE_ID(0),
-        .INIT_FILE("program.hex")
+        .INIT_FILE("program.hex"),
+        .PROGRAM_WORDS(9)
     ) u_core (
         .clk       (clk),
         .reset     (reset),
@@ -181,6 +182,23 @@ module core_tb;
             $display("    [PASS]"); test_pass = test_pass + 1;
         end else begin
             $display("    [FAIL]"); test_fail = test_fail + 1;
+        end
+
+        $display("");
+        $display("========================================");
+        $display("  PIPELINE EVIDENCE");
+        $display("========================================");
+        $display("  retired=%0d mem_stall=%0d load_use_stall=%0d flush=%0d",
+                 u_core.retired_count,
+                 u_core.mem_stall_count,
+                 u_core.load_use_stall_count,
+                 u_core.flush_count);
+        if (u_core.retired_count > 0 && u_core.load_use_stall_count > 0 && u_core.flush_count > 0) begin
+            $display("    [PASS] Pipeline counters show retire/stall/flush activity.");
+            test_pass = test_pass + 1;
+        end else begin
+            $display("    [FAIL] Pipeline counters did not capture expected activity.");
+            test_fail = test_fail + 1;
         end
 
         $display("");

@@ -24,8 +24,15 @@ module reg_file (
 
     // Asynchronous Read: Data is available immediately when addresses change
     // Note: Register x0 is hardwired to 0 in RISC-V
-    assign rs1_data = (rs1_addr == 5'd0) ? 32'd0 : registers[rs1_addr];
-    assign rs2_data = (rs2_addr == 5'd0) ? 32'd0 : registers[rs2_addr];
+    // Writeback bypass: a pipelined core can decode an instruction in the
+    // same cycle that WB commits its source register. Forward that value to
+    // the asynchronous read ports so load->branch/use cases see fresh data.
+    assign rs1_data = (rs1_addr == 5'd0) ? 32'd0 :
+                      (reg_write && (rd_addr == rs1_addr)) ? write_data :
+                      registers[rs1_addr];
+    assign rs2_data = (rs2_addr == 5'd0) ? 32'd0 :
+                      (reg_write && (rd_addr == rs2_addr)) ? write_data :
+                      registers[rs2_addr];
 
     // Synchronous Write: Updates happen on the rising edge of the clock
     integer i;

@@ -1,9 +1,8 @@
 // =============================================================================
-// system_tb.v - Testbench mô phỏng toàn bộ hệ thống 8 lõi
+// system_tb.v - Full 8-core pipelined RISC-V system simulation
 //
-// Khởi tạo top_8core, nạp system_program.hex cho tất cả các lõi.
-// Đợi các lõi thực thi xong (khoảng vài trăm cycle).
-// Kiểm tra nội dung của Data Memory để xác nhận thành công.
+// The test runs the same program on all 8 cores, verifies shared-memory output,
+// and prints pipeline/bus counters that can be used as slide evidence.
 // =============================================================================
 `timescale 1ns / 1ps
 
@@ -12,28 +11,61 @@ module system_tb;
     reg clk;
     reg reset;
 
-    // Tạo clock (100MHz -> 10ns period)
-    always #5 clk = ~clk;
+    always #5 clk = ~clk; // 100 MHz
 
-    // =========================================================================
-    // Khởi tạo Top Level (8 cores + Interconnect + Memory)
-    // =========================================================================
     top_8core #(
-        .PROGRAM_FILE("../software/system_program.hex")
+        .PROGRAM_FILE("../software/system_program.hex"),
+        .PROGRAM_WORDS(6)
     ) dut (
         .clk(clk),
         .reset(reset)
     );
 
-    // =========================================================================
-    // Monitor & Timeout
-    // =========================================================================
     integer cycle_count;
     integer test_pass;
     integer test_fail;
+    integer grant_count [0:7];
+    integer gi;
+
+    wire [31:0] core_retired [0:7];
+    wire [31:0] core_mem_stall [0:7];
+    wire [31:0] core_load_use_stall [0:7];
+    wire [31:0] core_flush [0:7];
+
+    assign core_retired[0]        = dut.gen_core[0].u_core.retired_count;
+    assign core_retired[1]        = dut.gen_core[1].u_core.retired_count;
+    assign core_retired[2]        = dut.gen_core[2].u_core.retired_count;
+    assign core_retired[3]        = dut.gen_core[3].u_core.retired_count;
+    assign core_retired[4]        = dut.gen_core[4].u_core.retired_count;
+    assign core_retired[5]        = dut.gen_core[5].u_core.retired_count;
+    assign core_retired[6]        = dut.gen_core[6].u_core.retired_count;
+    assign core_retired[7]        = dut.gen_core[7].u_core.retired_count;
+    assign core_mem_stall[0]      = dut.gen_core[0].u_core.mem_stall_count;
+    assign core_mem_stall[1]      = dut.gen_core[1].u_core.mem_stall_count;
+    assign core_mem_stall[2]      = dut.gen_core[2].u_core.mem_stall_count;
+    assign core_mem_stall[3]      = dut.gen_core[3].u_core.mem_stall_count;
+    assign core_mem_stall[4]      = dut.gen_core[4].u_core.mem_stall_count;
+    assign core_mem_stall[5]      = dut.gen_core[5].u_core.mem_stall_count;
+    assign core_mem_stall[6]      = dut.gen_core[6].u_core.mem_stall_count;
+    assign core_mem_stall[7]      = dut.gen_core[7].u_core.mem_stall_count;
+    assign core_load_use_stall[0] = dut.gen_core[0].u_core.load_use_stall_count;
+    assign core_load_use_stall[1] = dut.gen_core[1].u_core.load_use_stall_count;
+    assign core_load_use_stall[2] = dut.gen_core[2].u_core.load_use_stall_count;
+    assign core_load_use_stall[3] = dut.gen_core[3].u_core.load_use_stall_count;
+    assign core_load_use_stall[4] = dut.gen_core[4].u_core.load_use_stall_count;
+    assign core_load_use_stall[5] = dut.gen_core[5].u_core.load_use_stall_count;
+    assign core_load_use_stall[6] = dut.gen_core[6].u_core.load_use_stall_count;
+    assign core_load_use_stall[7] = dut.gen_core[7].u_core.load_use_stall_count;
+    assign core_flush[0]          = dut.gen_core[0].u_core.flush_count;
+    assign core_flush[1]          = dut.gen_core[1].u_core.flush_count;
+    assign core_flush[2]          = dut.gen_core[2].u_core.flush_count;
+    assign core_flush[3]          = dut.gen_core[3].u_core.flush_count;
+    assign core_flush[4]          = dut.gen_core[4].u_core.flush_count;
+    assign core_flush[5]          = dut.gen_core[5].u_core.flush_count;
+    assign core_flush[6]          = dut.gen_core[6].u_core.flush_count;
+    assign core_flush[7]          = dut.gen_core[7].u_core.flush_count;
 
     initial begin
-        // Tạo file VCD để xem dạng sóng trên GTKWave
         $dumpfile("system_tb.vcd");
         $dumpvars(0, system_tb);
 
@@ -42,51 +74,63 @@ module system_tb;
         cycle_count = 0;
         test_pass = 0;
         test_fail = 0;
+        for (gi = 0; gi < 8; gi = gi + 1)
+            grant_count[gi] = 0;
 
-        // Giữ reset trong vài cycle
         #25 reset = 0;
 
         $display("\n========================================");
-        $display("  BAT DAU MO PHONG HE THONG 8 LOI");
+        $display("  BAT DAU MO PHONG HE THONG 8 LOI PIPELINE");
         $display("========================================");
 
-        // Chạy tối đa 500 cycles (đủ cho chương trình ngắn)
         repeat (500) begin
             @(posedge clk);
             cycle_count = cycle_count + 1;
-            
-            // Tùy chọn in ra thông báo nếu cần debug
-            // if (cycle_count % 100 == 0)
-            //    $display("  ... running cycle %0d", cycle_count);
+
+            if (dut.u_arbiter.grant_valid)
+                grant_count[dut.u_arbiter.grant_id] = grant_count[dut.u_arbiter.grant_id] + 1;
         end
 
-        // =====================================================================
-        // Kiểm tra kết quả trong Data Memory
-        // =====================================================================
         $display("\n========================================");
         $display("  KET QUA MO PHONG TAI CYCLE %0d", cycle_count);
         $display("========================================");
 
-        // Theo system_program.hex:
-        // mem[0] phải bằng 42
-        // mem[4] (word_addr 1) phải bằng 99 (marker chạy xong)
-        
         $display("  Kiem tra mem[0] (Ky vong: 42) = %0d", dut.u_data_mem.mem[0]);
         if (dut.u_data_mem.mem[0] == 32'd42) begin
-            $display("    [PASS] Tat ca core da ghi gia tri chinh xac.");
+            $display("    [PASS] Shared memory data dung.");
             test_pass = test_pass + 1;
         end else begin
-            $display("    [FAIL] Du lieu sai.");
+            $display("    [FAIL] Shared memory data sai.");
             test_fail = test_fail + 1;
         end
 
         $display("  Kiem tra mem[1] addr 4 (Ky vong: 99) = %0d", dut.u_data_mem.mem[1]);
         if (dut.u_data_mem.mem[1] == 32'd99) begin
-            $display("    [PASS] He thong hoan thanh ma khong bi deadlock.");
+            $display("    [PASS] 8 core hoan thanh chuong trinh khong deadlock.");
             test_pass = test_pass + 1;
         end else begin
-            $display("    [FAIL] Cac core chua chay den lenh ghi marker.");
+            $display("    [FAIL] Chua thay marker hoan thanh.");
             test_fail = test_fail + 1;
+        end
+
+        $display("\n========================================");
+        $display("  PIPELINE / BUS EVIDENCE");
+        $display("========================================");
+        for (gi = 0; gi < 8; gi = gi + 1) begin
+            $display("  Core %0d: grant=%0d retired=%0d mem_stall=%0d load_use_stall=%0d flush=%0d",
+                     gi,
+                     grant_count[gi],
+                     core_retired[gi],
+                     core_mem_stall[gi],
+                     core_load_use_stall[gi],
+                     core_flush[gi]);
+
+            if (grant_count[gi] > 0 && core_retired[gi] > 0)
+                test_pass = test_pass + 1;
+            else begin
+                $display("    [FAIL] Core %0d khong co bang chung grant/retire.", gi);
+                test_fail = test_fail + 1;
+            end
         end
 
         $display("\n==========================================");

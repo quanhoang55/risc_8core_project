@@ -1,33 +1,29 @@
 // =============================================================================
-// instr_mem.v - Bộ nhớ lệnh (Instruction ROM)
+// instr_mem.v - Instruction ROM
 //
-// ROM chỉ đọc, 256 words = 1KB.
-// Mỗi core có 1 bản sao riêng (instantiated bên trong risc_core).
-// Nạp chương trình từ file .hex bằng $readmemh.
-//
-// Đọc bất đồng bộ (combinational) - trả instruction trong cùng cycle.
+// Read-only 256-word instruction memory. Each core instantiates its own copy.
+// PROGRAM_WORDS lets short demo programs load without noisy readmemh warnings.
 // =============================================================================
 `timescale 1ns / 1ps
 
 module instr_mem #(
-    parameter INIT_FILE = "program.hex"  // File hex nạp chương trình
+    parameter INIT_FILE = "program.hex",
+    parameter PROGRAM_WORDS = 256
 )(
-    input  wire [31:0] addr,        // Địa chỉ byte (từ PC, word-aligned)
-    output wire [31:0] instruction  // Lệnh 32-bit
+    input  wire [31:0] addr,
+    output wire [31:0] instruction
 );
 
-    // 256 words × 32 bits = 1 KB ROM
     reg [31:0] mem [0:255];
-
-    // Word index từ byte address
     wire [7:0] word_addr = addr[9:2];
 
-    // Đọc bất đồng bộ
     assign instruction = mem[word_addr];
 
-    // Nạp chương trình khi khởi tạo
+    integer i;
     initial begin
-        $readmemh(INIT_FILE, mem);
+        for (i = 0; i < 256; i = i + 1)
+            mem[i] = 32'h0000_0013; // ADDI x0, x0, 0 (NOP)
+        $readmemh(INIT_FILE, mem, 0, PROGRAM_WORDS - 1);
     end
 
 endmodule
