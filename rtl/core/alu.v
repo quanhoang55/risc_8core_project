@@ -1,6 +1,6 @@
 module alu (
-    input  [31:0] a,           // Toán hạng thứ nhất
-    input  [31:0] b,           // Toán hạng thứ hai
+    input  [31:0] a,
+    input  [31:0] b,
     input  [3:0]  alu_control, // Tín hiệu điều khiển từ Control Unit
     output reg [31:0] result,  // Kết quả tính toán
     output        zero         // Cờ báo kết quả bằng 0
