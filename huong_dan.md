@@ -1,104 +1,124 @@
-# Huong Dan Trinh Bay He Thong Mo Phong CPU RISC-V 8 Core Pipeline 5 Tang
+# Hướng Dẫn Trình Bày Hệ Thống Mô Phỏng CPU RISC-V 8 Core Pipeline 5 Tầng
 
-## 1. He Thong Da Hoan Thanh Chua?
+Tài liệu này dùng để giúp nhóm trình bày với thầy từ A đến Z: hệ thống đã làm được gì, cơ sở lý thuyết là gì, kiến trúc chạy ra sao, cách mô phỏng thế nào, và nên viết báo cáo theo bố cục nào.
 
-Co. O muc do do an mon Kien truc may tinh, he thong nay da hoan thanh viec mo phong CPU RISC-V 8 core theo kien truc pipeline 5 tang.
+## 1. Hệ Thống Đã Hoàn Thành Chưa?
 
-Bang chung trong ma nguon hien tai:
+Có. Ở mức độ đồ án môn Kiến trúc máy tính, hệ thống đã hoàn thành mô phỏng CPU RISC-V 8 core theo kiến trúc pipeline 5 tầng.
 
-- `rtl/core/risc_core.v` da duoc chuyen sang core pipeline 5 tang: `IF -> ID -> EX -> MEM -> WB`.
-- `rtl/top_8core.v` khoi tao 8 core pipeline va noi chung vao `bus_ctrl`, `arbiter`, `data_mem`.
-- `tb/system_tb.v` mo phong toan bo he thong 8 core, kiem tra ket qua RAM dung va in them bang chung pipeline/bus.
-- `tb/core_tb.v` mo phong 1 core, kiem tra ALU, load/store, branch, stall va flush.
-- `docs/pipeline_evidence.md` ghi lai bang chung va cac diem can dua vao slide.
-- `software/program.asm` va `software/system_program.asm` la ma assembly nguon de giai thich chuong trinh test.
+Bằng chứng trong project:
 
-Ket qua mong doi khi chay mo phong:
+- `rtl/core/risc_core.v` là core RISC-V pipeline 5 tầng.
+- Core có các pipeline register: `if_id`, `id_ex`, `ex_mem`, `mem_wb`.
+- `rtl/top_8core.v` khởi tạo 8 core pipeline.
+- 8 core dùng chung `data_mem` thông qua `bus_ctrl` và `arbiter`.
+- `tb/core_tb.v` kiểm tra một core pipeline.
+- `tb/system_tb.v` kiểm tra toàn hệ thống 8 core.
+- Testbench in ra các counter chứng minh pipeline và bus hoạt động.
+- Có waveform `.vcd` để xem trên GTKWave.
+
+Kết quả mong đợi:
 
 ```text
-CORE TEST:
+core_tb:
 SUMMARY: 7 PASSED, 0 FAILED
 
-SYSTEM TEST:
+system_tb:
 TONG KET: 10 PASSED, 0 FAILED
 ```
 
-Nen trinh bay voi thay theo huong: "He thong da mo phong thanh cong CPU RISC-V 8 loi, moi loi la mot pipeline 5 tang don gian, cung truy cap RAM dung chung thong qua bus controller va arbiter Round-Robin. Ket qua mo phong cho thay 8 core cung thuc thi chuong trinh, tranh chap bus, ghi/doc RAM dung va khong bi deadlock."
+Cách nói ngắn gọn:
 
-Ghi chu trung thuc: day la mo hinh RTL phuc vu hoc tap, chua phai CPU cong nghiep. He thong chua co cache, interrupt/exception day du, CSR, operating system, hay cache coherence.
+"Hệ thống đã mô phỏng thành công CPU RISC-V 8 lõi. Mỗi lõi là một pipeline 5 tầng, các lõi cùng truy cập bộ nhớ dữ liệu dùng chung thông qua bus controller và arbiter Round-Robin. Kết quả mô phỏng cho thấy 8 core đều chạy, đều truy cập bus, ghi/đọc RAM đúng và không bị deadlock."
 
-## 2. Muc Tieu Cua De Tai
+Ghi chú trung thực:
 
-Muc tieu chinh:
+Đây là mô hình RTL phục vụ học tập, chưa phải CPU công nghiệp. Hệ thống chưa có cache, cache coherence, interrupt/exception/CSR đầy đủ, hệ điều hành, hoặc hỗ trợ toàn bộ RISC-V ISA.
 
-- Thiet ke mot he thong CPU RISC-V 8 core bang Verilog.
-- Moi core co kha nang thuc thi mot chuong trinh RISC-V don gian.
-- Chuyen core tu kien truc multi-cycle sang pipeline 5 tang.
-- Ket noi 8 core vao mot bo nho du lieu dung chung.
-- Xu ly tranh chap truy cap bo nho bang arbiter Round-Robin.
-- Mo phong va kiem chung bang Icarus Verilog.
-- Tao file waveform `.vcd` de xem bang GTKWave va dua vao slide.
+## 2. Mục Tiêu Đề Tài
 
-Cac cau hoi can tra loi trong bao cao:
+Mục tiêu chính:
 
-- CPU RISC-V la gi?
-- Pipeline 5 tang hoat dong nhu the nao?
-- Mot lenh di qua cac tang pipeline ra sao?
-- Tai sao can forwarding, stall va flush?
-- 8 core tranh chap RAM dung chung nhu the nao?
-- Arbiter Round-Robin cap quyen bus nhu the nao?
-- Ket qua mo phong chung minh dieu gi?
+- Thiết kế một hệ thống CPU RISC-V 8 core bằng Verilog.
+- Chuyển lõi xử lý từ multi-cycle sang pipeline 5 tầng.
+- Mỗi core thực thi chương trình RISC-V đơn giản.
+- 8 core cùng dùng chung một bộ nhớ dữ liệu.
+- Điều phối tranh chấp RAM bằng arbiter Round-Robin.
+- Mô phỏng bằng Icarus Verilog.
+- Xuất waveform `.vcd` để quan sát bằng GTKWave.
+- Có bằng chứng terminal và waveform để đưa vào báo cáo/slide.
 
-## 3. Tong Quan Kien Truc He Thong
+Các câu hỏi báo cáo cần trả lời:
 
-So do muc cao:
+- RISC-V là gì?
+- Pipeline 5 tầng hoạt động như thế nào?
+- Một lệnh đi qua các tầng pipeline ra sao?
+- Hazard trong pipeline là gì?
+- Forwarding, stall và flush dùng để làm gì?
+- 8 core tranh chấp RAM dùng chung như thế nào?
+- Arbiter Round-Robin cấp quyền bus ra sao?
+- Kết quả mô phỏng chứng minh điều gì?
+
+## 3. Tổng Quan Kiến Trúc Hệ Thống
+
+Sơ đồ mức cao:
 
 ```text
-          +-------------+
-Core 0 -> |             |
-Core 1 -> |             |
-Core 2 -> |             |
-Core 3 -> |             |
-Core 4 -> |  bus_ctrl   | -> data_mem
-Core 5 -> |             |
-Core 6 -> |             |
-Core 7 -> |             |
-          +-------------+
-                 ^
-                 |
-            +---------+
-            | arbiter |
-            +---------+
+              +-------------+
+Core 0 -----> |             |
+Core 1 -----> |             |
+Core 2 -----> |             |
+Core 3 -----> |             |
+Core 4 -----> |  bus_ctrl   | ----> data_mem
+Core 5 -----> |             |
+Core 6 -----> |             |
+Core 7 -----> |             |
+              +-------------+
+                     ^
+                     |
+                +---------+
+                | arbiter |
+                +---------+
 ```
 
-Thanh phan chinh:
+Ý tưởng chính:
 
-- `top_8core`: module top-level, ghep 8 core pipeline voi bus va RAM dung chung.
-- `risc_core`: mot core RISC-V pipeline 5 tang.
-- `instr_mem`: bo nho lenh rieng cho moi core.
-- `data_mem`: bo nho du lieu dung chung 4 KB.
-- `bus_ctrl`: dieu khien giao tiep giua 8 core va data memory.
-- `arbiter`: chon core duoc truy cap RAM theo Round-Robin.
-- `control_unit`: giai ma lenh RISC-V va tao tin hieu dieu khien.
-- `alu`: thuc hien cac phep toan so hoc/logic.
-- `reg_file`: 32 thanh ghi 32-bit cua RISC-V.
+- Hệ thống có 8 core pipeline.
+- Mỗi core có instruction memory riêng.
+- Tất cả core dùng chung data memory.
+- Khi nhiều core muốn truy cập RAM cùng lúc, arbiter sẽ chọn một core được phục vụ.
+- Bus controller đưa giao dịch của core được chọn vào data memory và trả `mem_ready`.
 
-Y tuong quan trong: moi core co instruction memory rieng, nhung tat ca core dung chung data memory. Vi vay khi nhieu core cung doc/ghi RAM, he thong phai co arbiter de tranh xung dot.
+Các file quan trọng:
 
-## 4. Co So Ly Thuyet Can Nam
+| File | Vai trò |
+|---|---|
+| `rtl/top_8core.v` | Ghép 8 core với bus, arbiter và RAM |
+| `rtl/core/risc_core.v` | Core RISC-V pipeline 5 tầng |
+| `rtl/core/control_unit.v` | Giải mã lệnh RISC-V |
+| `rtl/core/alu.v` | Khối tính toán số học/logic |
+| `rtl/core/reg_file.v` | 32 thanh ghi RISC-V |
+| `rtl/memory/instr_mem.v` | Bộ nhớ lệnh riêng cho từng core |
+| `rtl/memory/data_mem.v` | RAM dữ liệu dùng chung |
+| `rtl/interconnect/arbiter.v` | Cấp quyền bus Round-Robin |
+| `rtl/interconnect/bus_ctrl.v` | Điều khiển giao dịch core-RAM |
+| `tb/core_tb.v` | Test một core |
+| `tb/system_tb.v` | Test toàn hệ thống 8 core |
 
-### 4.1. RISC-V La Gi?
+## 4. Cơ Sở Lý Thuyết RISC-V
 
-RISC-V la mot tap lenh mo theo kieu RISC. RISC co dac diem:
+RISC-V là một kiến trúc tập lệnh mở theo triết lý RISC.
 
-- Lenh co dang don gian.
-- Do dai lenh co ban la 32 bit.
-- Kien truc load/store: chi lenh load/store moi truy cap bo nho.
-- Cac phep toan ALU chu yeu lam viec tren thanh ghi.
-- Co 32 thanh ghi tong quat `x0` den `x31`.
-- Thanh ghi `x0` luon bang 0.
+Đặc điểm chính:
 
-Trong de tai nay, CPU ho tro mot tap con cua RV32I:
+- Lệnh đơn giản, dễ giải mã.
+- Kiến trúc load/store: chỉ `LW`, `SW` truy cập bộ nhớ.
+- Các phép toán ALU làm việc chủ yếu trên thanh ghi.
+- Có 32 thanh ghi tổng quát `x0` đến `x31`.
+- Thanh ghi `x0` luôn bằng 0.
+- Lệnh cơ bản có độ dài 32 bit.
+
+Trong project này, CPU hỗ trợ một tập con của RV32I:
 
 - R-type: `ADD`, `SUB`, `AND`, `OR`, `XOR`, `SLL`, `SRL`, `SLT`.
 - I-type: `ADDI`, `ANDI`, `ORI`, `XORI`, `SLTI`, `SLLI`, `SRLI`.
@@ -106,187 +126,182 @@ Trong de tai nay, CPU ho tro mot tap con cua RV32I:
 - Branch: `BEQ`, `BNE`, `BLT`, `BGE`.
 - Jump: `JAL`, `JALR`.
 - U-type: `LUI`, `AUIPC`.
-- Atomic signals: `LR`, `SC`, `AMO` da co duong tin hieu va logic bus, nhung nen trinh bay la phan mo rong/kiem thu bo sung neu chua demo sau.
 
-### 4.2. Kien Truc Pipeline 5 Tang
+Nên nói rõ trong báo cáo:
 
-Pipeline chia qua trinh thuc thi lenh thanh nhieu tang. Thay vi cho mot lenh chay xong het moi bat dau lenh tiep theo, pipeline cho nhieu lenh cung ton tai trong CPU o cac tang khac nhau.
+"Project hỗ trợ một tập con của RV32I đủ để minh họa datapath, control, pipeline, memory access và branch/jump. Đây chưa phải bộ xử lý RISC-V đầy đủ theo chuẩn công nghiệp."
 
-5 tang pipeline trong he thong:
+## 5. Pipeline 5 Tầng
+
+Pipeline chia quá trình thực thi lệnh thành nhiều tầng. Thay vì đợi một lệnh chạy xong hoàn toàn mới chạy lệnh tiếp theo, pipeline cho phép nhiều lệnh cùng tồn tại trong CPU ở các tầng khác nhau.
+
+Năm tầng trong hệ thống:
 
 ```text
 IF  -> ID  -> EX  -> MEM -> WB
 ```
 
-Y nghia tung tang:
+Ý nghĩa:
 
-- `IF` - Instruction Fetch: lay lenh tu instruction memory theo dia chi PC.
-- `ID` - Instruction Decode: giai ma lenh, doc thanh ghi, tao immediate va control signals.
-- `EX` - Execute: ALU tinh toan, xac dinh branch/jump, tinh dia chi memory.
-- `MEM` - Memory Access: doc/ghi data memory thong qua bus dung chung.
-- `WB` - Write Back: ghi ket qua ve register file.
+- `IF` - Instruction Fetch: lấy lệnh từ instruction memory theo PC.
+- `ID` - Instruction Decode: giải mã lệnh, đọc register file, tạo immediate.
+- `EX` - Execute: ALU tính toán, xử lý branch/jump, tính địa chỉ memory.
+- `MEM` - Memory Access: đọc/ghi data memory qua bus.
+- `WB` - Write Back: ghi kết quả về register file.
 
-Vi du voi lenh:
+Ví dụ với lệnh:
 
 ```asm
 addi x1, x0, 42
 ```
 
-Luong chay:
+Luồng hoạt động:
 
 ```text
-IF  : lay ma lenh addi
-ID  : giai ma opcode, doc x0, tao immediate = 42
-EX  : ALU tinh x0 + 42
-MEM : khong truy cap RAM
-WB  : ghi 42 vao x1
+IF  : lấy mã lệnh addi
+ID  : giải mã, đọc x0, tạo immediate = 42
+EX  : ALU tính x0 + 42
+MEM : không truy cập RAM
+WB  : ghi 42 vào x1
 ```
 
-Vi du voi lenh:
+Ví dụ với lệnh:
 
 ```asm
 sw x1, 0(x0)
 ```
 
-Luong chay:
+Luồng hoạt động:
 
 ```text
-IF  : lay ma lenh sw
-ID  : doc x1 va x0, tao immediate = 0
-EX  : tinh dia chi x0 + 0
-MEM : gui request ghi RAM qua bus
-WB  : khong ghi thanh ghi
+IF  : lấy mã lệnh sw
+ID  : đọc x1 và x0, tạo immediate = 0
+EX  : tính địa chỉ x0 + 0
+MEM : gửi request ghi RAM qua bus
+WB  : không ghi thanh ghi
 ```
 
-## 5. Cac Hazard Trong Pipeline
+## 6. Hazard Trong Pipeline
 
-Pipeline nhanh hon multi-cycle nhung sinh ra hazard. Bao cao nen co mot muc rieng ve hazard, vi day la diem the hien da that su phat trien kien truc pipeline.
+Pipeline giúp tăng thông lượng nhưng tạo ra hazard. Đây là phần nên trình bày kỹ, vì nó chứng minh nhóm hiểu bản chất pipeline chứ không chỉ đổi tên module.
 
-### 5.1. Data Hazard
+### 6.1. Data Hazard
 
-Data hazard xay ra khi mot lenh can dung ket qua cua lenh truoc do, nhung ket qua chua kip ghi ve register file.
+Data hazard xảy ra khi một lệnh cần dùng kết quả của lệnh trước, nhưng kết quả đó chưa kịp ghi về register file.
 
-Vi du:
+Ví dụ:
 
 ```asm
 addi x1, x0, 10
 add  x3, x1, x2
 ```
 
-Lenh `add` can gia tri moi cua `x1`, trong khi `addi` co the chua den tang `WB`.
+Lệnh `add` cần giá trị mới của `x1`, nhưng lệnh `addi` có thể chưa đến tầng `WB`.
 
-Cach xu ly trong he thong:
+Cách xử lý trong hệ thống:
 
-- Forwarding tu `EX/MEM` ve `EX`.
-- Forwarding tu `MEM/WB` ve `EX`.
-- Writeback bypass trong `reg_file` de lenh dang decode doc duoc gia tri vua WB.
+- Forwarding từ `EX/MEM` về `EX`.
+- Forwarding từ `MEM/WB` về `EX`.
+- Writeback bypass trong `reg_file`.
 
-Tin hieu/counter lien quan:
+### 6.2. Load-Use Hazard
 
-- `retired_count`: so lenh da di qua pipeline.
-- `load_use_stall_count`: so lan pipeline phai stall do load-use hazard.
+Load-use hazard xảy ra khi lệnh ngay sau `LW` dùng thanh ghi vừa load.
 
-### 5.2. Load-Use Hazard
-
-Load-use hazard xay ra khi lenh ngay sau `lw` dung thanh ghi vua load.
-
-Vi du trong `software/program.asm`:
+Ví dụ trong `software/program.asm`:
 
 ```asm
 lw   x4, 0(x0)
 beq  x3, x4, pass
 ```
 
-Lenh `beq` can `x4`, nhung `x4` chi co du lieu sau khi load xong tu memory. He thong phai chen stall de doi du lieu hop le.
+Dữ liệu của `x4` chỉ có sau khi load từ memory, nên pipeline phải chèn stall.
 
-Bang chung:
+Bằng chứng khi chạy `core_tb`:
 
 ```text
 load_use_stall=1
 ```
 
-Dong nay duoc in trong `tb/core_tb.v`.
+### 6.3. Control Hazard
 
-### 5.3. Control Hazard
+Control hazard xảy ra với branch hoặc jump. CPU có thể đã fetch lệnh tiếp theo trước khi biết nhánh có được lấy hay không.
 
-Control hazard xay ra voi branch/jump, vi CPU co the da fetch lenh tiep theo truoc khi biet branch co nhay hay khong.
+Cách xử lý:
 
-Vi du:
+- Branch/jump được quyết định ở tầng `EX`.
+- Nếu PC đổi, pipeline flush các lệnh sai đường.
 
-```asm
-beq x3, x4, pass
-jal x0, fail
+Bằng chứng:
+
+```text
+flush=62
 ```
 
-Neu branch duoc lay, lenh `jal x0, fail` da fetch sai duong va phai bi xoa khoi pipeline.
+### 6.4. Structural Hazard
 
-Cach xu ly:
+Structural hazard xảy ra khi nhiều thành phần cần dùng cùng một tài nguyên.
 
-- Branch/jump duoc quyet dinh o tang `EX`.
-- Neu branch/jump thay doi PC, pipeline flush cac lenh sai duong.
+Trong hệ thống này:
 
-Tin hieu/counter lien quan:
+- 8 core cùng dùng chung `data_mem`.
+- RAM chỉ phục vụ một giao dịch tại một thời điểm.
+- Core chưa được phục vụ sẽ phải chờ ở tầng `MEM`.
 
-- `flush_count`: so lan pipeline flush do branch/jump.
+Cách xử lý:
 
-### 5.4. Structural Hazard
+- `arbiter` chọn core được cấp bus.
+- `bus_ctrl` đưa giao dịch của core đó vào RAM.
+- Các core còn lại tiếp tục giữ request và stall.
 
-Structural hazard xay ra khi nhieu thanh phan can dung cung mot tai nguyen phan cung.
+Bằng chứng:
 
-Trong he thong 8 core:
+```text
+mem_stall > 0
+grant > 0 cho từng core
+```
 
-- Tat ca core dung chung `data_mem`.
-- RAM chi phuc vu mot giao dich tai mot thoi diem.
-- Nhieu core cung gui `mem_req` se gay tranh chap bus.
+## 7. Luồng Hoạt Động Từ A Đến Z
 
-Cach xu ly:
-
-- `arbiter` chon core duoc truy cap.
-- `bus_ctrl` chi dua giao dich cua core duoc grant vao RAM.
-- Core nao chua duoc phuc vu se stall o tang `MEM`.
-
-Tin hieu/counter lien quan:
-
-- `grant`: so lan moi core duoc cap bus.
-- `mem_stall_count`: so cycle core phai doi bus/memory.
-
-## 6. Luong Hoat Dong Tu A Den Z
-
-### 6.1. Khi Reset
+### 7.1. Khi Reset
 
 Khi `reset = 1`:
 
-- PC cua moi core ve 0.
-- Pipeline register bi clear.
-- Register file ve 0.
-- Data memory ve 0.
-- Arbiter va bus controller ve trang thai ban dau.
+- PC của mỗi core về 0.
+- Các pipeline register bị xóa.
+- Register file được reset.
+- Data memory được reset.
+- Arbiter và bus controller về trạng thái ban đầu.
 
-Sau do `reset = 0`, cac core bat dau fetch lenh tu dia chi 0.
+Khi `reset = 0`, 8 core bắt đầu fetch lệnh từ địa chỉ 0.
 
-### 6.2. Mot Core Thuc Thi Lenh
+### 7.2. Một Lệnh Đi Qua Core
 
-Luong cua mot lenh trong mot core:
+Luồng đi của một lệnh:
 
 ```text
-PC -> instr_mem -> IF/ID -> control_unit + reg_file
-   -> ID/EX -> ALU/branch logic
-   -> EX/MEM -> bus/data memory neu can
-   -> MEM/WB -> reg_file
+PC
+-> instr_mem
+-> IF/ID
+-> control_unit + reg_file
+-> ID/EX
+-> ALU hoặc branch logic
+-> EX/MEM
+-> data_mem nếu là load/store
+-> MEM/WB
+-> reg_file
 ```
 
-Trong code:
+Trong `risc_core.v`, các thanh ghi pipeline tương ứng là:
 
-- `if_id_*`: thanh ghi pipeline giua IF va ID.
-- `id_ex_*`: thanh ghi pipeline giua ID va EX.
-- `ex_mem_*`: thanh ghi pipeline giua EX va MEM.
-- `mem_wb_*`: thanh ghi pipeline giua MEM va WB.
+- `if_id_valid`, `if_id_pc`, `if_id_instr`.
+- `id_ex_valid`, `id_ex_rs1_data`, `id_ex_rs2_data`, `id_ex_imm`.
+- `ex_mem_valid`, `ex_mem_result`, `ex_mem_store_data`.
+- `mem_wb_valid`, `mem_wb_write_data`.
 
-Day la bang chung ro nhat cho thay core khong con la multi-cycle FSM nua, ma da co pipeline register that.
+### 7.3. 8 Core Cùng Chạy
 
-### 6.3. 8 Core Cung Chay
-
-Trong `top_8core.v`, he thong tao 8 instance:
+Trong `top_8core.v`, hệ thống tạo 8 instance:
 
 ```text
 gen_core[0].u_core
@@ -295,13 +310,13 @@ gen_core[1].u_core
 gen_core[7].u_core
 ```
 
-Tat ca core chay cung chuong trinh:
+Tất cả core chạy cùng chương trình:
 
 ```text
 software/system_program.hex
 ```
 
-Assembly tuong ung:
+Assembly tương ứng:
 
 ```asm
 addi x1, x0, 42
@@ -312,18 +327,18 @@ sw   x3, 4(x0)
 jal  x0, halt
 ```
 
-Y nghia:
+Ý nghĩa:
 
-- Moi core tao gia tri 42.
-- Moi core ghi 42 vao `mem[0]`.
-- Moi core doc lai `mem[0]`.
-- Moi core tao marker 99.
-- Moi core ghi 99 vao `mem[1]`.
-- Cuoi cung moi core vao vong lap halt.
+- Mỗi core tạo giá trị 42.
+- Mỗi core ghi 42 vào `mem[0]`.
+- Mỗi core đọc lại `mem[0]`.
+- Mỗi core tạo marker 99.
+- Mỗi core ghi 99 vào `mem[1]`.
+- Cuối cùng core vào vòng lặp halt.
 
-### 6.4. Khi Core Truy Cap RAM
+### 7.4. Core Truy Cập RAM
 
-Neu mot core gap lenh `LW`, `SW`, `LR`, `SC`, hoac `AMO`, no phat tin hieu:
+Khi core gặp `LW` hoặc `SW`, nó phát các tín hiệu:
 
 ```text
 mem_req
@@ -333,35 +348,35 @@ mem_we
 mem_re
 ```
 
-Sau do:
+Luồng truy cập RAM:
 
 ```text
 Core -> bus_ctrl -> arbiter -> data_mem -> bus_ctrl -> Core
 ```
 
-Chi tiet:
+Chi tiết:
 
-1. Core bat `mem_req = 1`.
-2. `bus_ctrl` gom request cua 8 core thanh `bus_request`.
-3. `arbiter` chon mot core theo Round-Robin.
-4. `bus_ctrl` dua dia chi/du lieu cua core duoc chon vao `data_mem`.
-5. `data_mem` doc hoac ghi.
-6. `bus_ctrl` tra `core_ready[core_id] = 1`.
-7. Core tiep tuc pipeline.
+1. Core bật `mem_req`.
+2. `bus_ctrl` chuyển request sang `arbiter`.
+3. `arbiter` chọn một core theo Round-Robin.
+4. `bus_ctrl` đưa địa chỉ/dữ liệu của core được chọn vào `data_mem`.
+5. `data_mem` đọc hoặc ghi.
+6. `bus_ctrl` trả `core_ready[core_id]`.
+7. Core tiếp tục pipeline.
 
-## 7. Arbiter Round-Robin
+## 8. Arbiter Round-Robin
 
-Vi tat ca core dung chung RAM, can co co che chon core nao duoc truy cap truoc.
+Vì 8 core cùng truy cập shared memory, cần một bộ phân xử bus.
 
-Round-Robin hoat dong nhu sau:
+Round-Robin hoạt động như sau:
 
-- Neu nhieu core cung request, arbiter chon core theo thu tu xoay vong.
-- Sau khi cap grant cho core `i`, lan tiep theo uu tien bat dau tu core `i + 1`.
-- Cach nay giup tranh viec mot core chiem bus lien tuc.
+- Nếu nhiều core cùng request, arbiter chọn một core theo thứ tự xoay vòng.
+- Sau khi cấp quyền cho core `i`, lần sau ưu tiên bắt đầu từ core `i + 1`.
+- Cách này tránh việc một core chiếm bus mãi.
 
-Trong output `system_tb`, cot `grant` cho biet moi core duoc cap bus bao nhieu lan.
+Trong output `system_tb`, cột `grant` cho biết mỗi core được cấp bus bao nhiêu lần.
 
-Vi du:
+Ví dụ:
 
 ```text
 Core 0: grant=3 retired=163 mem_stall=13 load_use_stall=0 flush=159
@@ -370,419 +385,260 @@ Core 1: grant=3 retired=163 mem_stall=14 load_use_stall=0 flush=159
 Core 7: grant=4 retired=161 mem_stall=20 load_use_stall=0 flush=157
 ```
 
-Khi trinh bay, co the noi:
+Cách giải thích:
 
-"Moi core deu co grant lon hon 0, nghia la tat ca core deu tung truy cap shared memory. He thong khong bi starvation va khong bi deadlock trong mo phong."
+"Mỗi core đều có `grant > 0`, nghĩa là tất cả 8 core đều từng được cấp quyền truy cập shared memory. Hệ thống không bị starvation và không bị deadlock trong mô phỏng."
 
-## 8. Cac File Quan Trong
+## 9. Quy Trình Chạy Mô Phỏng
 
-| File | Vai tro |
-|---|---|
-| `rtl/core/risc_core.v` | Core RISC-V pipeline 5 tang |
-| `rtl/core/control_unit.v` | Giai ma lenh, tao tin hieu dieu khien |
-| `rtl/core/alu.v` | Khoi tinh toan so hoc/logic |
-| `rtl/core/reg_file.v` | 32 thanh ghi RISC-V |
-| `rtl/memory/instr_mem.v` | ROM lenh rieng cua moi core |
-| `rtl/memory/data_mem.v` | RAM du lieu dung chung |
-| `rtl/interconnect/arbiter.v` | Cap bus theo Round-Robin |
-| `rtl/interconnect/bus_ctrl.v` | Dieu khien doc/ghi RAM cho 8 core |
-| `rtl/top_8core.v` | Noi 8 core voi bus va RAM |
-| `tb/core_tb.v` | Test 1 core pipeline |
-| `tb/system_tb.v` | Test full 8 core pipeline |
-| `software/program.asm` | Assembly cho test 1 core |
-| `software/system_program.asm` | Assembly cho test 8 core |
-| `docs/pipeline_evidence.md` | Bang chung pipeline cho slide |
+### 9.1. Công Cụ
 
-## 9. Quy Trinh Chay Mo Phong
-
-### 9.1. Cong Cu Can Co
-
-Can cai:
+Cần có:
 
 - Icarus Verilog: `iverilog`
-- Runtime cua Icarus: `vvp`
-- GTKWave neu muon xem waveform: `gtkwave`
+- Runtime mô phỏng: `vvp`
+- GTKWave nếu muốn xem waveform: `gtkwave`
 
-Kiem tra:
+Kiểm tra:
 
-```powershell
+```bash
 iverilog -V
 vvp -V
-```
-
-Neu co GTKWave:
-
-```powershell
 gtkwave --version
 ```
 
-### 9.2. Chay Mo Phong 8 Core
+### 9.2. Chạy Mô Phỏng 8 Core
 
-Tu thu muc root cua project:
+Từ thư mục gốc:
 
-```powershell
-iverilog -g2012 -o tb\system_test.vvp `
-  -I rtl\core -I rtl\interconnect -I rtl\memory `
-  rtl\core\alu.v `
-  rtl\core\control_unit.v `
-  rtl\core\pc_logic.v `
-  rtl\core\reg_file.v `
-  rtl\core\risc_core.v `
-  rtl\memory\data_mem.v `
-  rtl\memory\instr_mem.v `
-  rtl\interconnect\arbiter.v `
-  rtl\interconnect\bus_ctrl.v `
-  rtl\top_8core.v `
-  tb\system_tb.v
+```bash
+iverilog -g2012 -o tb/system_test.vvp \
+  -I rtl/core -I rtl/interconnect -I rtl/memory \
+  rtl/core/alu.v \
+  rtl/core/control_unit.v \
+  rtl/core/pc_logic.v \
+  rtl/core/reg_file.v \
+  rtl/core/risc_core.v \
+  rtl/memory/data_mem.v \
+  rtl/memory/instr_mem.v \
+  rtl/interconnect/arbiter.v \
+  rtl/interconnect/bus_ctrl.v \
+  rtl/top_8core.v \
+  tb/system_tb.v
 
 cd tb
 vvp system_test.vvp
 ```
 
-Ket qua can thay:
+Kết quả cần thấy:
 
 ```text
-BAT DAU MO PHONG HE THONG 8 LOI PIPELINE
-
-Kiem tra mem[0] (Ky vong: 42) = 42
-[PASS] Shared memory data dung.
-
-Kiem tra mem[1] addr 4 (Ky vong: 99) = 99
-[PASS] 8 core hoan thanh chuong trinh khong deadlock.
-
-PIPELINE / BUS EVIDENCE
-Core 0: grant=... retired=... mem_stall=... load_use_stall=... flush=...
-...
-Core 7: grant=... retired=... mem_stall=... load_use_stall=... flush=...
-
 TONG KET: 10 PASSED, 0 FAILED
 ```
 
-### 9.3. Chay Mo Phong 1 Core
+### 9.3. Chạy Mô Phỏng Một Core
 
-Tu thu muc root:
+Từ thư mục gốc:
 
-```powershell
-iverilog -g2012 -o tb\core_test.vvp `
-  -I rtl\core -I rtl\memory `
-  rtl\core\alu.v `
-  rtl\core\control_unit.v `
-  rtl\core\reg_file.v `
-  rtl\core\risc_core.v `
-  rtl\memory\data_mem.v `
-  rtl\memory\instr_mem.v `
-  tb\core_tb.v
+```bash
+iverilog -g2012 -o tb/core_test.vvp \
+  -I rtl/core -I rtl/memory \
+  rtl/core/alu.v \
+  rtl/core/control_unit.v \
+  rtl/core/reg_file.v \
+  rtl/core/risc_core.v \
+  rtl/memory/data_mem.v \
+  rtl/memory/instr_mem.v \
+  tb/core_tb.v
 
 cd tb
 vvp core_test.vvp
 ```
 
-Ket qua can thay:
+Kết quả cần thấy:
 
 ```text
-CORE TEST RESULTS
-x1 = 10  [PASS]
-x2 = 20  [PASS]
-x3 = 30  [PASS]
-x4 = 30  [PASS]
-x5 = 1   [PASS]
-mem[0] = 30 [PASS]
-
-PIPELINE EVIDENCE
-retired=67 mem_stall=4 load_use_stall=1 flush=62
-[PASS] Pipeline counters show retire/stall/flush activity.
-
 SUMMARY: 7 PASSED, 0 FAILED
 ```
 
-### 9.4. Chay Bang Script
+### 9.4. Xem Waveform
 
-Neu dung Windows:
-
-```powershell
-.\scripts\compile.bat
-```
-
-Script nay bien dich full system va chay `system_tb`.
-
-Neu dung Linux/MSYS/Git Bash:
+Sau khi mô phỏng, có thể mở:
 
 ```bash
-./scripts/compile.sh
+gtkwave tb/system_tb.vcd
 ```
 
-### 9.5. Xem Waveform
-
-Sau khi mo phong, testbench tao file:
-
-```text
-tb/system_tb.vcd
-tb/core_tb.vcd
-```
-
-Mo waveform:
-
-```powershell
-gtkwave tb\system_tb.vcd
-```
-
-Nen chup cac tin hieu sau de dua vao slide:
+Các tín hiệu nên chụp:
 
 - `clk`, `reset`
-- `dut.gen_core[0].u_core.pc`
-- `if_id_valid`, `id_ex_valid`, `ex_mem_valid`, `mem_wb_valid`
-- `mem_req`, `mem_ready`, `mem_addr`, `mem_we`, `mem_re`
-- `dut.u_arbiter.request`
-- `dut.u_arbiter.grant`
-- `dut.u_arbiter.grant_id`
-- `dut.u_data_mem.mem[0]`
-- `dut.u_data_mem.mem[1]`
+- `pc`
+- `if_id_valid`
+- `id_ex_valid`
+- `ex_mem_valid`
+- `mem_wb_valid`
+- `mem_req`
+- `mem_ready`
+- `grant`
+- `grant_id`
 - `retired_count`
 - `mem_stall_count`
 - `load_use_stall_count`
 - `flush_count`
 
-## 10. Cach Giai Thich Truoc Thay
+## 10. Cách Trình Bày Với Thầy
 
-Co the trinh bay theo thu tu nay:
+### Bước 1: Giới thiệu bài toán
 
-### Buoc 1: Gioi thieu bai toan
+"Nhóm em xây dựng hệ thống CPU RISC-V 8 lõi bằng Verilog. Mỗi lõi được phát triển thành pipeline 5 tầng. Các core chạy song song và cùng truy cập bộ nhớ dữ liệu dùng chung."
 
-"Em xay dung mot he thong CPU RISC-V 8 loi bang Verilog. Ban dau core co the la multi-cycle, sau do em phat trien thanh pipeline 5 tang. Muc tieu la mo phong qua trinh nhieu core cung thuc thi lenh va tranh chap RAM dung chung."
+### Bước 2: Giới thiệu RISC-V
 
-### Buoc 2: Noi ve RISC-V
+"RISC-V là kiến trúc load/store. Các phép toán ALU làm việc trên register, còn truy cập bộ nhớ thông qua `LW` và `SW`. Project hỗ trợ một subset của RV32I để minh họa datapath, control và pipeline."
 
-"RISC-V la kien truc load/store, cac phep toan ALU lam viec tren register, con truy cap bo nho chi qua `LW` va `SW`. Trong project, em ho tro mot tap con RV32I gom ALU, load/store, branch, jump va U-type."
+### Bước 3: Giới thiệu pipeline
 
-### Buoc 3: Noi ve pipeline
+"Mỗi core có 5 tầng: IF, ID, EX, MEM, WB. Nhiều lệnh có thể cùng tồn tại trong pipeline ở các tầng khác nhau, giúp tăng thông lượng so với multi-cycle."
 
-"Moi core duoc chia thanh 5 tang: IF, ID, EX, MEM, WB. Nhieu lenh co the cung nam trong pipeline o cac tang khac nhau, nen thong luong tot hon multi-cycle."
+### Bước 4: Giải thích hazard
 
-### Buoc 4: Noi ve hazard
+"Pipeline tạo ra data hazard, load-use hazard, control hazard và structural hazard. Nhóm xử lý bằng forwarding, writeback bypass, stall, flush và bus arbitration."
 
-"Pipeline sinh ra hazard. Em xu ly data hazard bang forwarding va writeback bypass, load-use hazard bang stall, control hazard bang flush, va structural hazard cua RAM dung chung bang bus controller voi arbiter."
+### Bước 5: Giải thích 8 core
 
-### Buoc 5: Noi ve 8 core
+"Top-level generate 8 instance của `risc_core`. Mỗi core có instruction memory riêng nhưng dùng chung data memory. Khi core cần RAM, nó gửi `mem_req`; arbiter chọn core được grant; bus controller đưa giao dịch vào RAM và trả `mem_ready`."
 
-"Top-level khoi tao 8 instance cua `risc_core`. Moi core co instruction memory rieng nhung dung chung data memory. Khi core can doc/ghi RAM, no gui request ra bus. Arbiter Round-Robin cap quyen cho tung core, bus controller dua giao dich vao RAM va tra `mem_ready`."
+### Bước 6: Giải thích chương trình test
 
-### Buoc 6: Noi ve chuong trinh test
+"Chương trình test cho mỗi core ghi 42 vào `mem[0]`, đọc lại, rồi ghi marker 99 vào `mem[1]`. Nếu cuối mô phỏng có `mem[0] = 42`, `mem[1] = 99`, hệ thống đã chạy đúng và không deadlock."
 
-"Chuong trinh 8 core rat ngan: moi core ghi 42 vao `mem[0]`, doc lai, roi ghi marker 99 vao `mem[1]`. Neu sau mo phong `mem[0] = 42` va `mem[1] = 99`, chung to 8 core da chay, bus/RAM hoat dong, va he thong khong deadlock."
+### Bước 7: Đưa bằng chứng
 
-### Buoc 7: Dua bang chung
+"Testbench in `TONG KET: 10 PASSED, 0 FAILED`. Mỗi core đều có `grant > 0` và `retired > 0`, chứng minh cả 8 core đều chạy và đều truy cập bus. Các counter `mem_stall`, `load_use_stall`, `flush` chứng minh pipeline có xử lý stall và flush."
 
-"Testbench in ra `TONG KET: 10 PASSED, 0 FAILED`. Ngoai ra moi core deu co `grant` va `retired`, chung to moi core deu duoc cap bus va co lenh duoc commit. Cac counter `mem_stall`, `load_use_stall`, `flush` la bang chung pipeline that su co co che stall/flush."
+## 11. Bố Cục Báo Cáo Gợi Ý
 
-## 11. De Xuat Cau Truc Bao Cao
+### Chương 1: Giới thiệu
 
-### Chuong 1: Gioi Thieu
+- Lý do chọn đề tài.
+- Mục tiêu mô phỏng CPU RISC-V 8 core.
+- Phạm vi: RTL, pipeline 5 tầng, shared memory, arbiter.
 
-Noi dung:
+### Chương 2: Cơ sở lý thuyết
 
-- Ly do chon de tai.
-- Muc tieu thiet ke CPU RISC-V 8 core.
-- Pham vi de tai: mo phong RTL, pipeline 5 tang, shared memory, arbiter.
+- Tổng quan RISC-V.
+- RV32I subset.
+- Datapath CPU.
+- Pipeline 5 tầng.
+- Hazard trong pipeline.
+- Shared memory và bus arbitration.
 
-### Chuong 2: Co So Ly Thuyet
+### Chương 3: Thiết kế hệ thống
 
-Noi dung:
+- Sơ đồ top-level 8 core.
+- Core pipeline.
+- Register file, ALU, control unit.
+- Instruction memory và data memory.
+- Bus controller và arbiter.
 
-- Tong quan RISC-V.
-- Tap lenh RV32I subset.
-- Kien truc datapath CPU.
-- Pipeline 5 tang.
-- Hazard: data, control, structural.
-- He thong da loi va shared memory.
-- Arbiter Round-Robin.
+### Chương 4: Thiết kế pipeline core
 
-### Chuong 3: Thiet Ke He Thong
-
-Noi dung:
-
-- So do tong the 8 core.
-- Giai thich `top_8core`.
-- Giai thich mot core pipeline.
-- Giai thich register file, ALU, control unit.
-- Giai thich instruction memory va data memory.
-- Giai thich bus controller va arbiter.
-
-### Chuong 4: Thiet Ke Pipeline Core
-
-Noi dung:
-
-- Cac pipeline register: `if_id`, `id_ex`, `ex_mem`, `mem_wb`.
-- Luong di chuyen cua lenh qua 5 tang.
+- Các pipeline register.
+- Luồng đi của lệnh.
 - Forwarding.
 - Load-use stall.
 - Branch/jump flush.
-- Memory stall khi doi bus.
-
-### Chuong 5: Mo Phong Va Kiem Thu
-
-Noi dung:
-
-- Cong cu: Icarus Verilog, VVP, GTKWave.
-- Test 1 core: muc tieu, chuong trinh, ket qua.
-- Test 8 core: muc tieu, chuong trinh, ket qua.
-- Bang ket qua pass/fail.
-- Waveform minh hoa.
-
-Bang ket qua goi y:
-
-| Test | Muc tieu | Ket qua ky vong | Ket qua |
-|---|---|---|---|
-| `core_tb` | Kiem tra 1 core pipeline | Register/RAM dung, co stall/flush | PASS |
-| `system_tb` | Kiem tra 8 core | `mem[0]=42`, `mem[1]=99`, khong deadlock | PASS |
-| Pipeline counters | Chung minh pipeline hoat dong | Co retired/stall/flush | PASS |
-| Bus grants | Chung minh 8 core truy cap RAM | Moi core grant > 0 | PASS |
-
-### Chuong 6: Danh Gia Va Han Che
-
-Da lam duoc:
-
-- Mo phong CPU RISC-V 8 core.
-- Chuyen core sang pipeline 5 tang.
-- Co xu ly forwarding, stall, flush.
-- Co shared memory va bus arbitration.
-- Co testbench va waveform.
-- Co bang chung terminal va VCD cho slide.
-
-Han che:
-
-- Chua co cache.
-- Chua co cache coherence.
-- Chua co interrupt/exception/CSR day du.
-- Chua ho tro toan bo RISC-V ISA.
-- Chua co assembler rieng, `.hex` van duoc viet san.
-- Atomic LR/SC/AMO nen trinh bay la huong mo rong neu khong demo rieng.
-
-### Chuong 7: Ket Luan
-
-Ket luan goi y:
-
-"De tai da xay dung va mo phong thanh cong he thong CPU RISC-V 8 loi theo kien truc pipeline 5 tang. Ket qua mo phong cho thay cac core co the cung thuc thi chuong trinh, truy cap RAM dung chung thong qua bus controller va arbiter, dong thoi pipeline co co che xu ly hazard nhu forwarding, stall va flush. He thong dat muc tieu minh hoa cac nguyen ly quan trong cua mon Kien truc may tinh: datapath, control, pipeline, bo nho dung chung va dieu phoi tai nguyen trong he thong da loi."
-
-## 12. Goi Y Slide Trinh Bay
-
-Slide 1: Ten de tai
-
-- Mo phong CPU RISC-V 8 core pipeline 5 tang.
-- Ten thanh vien/mon hoc.
-
-Slide 2: Muc tieu
-
-- Thiet ke CPU RISC-V.
-- Chuyen sang pipeline.
-- Mo phong 8 core dung chung RAM.
-- Kiem chung bang Verilog testbench.
-
-Slide 3: Tong quan RISC-V
-
-- RV32I subset.
-- Register file 32 thanh ghi.
-- Load/store architecture.
-
-Slide 4: Kien truc pipeline 5 tang
-
-```text
-IF -> ID -> EX -> MEM -> WB
-```
-
-Slide 5: Datapath mot core
-
-- PC.
-- Instruction memory.
-- Control unit.
-- Register file.
-- ALU.
-- Pipeline registers.
-
-Slide 6: Hazard handling
-
-- Forwarding.
-- Load-use stall.
-- Branch flush.
 - Memory stall.
 
-Slide 7: Kien truc 8 core
+### Chương 5: Mô phỏng và kiểm thử
 
-```text
-8 pipeline cores -> bus_ctrl -> data_mem
-                 -> arbiter
-```
+- Công cụ: Icarus Verilog, VVP, GTKWave.
+- Test một core.
+- Test full system 8 core.
+- Kết quả pass/fail.
+- Waveform minh họa.
 
-Slide 8: Arbiter va shared memory
+### Chương 6: Đánh giá và hạn chế
 
-- Round-Robin.
-- `mem_req`.
-- `grant`.
-- `mem_ready`.
+Đã làm được:
 
-Slide 9: Chuong trinh test
+- Mô phỏng CPU RISC-V 8 core.
+- Chuyển core sang pipeline 5 tầng.
+- Có forwarding, stall, flush.
+- Có shared memory và arbiter.
+- Có testbench và waveform.
 
-```asm
-addi x1, x0, 42
-sw   x1, 0(x0)
-lw   x2, 0(x0)
-addi x3, x0, 99
-sw   x3, 4(x0)
-jal  x0, halt
-```
+Hạn chế:
 
-Slide 10: Ket qua mo phong
+- Chưa có cache.
+- Chưa có cache coherence.
+- Chưa có interrupt/exception/CSR đầy đủ.
+- Chưa hỗ trợ toàn bộ RISC-V ISA.
+- Chưa có assembler tự động từ `.asm` sang `.hex`.
+- Atomic `LR/SC/AMO` chưa có bộ test đầy đủ trong demo chính.
 
-- `mem[0] = 42`.
-- `mem[1] = 99`.
-- `TONG KET: 10 PASSED, 0 FAILED`.
+### Chương 7: Kết luận
 
-Slide 11: Pipeline/bus evidence
+Kết luận gợi ý:
 
-- Bang `grant`, `retired`, `mem_stall`, `load_use_stall`, `flush`.
-- Anh chup waveform.
+"Đề tài đã xây dựng và mô phỏng thành công hệ thống CPU RISC-V 8 lõi theo kiến trúc pipeline 5 tầng. Kết quả mô phỏng cho thấy các core có thể cùng thực thi chương trình, truy cập RAM dùng chung thông qua bus controller và arbiter, đồng thời pipeline có cơ chế xử lý hazard như forwarding, stall và flush."
 
-Slide 12: Danh gia va huong phat trien
+## 12. Gợi Ý Slide
 
-- Da hoan thanh pipeline 8 core.
-- Han che: cache, coherence, interrupt, full ISA.
-- Huong phat trien: cache, assembler, atomic tests, pipeline toi uu hon.
+Slide 1: Tên đề tài.
 
-## 13. Cau Tra Loi Ngan Khi Thay Hoi
+Slide 2: Mục tiêu.
 
-Hoi: "He thong cua em la multi-cycle hay pipeline?"
+Slide 3: Tổng quan RISC-V.
 
-Tra loi: "Phien ban hien tai la pipeline 5 tang. Trong `risc_core.v`, em co cac pipeline register `if_id`, `id_ex`, `ex_mem`, `mem_wb`, khong con dung FSM 3 state fetch-execute-memory nhu multi-cycle."
+Slide 4: Pipeline 5 tầng.
 
-Hoi: "Bang chung pipeline hoat dong la gi?"
+Slide 5: Datapath một core.
 
-Tra loi: "Testbench in counter `retired`, `mem_stall`, `load_use_stall`, `flush`. Ngoai ra waveform co the hien cac pipeline register valid qua tung cycle."
+Slide 6: Hazard và cách xử lý.
 
-Hoi: "8 core co that su chay khong?"
+Slide 7: Kiến trúc 8 core.
 
-Tra loi: "Co. `top_8core.v` generate 8 instance `risc_core`. Trong `system_tb`, moi core deu co `grant > 0` va `retired > 0`, chung to moi core co thuc thi lenh va tung truy cap shared memory."
+Slide 8: Bus controller và arbiter.
 
-Hoi: "Neu 8 core cung truy cap RAM thi co xung dot khong?"
+Slide 9: Chương trình test.
 
-Tra loi: "Co kha nang xung dot, nen he thong dung `arbiter` Round-Robin va `bus_ctrl`. Moi thoi diem chi mot core duoc grant vao RAM, cac core con lai doi va stall o MEM stage."
+Slide 10: Kết quả mô phỏng.
 
-Hoi: "Tai sao `mem[0] = 42`, `mem[1] = 99` lai chung minh chay dung?"
+Slide 11: Waveform và pipeline counters.
 
-Tra loi: "Vi chuong trinh test cua moi core bat buoc phai ghi 42, doc lai, roi ghi marker 99. Neu RAM cuoi mo phong co hai gia tri nay va testbench khong timeout, nghia la cac core da chay qua duong lenh memory va he thong khong deadlock."
+Slide 12: Hạn chế và hướng phát triển.
 
-Hoi: "Han che cua project la gi?"
+## 13. Câu Trả Lời Nhanh Khi Bị Hỏi
 
-Tra loi: "Day la mo hinh RTL phuc vu hoc tap. Em chua trien khai cache, cache coherence, interrupt/exception day du, CSR va full ISA. Cac phan do co the dua vao huong phat trien."
+Hỏi: "Hệ thống là multi-cycle hay pipeline?"
 
-## 14. Checklist Truoc Khi Bao Cao
+Trả lời: "Phiên bản hiện tại là pipeline 5 tầng. Trong `risc_core.v` có các pipeline register `if_id`, `id_ex`, `ex_mem`, `mem_wb`."
 
-Truoc khi nop/trinh bay, nen lam:
+Hỏi: "Bằng chứng pipeline hoạt động là gì?"
 
-- Chay `core_tb` va chup ket qua `SUMMARY: 7 PASSED, 0 FAILED`.
-- Chay `system_tb` va chup ket qua `TONG KET: 10 PASSED, 0 FAILED`.
-- Mo `system_tb.vcd` bang GTKWave.
-- Chup waveform co `clk`, `pc`, pipeline valid, `mem_req`, `grant`, `mem_ready`.
-- Chup man hinh bang `PIPELINE / BUS EVIDENCE`.
-- Dua so do 8 core vao slide.
-- Dua so do `IF -> ID -> EX -> MEM -> WB` vao slide.
-- Ghi ro han che va huong phat trien de bao cao trong sang, khong bi hoi kho.
+Trả lời: "Testbench in ra `retired`, `mem_stall`, `load_use_stall`, `flush`. Waveform cũng có các pipeline valid signal."
+
+Hỏi: "8 core có thật sự chạy không?"
+
+Trả lời: "Có. Trong `system_tb`, mỗi core đều có `grant > 0` và `retired > 0`, chứng minh từng core có thực thi lệnh và từng truy cập shared memory."
+
+Hỏi: "Nếu 8 core cùng truy cập RAM thì xử lý thế nào?"
+
+Trả lời: "Arbiter Round-Robin chọn một core được truy cập bus tại một thời điểm. Bus controller đưa giao dịch của core đó vào RAM và trả `mem_ready`."
+
+Hỏi: "Tại sao `mem[0] = 42`, `mem[1] = 99` lại chứng minh chạy đúng?"
+
+Trả lời: "Vì chương trình test bắt buộc mỗi core phải ghi 42, đọc lại, rồi ghi marker 99. Nếu RAM cuối mô phỏng đúng hai giá trị này và test không timeout, nghĩa là hệ thống chạy đúng qua đường memory và không deadlock."
+
+## 14. Checklist Trước Khi Trình Bày
+
+- Chạy `core_tb` và chụp `SUMMARY: 7 PASSED, 0 FAILED`.
+- Chạy `system_tb` và chụp `TONG KET: 10 PASSED, 0 FAILED`.
+- Chụp phần `PIPELINE / BUS EVIDENCE`.
+- Mở `system_tb.vcd` bằng GTKWave.
+- Chụp waveform có `pc`, pipeline valid, `mem_req`, `grant`, `mem_ready`.
+- Đưa sơ đồ `IF -> ID -> EX -> MEM -> WB` vào slide.
+- Đưa sơ đồ `8 cores -> bus_ctrl -> data_mem` vào slide.
+- Nêu rõ hạn chế và hướng phát triển.
 
