@@ -1,0 +1,23 @@
+% Sub-section: Hazard
+\begin{frame}{3.3 Quản Lý Xung Đột (\texttt{pipeline\_hazard.v})}
+    Chạy gối đầu lệnh tạo ra các xung đột phần cứng nguy hiểm cần mạch Logic xử lý:
+    \vspace{0.3cm}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \textbf{1. Data Hazard (Xung đột dữ liệu)}
+            \begin{itemize}
+                \item Xảy ra khi lệnh sau cần đọc thanh ghi mà lệnh trước chưa kịp ghi xong.
+                \item \textbf{Giải pháp:} Thiết kế mạch \textbf{Forwarding Unit} để bơm tắt dữ liệu từ ngõ ra ALU tầng sau về ngay ngõ vào ALU tầng trước mà không cần đợi.
+                \item Với lệnh Load, thực hiện \textbf{Stall} (hoãn) pipeline 1 chu kỳ.
+            \end{itemize}
+        \end{column}
+        
+        \begin{column}{0.5\textwidth}
+            \textbf{2. Control Hazard (Xung đột điều khiển)}
+            \begin{itemize}
+                \item Xảy ra khi lệnh rẽ nhánh (\texttt{BEQ}, \texttt{BNE}) làm thay đổi dòng chảy của \texttt{PC}.
+                \item \textbf{Giải pháp:} Thực hiện \textbf{Flush} (xóa bỏ dữ liệu lỗi bằng cách nạp mã lệnh rỗng NOP) tại các tầng nạp sai lệnh trước đó.
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}

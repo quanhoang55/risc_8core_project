@@ -1,0 +1,28 @@
+% ==========================================
+% SECTION 4: TESTING & SIMULATION
+% ==========================================
+\section{Chiến Lược Kiểm Thử (Testing)}
+
+\begin{frame}{4. Chiến Lược Kiểm Thử \& Đọc Waveform}
+    Hệ thống được kiểm thử bài bản từ cấp độ Module cô lập đến chạy ứng dụng thực tế:
+    \vspace{0.3cm}
+    
+    \begin{table}[]
+        \centering
+        \small
+        \begin{tabular}{lll}
+            \toprule
+            \textbf{Cấp độ kiểm thử} & \textbf{Cách thực hiện kiểm chứng trên Waveform} & \textbf{Trạng thái} \\
+            \midrule
+            \textbf{1. Single Core} & Nạp file Hex mẫu. Xem \texttt{PC} tăng tiến và các toán hạng ALU khớp. & Hoàn thành \\
+            \textbf{2. Pipeline Hazard} & Gây lỗi đọc-ghi liên tiếp. Kiểm tra tín hiệu \texttt{ForwardA/B} bật lên. & Hoàn thành \\
+            \textbf{3. Multi-Core} & Cho 8 Core cùng chạy, theo dõi tín hiệu phân phối \texttt{grant} của Arbiter. & Đang triển khai \\
+            \bottomrule
+        \end{tabular}
+    \end{table}
+    
+    \vspace{0.2cm}
+    \begin{block}{Minh chứng Thuyết trình (Bằng chứng trực quan)}
+        Trong báo cáo chi tiết, chúng em sử dụng ảnh chụp Waveform từ công cụ mô phỏng để giải thích rõ ràng các pha \textbf{Cache Miss / Stall} và cách hệ thống tự động sửa sai trên dòng xung nhịp thực tế.
+    \end{block}
+\end{frame}

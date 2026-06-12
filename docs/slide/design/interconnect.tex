@@ -1,0 +1,10 @@
+% Sub-section: Interconnect
+\begin{frame}{3.4 Kết Nối Đa Nhân (\texttt{interconnect.v})}
+    Để liên kết \textbf{8 lõi CPU độc lập} tương tác với hệ thống Bộ nhớ dùng chung (Shared Memory):
+    \vspace{0.2cm}
+    \begin{itemize}
+        \item \textbf{Bus Interconnect:} Hệ thống dây dẫn cấu trúc hóa kết nối song song dữ liệu và địa chỉ.
+        \item \textbf{Bus Arbiter (Bộ trọng tài):} Điều phối quyền truy cập Bus bằng thuật toán phân phối (ví dụ \textit{Round-Robin}), ngăn chặn hiện tượng tranh chấp dữ liệu (Collision) và "đói" tài nguyên bộ nhớ giữa các Core.
+        \item Khi Core $A$ chiếm giữ Bus qua tín hiệu \texttt{grant = 1}, các Core khác tự động giữ yêu cầu \texttt{req = 1} và chuyển trạng thái chờ đợi.
+    \end{itemize}
+\end{frame}

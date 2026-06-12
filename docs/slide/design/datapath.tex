@@ -1,0 +1,12 @@
+% Sub-section: Datapath
+\begin{frame}{3.1 Xây Dựng Khối Datapath (\texttt{datapath.v})}
+    \begin{alertblock}{Sự khác biệt cốt lõi: Single-Cycle vs Pipeline Datapath}
+        \textbf{Pipeline Datapath bắt buộc phải tái cấu trúc hoàn toàn vật lý} chứ không chỉ khác biệt ở Control Unit.
+    \end{alertblock}
+    
+    \begin{itemize}
+        \item \textbf{Pipeline Registers:} Chèn 4 hàng thanh ghi đệm (\texttt{IF/ID}, \texttt{ID/EX}, \texttt{EX/MEM}, \texttt{MEM/WB}) để chia cắt Datapath thành 5 khúc biệt lập.
+        \item \textbf{Dịch chuyển tín hiệu:} Các tín hiệu điều khiển không chạy trực tiếp mà phải xếp hàng, "đi chung hành trình" dọc theo các thanh ghi đệm này cùng với lệnh.
+        \item \textbf{Mở rộng phần cứng:} Bổ sung các bộ Mux lớn tại ngõ vào ALU để sẵn sàng nhận dữ liệu hồi tiếp (Forwarding).
+    \end{itemize}
+\end{frame}

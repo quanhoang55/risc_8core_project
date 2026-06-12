@@ -1,0 +1,80 @@
+\documentclass[10pt, aspectratio=169]{beamer}
+
+% --- Cấu hình Giao diện & Màu sắc (Theme) ---
+\usetheme{Madrid}
+\usecolortheme{whale}
+
+% Định nghĩa hệ màu sắc chuyên nghiệp (Deep Blue & Accent Green)
+\definecolor{DeepBlue}{RGB}{0, 43, 77}
+\definecolor{AccentGreen}{RGB}{17, 202, 160}
+\definecolor{LightGray}{RGB}{241, 245, 249}
+
+\setbeamercolor{palette primary}{bg=DeepBlue, fg=white}
+\setbeamercolor{palette secondary}{bg=DeepBlue!85, fg=white}
+\setbeamercolor{palette tertiary}{bg=DeepBlue!70, fg=white}
+\setbeamercolor{titlelike}{parent=palette primary}
+\setbeamercolor{structure}{fg=DeepBlue}
+
+% --- Các gói lệnh cần thiết ---
+\usepackage[utf8]{inputenc}
+\usepackage[vietnamese]{babel} % Hỗ trợ tiếng Việt
+\usepackage{amsmath, amssymb}
+\usepackage{booktabs} % Cho bảng chuẩn dòng
+\usepackage{graphicx}
+\usepackage{listings} % Để chèn code hoặc tên tín hiệu mượt mà
+
+% --- Thông tin Đề tài ---
+\title[Mô phỏng CPU 8-Core RISC-V]{\textbf{MÔ PHỎNG CPU 8-CORE VỚI KIẾN TRÚC TẬP LỆNH RISC-V}}
+\subtitle{Multiple Processing System sử dụng Verilog HDL}
+\author[Nhóm Dự Án]{Thực hiện: Nhóm Học Viên}
+\institute[Hội Đồng]{Báo Cáo Tiến Độ Dự Án Kiến Trúc Máy Tính}
+\date{\today}
+
+\begin{document}
+
+% ==========================================
+% SLIDE 1: TRANG TIÊU ĐỀ
+% ==========================================
+{\setbeamercolor{background canvas}{bg=LightGray}
+\begin{frame}[plain]
+    \titlepage
+\end{frame}}
+
+% ==========================================
+% SLIDE 2: MỤC LỤC
+% ==========================================
+\begin{frame}{Nội Dung Báo Cáo}
+    \tableofcontents
+\end{frame}
+
+\input{introduction.tex}
+\input{isa.tex}
+
+
+% ==========================================
+% SECTION 3: DESIGN ARCHITECTURE
+% ==========================================
+\section{Thiết Kế Hệ Thống (Design)}
+
+\begin{frame}{3. Thiết Kế Hệ Thống: Cấu Trúc Tổng Thể}
+    \begin{center}
+        \textbf{Sơ đồ phân rã các Module trong mã nguồn Verilog}
+    \end{center}
+    Hệ thống được chia thành 4 phân vùng chính để quản lý và hiện thực hóa trong mã nguồn:
+    \vspace{0.3cm}
+    \begin{enumerate}
+        \item \textbf{Datapath (Single Core):} Trục xương sống dịch chuyển và biến đổi dữ liệu.
+        \item \textbf{Control Unit:} Bộ não điều khiển luồng dữ liệu chạy nhịp nhàng qua Pipeline.
+        \item \textbf{Pipeline Hazard Unit:} Khối cứu nguy và xử lý các xung đột phần cứng.
+        \item \textbf{Interconnect:} Hệ thống trục Bus kết nối, phân xử quyền hạn giữa 8 lõi CPU.
+    \end{enumerate}
+\end{frame}
+
+
+\input{design/datapath.tex}
+\input{design/control_unit.tex}
+\input{design/pipeline_hazard.tex}
+\input{design/interconnect.tex}
+\input{test.tex}
+
+\end{document}

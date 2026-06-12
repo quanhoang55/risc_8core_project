@@ -1,0 +1,32 @@
+% Sub-section: Control Unit
+\begin{frame}{3.2 Control Unit \& 5 Giai Đoạn Pipeline (\texttt{control\_unit.v})}
+    Điều khiển luồng dữ liệu chạy gối đầu nhau qua từng chu kỳ clock trên 5 tầng:
+    \vspace{0.2cm}
+    \begin{columns}
+        \begin{column}{0.31\textwidth}
+            \begin{exampleblock}{1. Fetch (IF)}
+                Lấy mã lệnh từ Instruction Memory dựa trên giá trị bộ đếm \texttt{PC}.
+            \end{exampleblock}
+            \vspace{0.1cm}
+            \begin{exampleblock}{2. Decode (ID)}
+                Giải mã lệnh sinh tín hiệu điều khiển; Đọc dữ liệu từ Register File.
+            \end{exampleblock}
+        \end{column}
+        
+        \begin{column}{0.31\textwidth}
+            \begin{exampleblock}{3. Execute (EX)}
+                Bộ \textbf{ALU} thực thi các phép toán số học hoặc tính toán địa chỉ rẽ nhánh.
+            \end{exampleblock}
+            \vspace{0.1cm}
+            \begin{exampleblock}{4. Memory (MEM)}
+                Đọc/Ghi dữ liệu vào Data Cache / RAM nếu gặp lệnh Load/Store.
+            \end{exampleblock}
+        \end{column}
+        
+        \begin{column}{0.31\textwidth}
+            \begin{exampleblock}{5. Write Back (WB)}
+                Ghi kết quả tính toán cuối cùng từ RAM/ALU ngược về Register File.
+            \end{exampleblock}
+        \end{column}
+    \end{columns}
+\end{frame}

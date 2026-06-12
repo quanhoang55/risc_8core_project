@@ -1,0 +1,24 @@
+% ==========================================
+% SECTION 2: ISA RISC-V 32-bit
+% ==========================================
+\section{Kiến Trúc Tập Lệnh (ISA)}
+
+\begin{frame}{2. Kiến Trúc Tập Lệnh RISC-V 32-bit (RV32I)}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \textbf{Đặc điểm cốt lõi của RV32I:}
+            \begin{itemize}
+                \item Không gian địa chỉ và độ dài lệnh cố định \textbf{32-bit}.
+                \item Cơ chế \textbf{Load-Store}: Chỉ có lệnh Load/Store mới được truy cập Memory; các phép toán toán học chỉ thực thi trên Tập thanh ghi.
+                \item \textbf{32 Thanh ghi đa năng} ($x0 \rightarrow x31$), trong đó $x0$ luôn cố định bằng số $0$.
+                \item 6 kiểu định dạng lệnh cơ bản: R, I, S, B, U, J.
+            \end{itemize}
+        \end{column}
+        
+        \begin{column}{0.5\textwidth}
+            \begin{alertblock}{Định dạng mã máy đồng nhất}
+                Các trường nguồn dữ liệu (\texttt{rs1}, \texttt{rs2}) và đích (\texttt{rd}) luôn nằm ở các vị trí bit cố định $\rightarrow$ Giúp khối \textbf{Decode} phần cứng cực kỳ đơn giản và nhanh chóng.
+            \end{alertblock}
+        \end{column}
+    \end{columns}
+\end{frame}
