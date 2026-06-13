@@ -32,7 +32,7 @@ module reg_file (
                       registers[rs1_addr];
     assign rs2_data = (rs2_addr == 5'd0) ? 32'd0 :
                       (reg_write && (rd_addr == rs2_addr)) ? write_data :
-                      registers[rs2_addr];
+                      registers[rs2_addr]; 
 
     // Synchronous Write: Updates happen on the rising edge of the clock
     integer i;

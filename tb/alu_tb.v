@@ -27,36 +27,39 @@ module alu_tb();
 
     // 3. Quy trình kiểm thử
     initial begin
-        // Hiển thị tiêu đề bảng kết quả
-        $display("Time | A | B | Control | Result | Zero");
-        $display("----------------------------------------------");
+        $dumpfile("tb/alu_tb.vcd"); // Đặt tên file xuất sóng
+        $dumpvars(0, alu_tb);       // Ghi lại tất cả biến trong module alu_tb
+
+        // Hiển thị tiêu đề bảng kết quả (được căn lề hoàn hảo)
+        $display("Time (ns) |       A (Hex) [Signed Dec]       |       B (Hex) [Signed Dec]       | Control  |    Result (Hex) [Signed Dec]     | Zero");
+        $display("----------|----------------------------------|----------------------------------|----------|----------------------------------|------");
 
         // Test Case 1: Phép cộng (ADD)
         a = 32'd10; b = 32'd20; alu_control = ADD;
-        #10; // Đợi 10 đơn vị thời gian
-        $display("%4t | %d | %d |  ADD    | %d | %b", $time, a, b, result, zero);
+        #10;
+        $display("%9d | 0x%08h (%11d) | 0x%08h (%11d) |   ADD    | 0x%08h (%11d) |  %b  ", $time, a, $signed(a), b, $signed(b), result, $signed(result), zero);
 
         // Test Case 2: Phép trừ (SUB) dẫn đến kết quả bằng 0
         a = 32'd50; b = 32'd50; alu_control = SUB;
         #10;
-        $display("%4t | %d | %d |  SUB    | %d | %b", $time, a, b, result, zero);
+        $display("%9d | 0x%08h (%11d) | 0x%08h (%11d) |   SUB    | 0x%08h (%11d) |  %b  ", $time, a, $signed(a), b, $signed(b), result, $signed(result), zero);
 
         // Test Case 3: Phép toán logic AND
         a = 32'hAAAA_AAAA; b = 32'h5555_5555; alu_control = AND;
         #10;
-        $display("%4t | %h | %h |  AND    | %h | %b", $time, a, b, result, zero);
+        $display("%9d | 0x%08h (%11d) | 0x%08h (%11d) |   AND    | 0x%08h (%11d) |  %b  ", $time, a, $signed(a), b, $signed(b), result, $signed(result), zero);
 
         // Test Case 4: So sánh nhỏ hơn (SLT) - Số dương
         a = 32'd15; b = 32'd25; alu_control = SLT;
         #10;
-        $display("%4t | %d | %d |  SLT    | %d | %b", $time, a, b, result, zero);
+        $display("%9d | 0x%08h (%11d) | 0x%08h (%11d) |   SLT    | 0x%08h (%11d) |  %b  ", $time, a, $signed(a), b, $signed(b), result, $signed(result), zero);
 
         // Test Case 5: So sánh nhỏ hơn (SLT) - Số âm (Kiểm tra tính đúng đắn của $signed)
         a = -32'd10; b = 32'd5; alu_control = SLT;
         #10;
-        $display("%4t | %d | %d |  SLT    | %d | %b", $time, a, b, result, zero);
+        $display("%9d | 0x%08h (%11d) | 0x%08h (%11d) |   SLT    | 0x%08h (%11d) |  %b  ", $time, a, $signed(a), b, $signed(b), result, $signed(result), zero);
 
-        $display("----------------------------------------------");
+        $display("----------|----------------------------------|----------------------------------|----------|----------------------------------|------");
         $display("Kiem tra ket thuc.");
         $finish; // Dừng mô phỏng
     end
