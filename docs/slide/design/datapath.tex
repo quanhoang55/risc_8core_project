@@ -548,6 +548,65 @@ Kiem tra ket thuc.
     \end{itemize}
 \end{frame}
 
+\begin{frame}{ALU: Giản Đồ Sóng Mô Phỏng (GTKWave)}
+    \begin{block}{Giản đồ sóng chi tiết thu được từ bộ mô phỏng}
+        \centering
+        \vspace{0.05cm}
+        \includegraphics[width=0.95\textwidth]{alu_wave.png}
+        \vspace{0.05cm}
+    \end{block}
+    \vspace{0.15cm}
+    \begin{columns}[t]
+        \begin{column}{0.48\textwidth}
+            \small\textbf{\color{DeepBlue}$\bullet$ Tín hiệu ngõ vào (Inputs)}
+            \vspace{0.05cm}
+            \scriptsize
+            \begin{itemize}
+                \item \texttt{a[31:0]}, \texttt{b[31:0]}: Toán hạng ngõ vào (dạng Hex).
+                \item \texttt{alu\_control[3:0]}: Mã phép toán điều khiển (\texttt{2}=ADD, \texttt{6}=SUB, \texttt{0}=AND, \texttt{7}=SLT).
+            \end{itemize}
+        \end{column}
+        
+        \begin{column}{0.48\textwidth}
+            \small\textbf{\color{DeepBlue}$\bullet$ Tín hiệu ngõ ra (Outputs)}
+            \vspace{0.05cm}
+            \scriptsize
+            \begin{itemize}
+                \item \texttt{result[31:0]}: Kết quả tính toán (dạng Hex).
+                \item \texttt{zero}: Cờ báo bằng không, mức cao (\texttt{1}) khi \texttt{result} = 0.
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{ALU: Phân Tích Chi Tiết Sóng Mô Phỏng}
+    \begin{columns}
+        \begin{column}{0.58\textwidth}
+            \begin{block}{Phân tích 5 Test Case thực thi}
+                \scriptsize
+                \begin{itemize}
+                    \item \textbf{0ns - 10ns (ADD):} $10 + 20 = 30$ (\texttt{0x1E}). Kết quả khác 0 $\rightarrow$ cờ \texttt{zero = 0}.
+                    \item \textbf{10ns - 20ns (SUB):} $50 - 50 = 0$. Kết quả bằng 0 $\rightarrow$ cờ \texttt{zero = 1} kéo lên mức cao.
+                    \item \textbf{20ns - 30ns (AND):} \texttt{0xAAAAAAAA} AND \texttt{0x55555555} = $0$. Cờ \texttt{zero} tiếp tục giữ ở mức cao.
+                    \item \textbf{30ns - 40ns (SLT - Số dương):} So sánh $15 < 25$ (Đúng $\rightarrow$ \texttt{result = 1}). Cờ \texttt{zero = 0}.
+                    \item \textbf{40ns - 50ns (SLT - Số âm):} So sánh có dấu $-10$ (\texttt{0xFFFFFFF6}) $< 5$ (Đúng $\rightarrow$ \texttt{result = 1}).
+                \end{itemize}
+            \end{block}
+        \end{column}
+        
+        \begin{column}{0.38\textwidth}
+            \begin{block}{Nhận xét kỹ thuật}
+                \scriptsize
+                \begin{itemize}
+                    \item Phép so sánh \texttt{SLT} hoạt động chính xác với số âm (\texttt{\$signed}) nhờ biểu diễn bù 2, không bị nhầm lẫn với số không dấu.
+                    \item Cờ \texttt{zero} phản hồi tức thời theo giá trị của \texttt{result}.
+                    \item Thiết kế ALU hoạt động đúng chức năng của tập lệnh RV32I.
+                \end{itemize}
+            \end{block}
+        \end{column}
+    \end{columns}
+\end{frame}
+
 \subsubsection{Bộ nhớ dữ liệu (Data Memory)}
 \begin{frame}[fragile]{Bộ Nhớ Dữ Liệu Dùng Chung (\texttt{data\_mem.v})}
     \begin{columns}
