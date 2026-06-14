@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.4.7)  14 JUN 2026 09:14
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.4.7)  14 JUN 2026 12:24
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1131,32 +1131,32 @@ Package babel Info: 'vietnamese' activates 'vietnamese' shorthands.
 )
 \openout1 = `main.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 35.
-LaTeX Font Info:    ... okay on input line 35.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 35.
-LaTeX Font Info:    ... okay on input line 35.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 35.
-LaTeX Font Info:    ... okay on input line 35.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 35.
-LaTeX Font Info:    ... okay on input line 35.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 35.
-LaTeX Font Info:    ... okay on input line 35.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 35.
-LaTeX Font Info:    ... okay on input line 35.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 35.
-LaTeX Font Info:    ... okay on input line 35.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 35.
-LaTeX Font Info:    ... okay on input line 35.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 35.
-LaTeX Font Info:    ... okay on input line 35.
-LaTeX Font Info:    Checking defaults for T5/cmr/m/n on input line 35.
-LaTeX Font Info:    Trying to load font information for T5+cmr on input line 35
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for T5/cmr/m/n on input line 49.
+LaTeX Font Info:    Trying to load font information for T5+cmr on input line 49
 .
 
 (C:\Users\ACER\AppData\Local\Programs\MiKTeX\tex/latex/vntex\t5cmr.fd
 File: t5cmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
-LaTeX Font Info:    ... okay on input line 35.
+LaTeX Font Info:    ... okay on input line 49.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
@@ -1218,63 +1218,63 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 g
 File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
 ))
-Package hyperref Info: Link coloring OFF on input line 35.
+Package hyperref Info: Link coloring OFF on input line 49.
  (main.out) (main.out)
 \@outlinefile=\write5
 \openout5 = `main.out'.
 
 LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
-(Font)                  OT1/cmr/m/n --> OT1/cmss/m/n on input line 35.
+(Font)                  OT1/cmr/m/n --> OT1/cmss/m/n on input line 49.
 LaTeX Font Info:    Overwriting symbol font `operators' in version `bold'
-(Font)                  OT1/cmr/bx/n --> OT1/cmss/b/n on input line 35.
+(Font)                  OT1/cmr/bx/n --> OT1/cmss/b/n on input line 49.
 \symnumbers=\mathgroup6
 \sympureletters=\mathgroup7
 LaTeX Font Info:    Overwriting math alphabet `\mathrm' in version `normal'
-(Font)                  OT1/cmss/m/n --> OT1/cmr/m/n on input line 35.
-LaTeX Font Info:    Redeclaring math alphabet \mathbf on input line 35.
+(Font)                  OT1/cmss/m/n --> OT1/cmr/m/n on input line 49.
+LaTeX Font Info:    Redeclaring math alphabet \mathbf on input line 49.
 LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `normal'
-(Font)                  OT1/cmr/bx/n --> OT1/cmss/b/n on input line 35.
+(Font)                  OT1/cmr/bx/n --> OT1/cmss/b/n on input line 49.
 LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `bold'
-(Font)                  OT1/cmr/bx/n --> OT1/cmss/b/n on input line 35.
-LaTeX Font Info:    Redeclaring math alphabet \mathsf on input line 35.
+(Font)                  OT1/cmr/bx/n --> OT1/cmss/b/n on input line 49.
+LaTeX Font Info:    Redeclaring math alphabet \mathsf on input line 49.
 LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `normal'
-(Font)                  OT1/cmss/m/n --> OT1/cmss/m/n on input line 35.
+(Font)                  OT1/cmss/m/n --> OT1/cmss/m/n on input line 49.
 LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `bold'
-(Font)                  OT1/cmss/bx/n --> OT1/cmss/m/n on input line 35.
-LaTeX Font Info:    Redeclaring math alphabet \mathit on input line 35.
+(Font)                  OT1/cmss/bx/n --> OT1/cmss/m/n on input line 49.
+LaTeX Font Info:    Redeclaring math alphabet \mathit on input line 49.
 LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `normal'
-(Font)                  OT1/cmr/m/it --> OT1/cmss/m/it on input line 35.
+(Font)                  OT1/cmr/m/it --> OT1/cmss/m/it on input line 49.
 LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `bold'
-(Font)                  OT1/cmr/bx/it --> OT1/cmss/m/it on input line 35.
-LaTeX Font Info:    Redeclaring math alphabet \mathtt on input line 35.
+(Font)                  OT1/cmr/bx/it --> OT1/cmss/m/it on input line 49.
+LaTeX Font Info:    Redeclaring math alphabet \mathtt on input line 49.
 LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `normal'
-(Font)                  OT1/cmtt/m/n --> OT1/cmtt/m/n on input line 35.
+(Font)                  OT1/cmtt/m/n --> OT1/cmtt/m/n on input line 49.
 LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `bold'
-(Font)                  OT1/cmtt/m/n --> OT1/cmtt/m/n on input line 35.
+(Font)                  OT1/cmtt/m/n --> OT1/cmtt/m/n on input line 49.
 LaTeX Font Info:    Overwriting symbol font `numbers' in version `bold'
-(Font)                  OT1/cmss/m/n --> OT1/cmss/b/n on input line 35.
+(Font)                  OT1/cmss/m/n --> OT1/cmss/b/n on input line 49.
 LaTeX Font Info:    Overwriting symbol font `pureletters' in version `bold'
-(Font)                  OT1/cmss/m/it --> OT1/cmss/b/it on input line 35.
+(Font)                  OT1/cmss/m/it --> OT1/cmss/b/it on input line 49.
 LaTeX Font Info:    Overwriting math alphabet `\mathrm' in version `bold'
-(Font)                  OT1/cmss/b/n --> OT1/cmr/b/n on input line 35.
+(Font)                  OT1/cmss/b/n --> OT1/cmr/b/n on input line 49.
 LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `bold'
-(Font)                  OT1/cmss/b/n --> OT1/cmss/b/n on input line 35.
+(Font)                  OT1/cmss/b/n --> OT1/cmss/b/n on input line 49.
 LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `bold'
-(Font)                  OT1/cmss/m/n --> OT1/cmss/b/n on input line 35.
+(Font)                  OT1/cmss/m/n --> OT1/cmss/b/n on input line 49.
 LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `bold'
-(Font)                  OT1/cmss/m/it --> OT1/cmss/b/it on input line 35.
+(Font)                  OT1/cmss/m/it --> OT1/cmss/b/it on input line 49.
 LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `bold'
-(Font)                  OT1/cmtt/m/n --> OT1/cmtt/b/n on input line 35.
-LaTeX Font Info:    Redeclaring symbol font `pureletters' on input line 35.
+(Font)                  OT1/cmtt/m/n --> OT1/cmtt/b/n on input line 49.
+LaTeX Font Info:    Redeclaring symbol font `pureletters' on input line 49.
 LaTeX Font Info:    Overwriting symbol font `pureletters' in version `normal'
-(Font)                  OT1/cmss/m/it --> OT1/mathkerncmss/m/sl on input line 3
-5.
+(Font)                  OT1/cmss/m/it --> OT1/mathkerncmss/m/sl on input line 4
+9.
 LaTeX Font Info:    Overwriting symbol font `pureletters' in version `bold'
-(Font)                  OT1/cmss/b/it --> OT1/mathkerncmss/m/sl on input line 3
-5.
+(Font)                  OT1/cmss/b/it --> OT1/mathkerncmss/m/sl on input line 4
+9.
 LaTeX Font Info:    Overwriting symbol font `pureletters' in version `bold'
 (Font)                  OT1/mathkerncmss/m/sl --> OT1/mathkerncmss/bx/sl on inp
-ut line 35.
+ut line 49.
 
 (C:\Users\ACER\AppData\Local\Programs\MiKTeX\tex/latex/translator\translator-ba
 sic-dictionary-English.dict
@@ -1305,49 +1305,61 @@ Dictionary: translator-theorem-dictionary, Language: English
 
 {C:/Users/ACER/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}] (main.toc) [2
 
-] (introduction.tex [3
+] (introduction.tex (main.toc)
+[3
 
-]) (isa.tex
-LaTeX Font Info:    Trying to load font information for U+msa on input line 27.
+] [4
+
+]) (isa.tex (main.toc) [5
+
+]
+LaTeX Font Info:    Trying to load font information for U+msa on input line 28.
 
 
 (C:\Users\ACER\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 27.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 28.
 
 
 (C:\Users\ACER\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
 LaTeX Font Info:    Trying to load font information for OT1+mathkerncmss on inp
-ut line 27.
+ut line 28.
 
 (C:\Users\ACER\AppData\Local\Programs\MiKTeX\tex/latex/sansmathaccent\ot1mathke
 rncmss.fd
 File: ot1mathkerncmss.fd 2020/01/31 Fontinst v1.933 font definitions for OT1/ma
 thkerncmss.
-) [4
+) [6
 
 ]
 LaTeX Font Info:    Trying to load font information for T5+cmtt on input line 5
-5.
+6.
 
 (C:\Users\ACER\AppData\Local\Programs\MiKTeX\tex/latex/vntex\t5cmtt.fd
 File: t5cmtt.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `T5/cmtt/bx/n' in size <7> not available
-(Font)              Font shape `T5/cmtt/m/n' tried instead on input line 55.
+(Font)              Font shape `T5/cmtt/m/n' tried instead on input line 56.
 
-[5
+[7
 
-] [6
+] [8
 
-] [7
+] (main.toc) [9
 
-]) [8
+] [10
 
-] (design/datapath.tex [9
+]) (main.toc) [11
+
+] [12
+
+] (design/datapath.tex [13
+
+]
+(main.toc) [14
 
 ]
 \openout4 = `main.vrb'.
@@ -1365,53 +1377,108 @@ File: lstlang2.sty 2025/11/14 1.11b listings language file
 (C:\Users\ACER\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang3.sty
 File: lstlang3.sty 2025/11/14 1.11b listings language file
 ))
-[10
+[15
 
 ]
 \openout4 = `main.vrb'.
 
- (main.vrb) [11
+ (main.vrb) [16
 
 ]
 \openout4 = `main.vrb'.
 
- (main.vrb) [12
+ (main.vrb) [17
 
 ]
 \openout4 = `main.vrb'.
 
- (main.vrb) [13
+ (main.vrb) [18
+
+]
+\openout4 = `main.vrb'.
+
+ (main.vrb) [19
 
 ]
 \openout4 = `main.vrb'.
 
  (main.vrb
-Overfull \hbox (56.22144pt too wide) in paragraph at lines 28--29
-[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
+<pc_logic_wave.png, id=908, 728.7225pt x 250.9375pt>
+File: pc_logic_wave.png Graphic file (type png)
+<use pc_logic_wave.png>
+Package pdftex.def Info: pc_logic_wave.png  used on input line 26.
+(pdftex.def)             Requested size: 208.91528pt x 71.9391pt.
+) [20
+
+ <./pc_logic_wave.png>]
+\openout4 = `main.vrb'.
+
+ (main.vrb)
+Overfull \vbox (10.79149pt too high) detected at line 403
  []
 
-) [14
+[21
 
-] [15
+]
+\openout4 = `main.vrb'.
 
-]) (design/control_unit.tex [16
+ (main.vrb) [22
 
-]) (design/pipeline_hazard.tex
-[17
+]
+\openout4 = `main.vrb'.
 
-]) (design/interconnect.tex
+ (main.vrb
+Overfull \hbox (1.41003pt too wide) in paragraph at lines 36--38
+[][][][][][][][][][][][][][][][][][][][][][][][][][][] 
+ []
+
+
+Overfull \hbox (1.41003pt too wide) in paragraph at lines 39--41
+[][][][][][][][][][][][][][][][][][][][][][][][][][][] 
+ []
+
+
+Overfull \hbox (1.41003pt too wide) in paragraph at lines 46--48
+[][][][][][][][][][][][][][][][][][][][][][][][][][][] 
+ []
+
+) [23
+
+]
+\openout4 = `main.vrb'.
+
+ (main.vrb) [24
+
+]
+\openout4 = `main.vrb'.
+
+ (main.vrb) [25
+
+] (main.toc) [26
+
+] [27
+
+])
+(design/control_unit.tex [28
+
+]) (design/pipeline_hazard.tex [29
+
+])
+(design/interconnect.tex
 LaTeX Font Info:    Font shape `T5/cmtt/bx/n' in size <10> not available
 (Font)              Font shape `T5/cmtt/m/n' tried instead on input line 19.
 LaTeX Font Info:    Font shape `T5/cmtt/bx/n' in size <9> not available
 (Font)              Font shape `T5/cmtt/m/n' tried instead on input line 19.
- [18
+ [30
 
-]) (test.tex
-Overfull \hbox (8.31746pt too wide) in paragraph at lines 28--28
+]) (test.tex (main.toc) [31
+
+]
+Overfull \hbox (8.31746pt too wide) in paragraph at lines 29--29
  [] 
  []
 
-[19
+[32
 
 ])
 \tf@nav=\write6
@@ -1429,33 +1496,34 @@ LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-24>
  ***********
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: C7C2BC5E8667B764937F71BB50FE197F;769.
+(rerunfilecheck)             Checksum: A4641722C4B5F95198AADD4960849A4D;2407.
  ) 
 Here is how much of TeX's memory you used:
- 29134 strings out of 467871
- 573532 string characters out of 5418861
- 1171227 words of memory out of 5000000
- 57370 multiletter control sequences out of 15000+600000
- 651407 words of font info for 89 fonts, out of 8000000 for 9000
+ 29490 strings out of 467871
+ 581939 string characters out of 5418861
+ 1180419 words of memory out of 5000000
+ 57658 multiletter control sequences out of 15000+600000
+ 653909 words of font info for 93 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  128i,15n,123p,381b,1940s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/ACER/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/c
 mss10.pfb><C:/Users/ACER/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfo
-nts/cm/cmssi10.pfb><C:/Users/ACER/AppData/Local/Programs/MiKTeX/fonts/type1/pub
-lic/amsfonts/cm/cmsy10.pfb><C:/Users/ACER/AppData/Local/Programs/MiKTeX/fonts/t
-ype1/public/amsfonts/cm/cmsy7.pfb><C:/Users/ACER/AppData/Local/Programs/MiKTeX/
-fonts/type1/vntex/vnr/vnss10.pfb><C:/Users/ACER/AppData/Local/Programs/MiKTeX/f
-onts/type1/vntex/vnr/vnss12.pfb><C:/Users/ACER/AppData/Local/Programs/MiKTeX/fo
-nts/type1/vntex/vnr/vnss8.pfb><C:/Users/ACER/AppData/Local/Programs/MiKTeX/font
-s/type1/vntex/vnr/vnss9.pfb><C:/Users/ACER/AppData/Local/Programs/MiKTeX/fonts/
-type1/vntex/vnr/vnssbx10.pfb><C:/Users/ACER/AppData/Local/Programs/MiKTeX/fonts
-/type1/vntex/vnr/vntt10.pfb><C:/Users/ACER/AppData/Local/Programs/MiKTeX/fonts/
-type1/vntex/vnr/vntt12.pfb><C:/Users/ACER/AppData/Local/Programs/MiKTeX/fonts/t
-ype1/vntex/vnr/vntt8.pfb><C:/Users/ACER/AppData/Local/Programs/MiKTeX/fonts/typ
-e1/vntex/vnr/vntt9.pfb>
-Output written on main.pdf (19 pages, 412311 bytes).
+nts/cm/cmss8.pfb><C:/Users/ACER/AppData/Local/Programs/MiKTeX/fonts/type1/publi
+c/amsfonts/cm/cmssi10.pfb><C:/Users/ACER/AppData/Local/Programs/MiKTeX/fonts/ty
+pe1/public/amsfonts/cm/cmsy10.pfb><C:/Users/ACER/AppData/Local/Programs/MiKTeX/
+fonts/type1/public/amsfonts/cm/cmsy7.pfb><C:/Users/ACER/AppData/Local/Programs/
+MiKTeX/fonts/type1/vntex/vnr/vnss10.pfb><C:/Users/ACER/AppData/Local/Programs/M
+iKTeX/fonts/type1/vntex/vnr/vnss12.pfb><C:/Users/ACER/AppData/Local/Programs/Mi
+KTeX/fonts/type1/vntex/vnr/vnss8.pfb><C:/Users/ACER/AppData/Local/Programs/MiKT
+eX/fonts/type1/vntex/vnr/vnss9.pfb><C:/Users/ACER/AppData/Local/Programs/MiKTeX
+/fonts/type1/vntex/vnr/vnssbx10.pfb><C:/Users/ACER/AppData/Local/Programs/MiKTe
+X/fonts/type1/vntex/vnr/vntt10.pfb><C:/Users/ACER/AppData/Local/Programs/MiKTeX
+/fonts/type1/vntex/vnr/vntt12.pfb><C:/Users/ACER/AppData/Local/Programs/MiKTeX/
+fonts/type1/vntex/vnr/vntt8.pfb><C:/Users/ACER/AppData/Local/Programs/MiKTeX/fo
+nts/type1/vntex/vnr/vntt9.pfb>
+Output written on main.pdf (32 pages, 589432 bytes).
 PDF statistics:
- 952 PDF objects out of 1000 (max. 8388607)
- 43 named destinations out of 1000 (max. 500000)
- 1029 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 1568 PDF objects out of 1728 (max. 8388607)
+ 85 named destinations out of 1000 (max. 500000)
+ 1498 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -1,5 +1,4 @@
-% Sub-section: Datapath
-\begin{frame}{3.1a Phân bố phần cứng trên 5 tầng Pipeline}
+\begin{frame}{Phân bố phần cứng trên 5 tầng Pipeline}
     Đường truyền dữ liệu (Datapath) ánh xạ trực tiếp các module Verilog vào từng giai đoạn xử lý:
     \vspace{0.3cm}
     
@@ -51,7 +50,9 @@
     \end{block}
 \end{frame}
 
-\begin{frame}[fragile]{3.1b Khối Bộ nhớ lệnh (\texttt{instr\_mem.v})}
+\subsection{Các khối xử lý logic chức năng}
+\subsubsection{Bộ nhớ lệnh (Instruction Memory)}
+\begin{frame}[fragile]{Bộ nhớ lệnh (\texttt{instr\_mem.v})}
     \begin{columns}
         \begin{column}{0.48\textwidth}
             \centering
@@ -101,8 +102,8 @@ endmodule
         \end{column}
     \end{columns}
 \end{frame}
-
-\begin{frame}[fragile]{3.1c Khối PC Logic - Sơ đồ \& Nguyên lý hoạt động}
+\subsubsection{Khối PC Logic}
+\begin{frame}[fragile]{PC Logic: Sơ đồ \& Nguyên lý hoạt động}
     \begin{columns}
         \begin{column}{0.48\textwidth}
             \centering
@@ -148,7 +149,7 @@ endmodule
     \end{columns}
 \end{frame}
 
-\begin{frame}[fragile]{3.1d Khối PC Logic - Mã nguồn Verilog}
+\begin{frame}[fragile]{PC Logic: Hiện thực mã nguồn Verilog}
     \begin{columns}[t]
         \begin{column}{0.46\textwidth}
             \begin{block}{Khai báo Module \& Ports}
@@ -198,7 +199,7 @@ endmodule
     \end{columns}
 \end{frame}
 
-\begin{frame}[fragile]{3.1e Khối PC Logic - Testbench (Khai báo \& Khởi tạo)}
+\begin{frame}[fragile]{PC Logic: Thiết lập môi trường Testbench}
     \begin{columns}[t]
         \begin{column}{0.46\textwidth}
             \begin{block}{Khai báo Tín hiệu \& Mạch nạp}
@@ -243,7 +244,7 @@ module pc_logic_tb;
     \end{columns}
 \end{frame}
 
-\begin{frame}[fragile]{3.1f Khối PC Logic - Testbench (Kịch bản kích thích)}
+\begin{frame}[fragile]{PC Logic: Kịch bản kiểm thử}
     \begin{columns}[t]
         \begin{column}{0.48\textwidth}
             \begin{block}{Kịch bản kích thích chính}
@@ -270,7 +271,7 @@ module pc_logic_tb;
                 \begin{lstlisting}[language=Verilog, basicstyle=\fontsize{6.5pt}{8.0pt}\selectfont\ttfamily, keywordstyle=\color{blue}, commentstyle=\color{gray}]
     initial begin
         $monitor(
-            "Time=%0t | PC=%d | stall=%b | branch=%b | jump=%b",
+            "t=%0t pc=%0d s=%b b=%b j=%b",
             $time, pc, stall, branch_taken, jump
         );
     end
@@ -286,7 +287,341 @@ endmodule
         \end{column}
     \end{columns}
 \end{frame}
-\begin{frame}{3.1g Thanh ghi đệm - Cơ chế hoạt động Pipeline Registers}
+\begin{frame}[fragile]{PC Logic: Kết quả mô phỏng \& Giản đồ sóng}
+    \begin{columns}[t]
+        \begin{column}{0.48\textwidth}
+            \begin{block}{Console Output (\$monitor)}
+                \begin{lstlisting}[basicstyle=\fontsize{5.5pt}{6.5pt}\selectfont\ttfamily]
+Time=0 | PC=         0 | stall=0 | branch=0 | jump=0
+Time=15000 | PC=         4 | stall=0 | branch=0 | jump=0
+Time=25000 | PC=         8 | stall=0 | branch=0 | jump=0
+Time=30000 | PC=         8 | stall=1 | branch=0 | jump=0
+Time=40000 | PC=         8 | stall=0 | branch=1 | jump=0
+Time=45000 | PC=       100 | stall=0 | branch=1 | jump=0
+Time=50000 | PC=       100 | stall=0 | branch=0 | jump=1
+Time=55000 | PC=       200 | stall=0 | branch=0 | jump=1
+Time=60000 | PC=       200 | stall=0 | branch=0 | jump=0
+Time=65000 | PC=       204 | stall=0 | branch=0 | jump=0
+Time=75000 | PC=       208 | stall=0 | branch=0 | jump=0
+tb/pc_logic_tb.v:63: $finish called at 80000 (1ps)
+                \end{lstlisting}
+            \end{block}
+        \end{column}
+        
+        \begin{column}{0.48\textwidth}
+            \begin{block}{Giản đồ sóng (Waveform)}
+                \centering
+                \vspace{0.1cm}
+                \includegraphics[width=\textwidth]{pc_logic_wave.png}
+                \vspace{0.2cm}
+                \scriptsize
+                \begin{itemize}
+                    \item \textbf{Stall (30-40ns):} PC giữ nguyên giá trị cũ (= 8).
+                    \item \textbf{Branch (40-50ns):} PC nhảy tới `0x64` (= 100).
+                    \item \textbf{Jump (50-60ns):} PC nhảy tới `0xC8` (= 200).
+                \end{itemize}
+            \end{block}
+        \end{column}
+    \end{columns}
+\end{frame}
+\subsubsection{Khối Tập thanh ghi (Register File)}
+\begin{frame}[fragile]{Khối Tập Thanh Ghi (\texttt{reg\_file.v})}
+    \begin{columns}
+        \begin{column}{0.46\textwidth}
+            \centering
+            \textbf{Sơ đồ khối chức năng}
+            \vspace{0.2cm}
+            
+            \begin{tikzpicture}[
+                block/.style={draw, thick, fill=blue!10, draw=DeepBlue, minimum width=2.8cm, minimum height=2.6cm, rounded corners, font=\scriptsize\bfseries, align=center},
+                bus/.style={->, >=stealth, double, double distance=1.5pt, thick, DeepBlue},
+                wire/.style={->, >=stealth, thick, DeepBlue}
+            ]
+                % Main Block
+                \node[block] (rf) at (0, 0) {Register File\\[0.1cm]\tiny (\texttt{reg\_file.v})};
+                
+                % Inputs (Left side)
+                \draw[wire] (-2.0, 0.9) -- node[above, font=\tiny\bfseries] {clk} ([yshift=0.9cm]rf.west);
+                \draw[bus] (-2.0, 0.4) -- node[above=0.01cm, font=\tiny\bfseries] {rs1\_addr} ([yshift=0.4cm]rf.west);
+                \draw[bus] (-2.0, 0.0) -- node[above=0.01cm, font=\tiny\bfseries] {rs2\_addr} ([yshift=0.0cm]rf.west);
+                \draw[bus] (-2.0, -0.4) -- node[above=0.01cm, font=\tiny\bfseries] {rd\_addr} ([yshift=-0.4cm]rf.west);
+                \draw[bus] (-2.0, -0.9) -- node[above=0.01cm, font=\tiny\bfseries] {wdata} ([yshift=-0.9cm]rf.west);
+                
+                % Control Input (Top side)
+                \draw[wire] (0, 1.7) -- node[right, font=\tiny\bfseries] {reg\_write} (rf.north);
+                
+                % Outputs (Right side)
+                \draw[bus] ([yshift=0.4cm]rf.east) -- node[above=0.01cm, font=\tiny\bfseries] {rs1\_data} (2.0, 0.4);
+                \draw[bus] ([yshift=-0.4cm]rf.east) -- node[above=0.01cm, font=\tiny\bfseries] {rs2\_data} (2.0, -0.4);
+            \end{tikzpicture}
+            
+            \vspace{0.15cm}
+            \scriptsize
+            \begin{block}{Nguyên lý hoạt động}
+                \begin{itemize}
+                    \item \textbf{Quy mô:} 32 thanh ghi 32-bit (x0 cứng về 0).
+                    \item \textbf{Đọc bất đồng bộ:} rs1\_data, rs2\_data.
+                    \item \textbf{Ghi đồng bộ:} rd khi reg\_write=1.
+                    \item \textbf{Cầu bypass:} Tránh trễ 1 chu kỳ khi đọc-ghi cùng thanh ghi.
+                \end{itemize}
+            \end{block}
+        \end{column}
+        
+        \begin{column}{0.52\textwidth}
+            \begin{block}{Mã nguồn Verilog tập thanh ghi}
+                \begin{lstlisting}[language=Verilog, basicstyle=\fontsize{6.0pt}{6.8pt}\selectfont\ttfamily, keywordstyle=\color{blue}, commentstyle=\color{gray}]
+module reg_file (
+    input  wire        clk, reset,
+    input  wire [4:0]  rs1_addr, rs2_addr, rd_addr,
+    input  wire [31:0] write_data,
+    input  wire        reg_write,
+    output wire [31:0] rs1_data, rs2_data
+);
+    reg [31:0] registers [0:31];
+
+    assign rs1_data = (rs1_addr == 5'd0) ? 32'd0 :
+                      (reg_write && (rd_addr == rs1_addr)) 
+                      ? write_data : registers[rs1_addr];
+    assign rs2_data = (rs2_addr == 5'd0) ? 32'd0 :
+                      (reg_write && (rd_addr == rs2_addr)) 
+                      ? write_data : registers[rs2_addr];
+
+    integer i;
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            for (i = 0; i < 32; i = i + 1)
+                registers[i] <= 32'd0;
+        end else if (reg_write && (rd_addr != 5'd0)) begin
+            registers[rd_addr] <= write_data;
+        end
+    end
+endmodule
+                \end{lstlisting}
+            \end{block}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\subsubsection{Khối Tính toán Số học \& Logic (ALU)}
+\begin{frame}[fragile]{Khối Tính Toán Số Học \& Logic (\texttt{alu.v})}
+    \begin{columns}
+        \begin{column}{0.46\textwidth}
+            \centering
+            \textbf{Sơ đồ khối chức năng}
+            \vspace{0.2cm}
+            
+            \begin{tikzpicture}[
+                alu/.style={draw, thick, fill=blue!10, draw=DeepBlue, minimum width=2.4cm, minimum height=1.6cm, font=\scriptsize\bfseries, align=center},
+                bus/.style={->, >=stealth, double, double distance=1.5pt, thick, DeepBlue},
+                wire/.style={->, >=stealth, thick, DeepBlue}
+            ]
+                % Main ALU Block
+                \node[alu] (alu_block) at (0, 0) {ALU\\[0.15cm]\tiny (\texttt{alu.v})};
+                
+                % Inputs
+                \draw[bus] (-2.2, 0.4) -- node[above=0.01cm, font=\tiny\bfseries] {a[31:0]} ([yshift=0.4cm]alu_block.west);
+                \draw[bus] (-2.2, -0.4) -- node[above=0.01cm, font=\tiny\bfseries] {b[31:0]} ([yshift=-0.4cm]alu_block.west);
+                \draw[bus] (0, 1.4) -- node[right, font=\tiny\bfseries] {alu\_control[3:0]} (alu_block.north);
+                
+                % Outputs
+                \draw[bus] ([yshift=0.3cm]alu_block.east) -- node[above=0.01cm, font=\tiny\bfseries] {result[31:0]} (2.2, 0.3);
+                \draw[wire] ([yshift=-0.3cm]alu_block.east) -- node[above=0.01cm, font=\tiny\bfseries] {zero} (2.2, -0.3);
+            \end{tikzpicture}
+            
+            \vspace{0.2cm}
+            \scriptsize
+            \begin{block}{Đặc tả hoạt động}
+                \begin{itemize}
+                    \item \textbf{Phép toán số học:} ADD (cộng), SUB (trừ), so sánh có dấu SLT.
+                    \item \textbf{Phép toán logic:} AND, OR, XOR và dịch chuyển bit logic (SLL, SRL).
+                    \item \textbf{Cờ Zero:} Tín hiệu ra 1-bit, tích cực mức cao khi kết quả toán học bằng 0 (dùng cho lệnh rẽ nhánh).
+                \end{itemize}
+            \end{block}
+        \end{column}
+        
+        \begin{column}{0.52\textwidth}
+            \begin{block}{Hiện thực khối Case ALU}
+                \begin{lstlisting}[language=Verilog, basicstyle=\fontsize{6.0pt}{7.2pt}\selectfont\ttfamily, keywordstyle=\color{blue}, commentstyle=\color{gray}]
+always @(*) begin
+    case (alu_control)
+        4'b0010: result = a + b; // ADD
+        4'b0110: result = a - b; // SUB
+        4'b0000: result = a & b; // AND
+        4'b0001: result = a | b; // OR
+        4'b0100: result = a ^ b; // XOR
+        4'b0011: result = a << b[4:0]; // SLL
+        4'b0101: result = a >> b[4:0]; // SRL
+        4'b0111: result = ($signed(a) < $signed(b)) 
+                          ? 32'd1 : 32'd0; // SLT
+        default: result = 32'b0;
+    endcase
+end
+
+// Co bao Zero
+assign zero = (result == 32'b0);
+                \end{lstlisting}
+            \end{block}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{ALU: Kịch bản kiểm thử (Testbench)}
+    \begin{columns}[t]
+        \begin{column}{0.48\textwidth}
+            \begin{block}{DUT \& Khai báo tín hiệu}
+                \begin{lstlisting}[language=Verilog, basicstyle=\fontsize{6.0pt}{7.0pt}\selectfont\ttfamily, keywordstyle=\color{blue}, commentstyle=\color{gray}]
+module alu_tb();
+    reg  [31:0] a, b;
+    reg  [3:0]  alu_control;
+    wire [31:0] result;
+    wire        zero;
+
+    // Khoi tao Device Under Test (DUT)
+    alu dut (
+        .a(a), .b(b),
+        .alu_control(alu_control),
+        .result(result), .zero(zero)
+    );
+
+    localparam AND = 4'b0000;
+    localparam OR  = 4'b0001;
+    localparam ADD = 4'b0010;
+    localparam SUB = 4'b0110;
+    localparam SLT = 4'b0111;
+                \end{lstlisting}
+            \end{block}
+        \end{column}
+        
+        \begin{column}{0.48\textwidth}
+            \begin{block}{Kịch bản kích thích chính}
+                \begin{lstlisting}[language=Verilog, basicstyle=\fontsize{6.0pt}{7.0pt}\selectfont\ttfamily, keywordstyle=\color{blue}, commentstyle=\color{gray}]
+    initial begin
+        $dumpfile("tb/alu_tb.vcd");
+        $dumpvars(0, alu_tb);
+
+        // Case 1: Phep cong (ADD)
+        a = 32'd10; b = 32'd20; alu_control = ADD; #10;
+        
+        // Case 2: Phep tru (SUB) -> zero = 1
+        a = 32'd50; b = 32'd50; alu_control = SUB; #10;
+        
+        // Case 3: Phep logic AND
+        a = 32'hAAAA_AAAA; b = 32'h5555_5555; 
+        alu_control = AND; #10;
+        
+        // Case 4: So sanh nho hon SLT (co dau)
+        a = -32'd10; b = 32'd5; alu_control = SLT; #10;
+        
+        $finish;
+    end
+                \end{lstlisting}
+            \end{block}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{ALU: Kết quả mô phỏng Console}
+    Mô phỏng thực thi chính xác các phép tính và kiểm chứng cờ rẽ nhánh:
+    \vspace{0.2cm}
+    
+    \begin{block}{Kết quả xuất ra màn hình (Console Output)}
+        \begin{lstlisting}[basicstyle=\fontsize{6.0pt}{7.0pt}\selectfont\ttfamily]
+Time |     A (Hex) [Dec]     |     B (Hex) [Dec]     | Control |   Result [Dec]    | Zero
+-----|-----------------------|-----------------------|---------|-------------------|-----
+  10 | 0x0000000a (  10)     | 0x00000014 (  20)     |   ADD   | 0x0000001e (  30) |  0
+  20 | 0x00000032 (  50)     | 0x00000032 (  50)     |   SUB   | 0x00000000 (   0) |  1
+  30 | 0xaaaaaaaa (-1.43G)   | 0x55555555 ( 1.43G)   |   AND   | 0x00000000 (   0) |  1
+  40 | 0x0000000f (  15)     | 0x00000019 (  25)     |   SLT   | 0x00000001 (   1) |  0
+  50 | 0xfffffff6 ( -10)     | 0x00000005 (   5)     |   SLT   | 0x00000001 (   1) |  0
+-----|-----------------------|-----------------------|---------|-------------------|-----
+Kiem tra ket thuc.
+        \end{lstlisting}
+    \end{block}
+    
+    \vspace{0.1cm}
+    \scriptsize
+    \textbf{Nhận xét kết quả:}
+    \begin{itemize}
+        \item \textbf{Tính toán chính xác:} Phép `ADD` (10 + 20 = 30) và phép `SUB` (50 - 50 = 0) cho kết quả khớp lý thuyết.
+        \item \textbf{Cờ Zero:} Tự động kích hoạt lên `1` khi kết quả của phép `SUB` và `AND` bằng 0.
+        \item \textbf{Phép toán có dấu SLT:} So sánh $-10$ và $5$ cho kết quả đúng bằng `1` (SLT thực hiện so sánh có dấu \texttt{\$signed}).
+    \end{itemize}
+\end{frame}
+
+\subsubsection{Bộ nhớ dữ liệu (Data Memory)}
+\begin{frame}[fragile]{Bộ Nhớ Dữ Liệu Dùng Chung (\texttt{data\_mem.v})}
+    \begin{columns}
+        \begin{column}{0.46\textwidth}
+            \centering
+            \textbf{Sơ đồ khối chức năng}
+            \vspace{0.2cm}
+            
+            \begin{tikzpicture}[
+                block/.style={draw, thick, fill=blue!10, draw=DeepBlue, minimum width=3.0cm, minimum height=2.4cm, rounded corners, font=\scriptsize\bfseries, align=center},
+                bus/.style={->, >=stealth, double, double distance=1.5pt, thick, DeepBlue},
+                wire/.style={->, >=stealth, thick, DeepBlue}
+            ]
+                % Main Block
+                \node[block] (mem) at (0, 0) {Shared RAM 4KB\\[0.1cm]\tiny (\texttt{data\_mem.v})};
+                
+                % Inputs (Left side)
+                \draw[wire] (-2.2, 0.9) -- node[above, font=\tiny\bfseries] {clk} ([yshift=0.9cm]mem.west);
+                \draw[wire] (-2.2, 0.5) -- node[above, font=\tiny\bfseries] {reset} ([yshift=0.5cm]mem.west);
+                \draw[bus] (-2.2, 0.1) -- node[above=0.01cm, font=\tiny\bfseries] {addr[31:0]} ([yshift=0.1cm]mem.west);
+                \draw[bus] (-2.2, -0.4) -- node[above=0.01cm, font=\tiny\bfseries] {wdata[31:0]} ([yshift=-0.4cm]mem.west);
+                \draw[wire] (-2.2, -0.9) -- node[above, font=\tiny\bfseries] {we} ([yshift=-0.9cm]mem.west);
+                
+                % Outputs (Right side)
+                \draw[bus] (mem.east) -- node[above=0.01cm, font=\tiny\bfseries] {rdata[31:0]} (2.2, 0);
+            \end{tikzpicture}
+            
+            \vspace{0.2cm}
+            \scriptsize
+            \begin{block}{Cơ chế hoạt động bộ nhớ}
+                \begin{itemize}
+                    \item \textbf{Căn lề địa chỉ (Word-aligned):} Lấy 10 bit địa chỉ thực tế \texttt{addr[11:2]} để lập chỉ mục 1024 từ nhớ (mỗi từ 32-bit).
+                    \item \textbf{Đọc tổ hợp (Bất đồng bộ):} Trả về rdata lập tức khi đổi địa chỉ và re=1 (thuận tiện cho kết nối Bus).
+                    \item \textbf{Ghi đồng bộ:} Cập nhật mảng nhớ tại cạnh lên clk khi we=1.
+                \end{itemize}
+            \end{block}
+        \end{column}
+        
+        \begin{column}{0.52\textwidth}
+            \begin{block}{Mã nguồn RAM 4KB dùng chung}
+                \begin{lstlisting}[language=Verilog, basicstyle=\fontsize{6.0pt}{6.8pt}\selectfont\ttfamily, keywordstyle=\color{blue}, commentstyle=\color{gray}]
+module data_mem (
+    input  wire        clk, reset,
+    input  wire [31:0] addr, wdata,
+    input  wire        we, re,
+    output reg  [31:0] rdata
+);
+    reg [31:0] mem [0:1023];
+    wire [9:0] word_addr = addr[11:2];
+
+    always @(*) begin
+        if (re)  rdata = mem[word_addr];
+        else     rdata = 32'd0;
+    end
+
+    integer i;
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            for (i = 0; i < 1024; i = i + 1)
+                mem[i] <= 32'd0;
+        end else if (we) begin
+            mem[word_addr] <= wdata;
+        end
+    end
+endmodule
+                \end{lstlisting}
+            \end{block}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\subsection{Cơ chế Pipeline và điều phối hệ thống}
+\subsubsection{Thanh ghi đệm (Pipeline Registers)}
+\begin{frame}{Cơ chế hoạt động của Pipeline Registers}
     Các thanh ghi đệm hoạt động như các "vách ngăn" đồng bộ bằng xung nhịp Clock:
     \vspace{0.2cm}
     \begin{columns}

@@ -22,6 +22,7 @@
 \usepackage{booktabs} % Cho bảng chuẩn dòng
 \usepackage{graphicx}
 \usepackage{listings} % Để chèn code hoặc tên tín hiệu mượt mà
+\lstset{showstringspaces=false}
 \usepackage{tikz}
 \usetikzlibrary{positioning}
 
@@ -31,6 +32,19 @@
 \author[Nhóm Dự Án]{Thực hiện: Nhóm Học Viên}
 \institute[Hội Đồng]{Báo Cáo Tiến Độ Dự Án Kiến Trúc Máy Tính}
 \date{\today}
+
+% --- Tự động hiển thị mục lục rút gọn trước mỗi Subsection ---
+\AtBeginSubsection[]
+{
+  \begin{frame}{Nội Dung Báo Cáo}
+    \tableofcontents[
+      currentsection,
+      currentsubsection,
+      subsectionstyle=show/shaded/hide,
+      subsubsectionstyle=show/show/hide
+    ]
+  \end{frame}
+}
 
 \begin{document}
 
@@ -58,7 +72,8 @@
 % ==========================================
 \section{Thiết Kế Hệ Thống (Design)}
 
-\begin{frame}{3. Thiết Kế Hệ Thống: Cấu Trúc Tổng Thể}
+\subsection{Cấu trúc tổng thể}
+\begin{frame}{Cấu Trúc Tổng Thể Hệ Thống 8-Core}
     \centering
     \begin{tikzpicture}[
         node distance=0.8cm and 1.2cm,

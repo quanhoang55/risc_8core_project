@@ -1,40 +1,66 @@
-\frametitle{3.1f Khối PC Logic - Testbench (Kịch bản kích thích)}
-\begin{columns}[t]
-        \begin{column}{0.48\textwidth}
-            \begin{block}{Kịch bản kích thích chính}
-                \begin{lstlisting}[language=Verilog, basicstyle=\fontsize{6.5pt}{8.0pt}\selectfont\ttfamily, keywordstyle=\color{blue}, commentstyle=\color{gray}]
-    initial begin
-        clk = 0; reset = 1; stall = 0;
-        branch_taken = 0; branch_target = 0;
-        jump = 0; jump_target = 0;
-        #10 reset = 0;
-        #20; // Normal PC increment
-        stall = 1; #10; stall = 0; // Stall
-        branch_taken = 1; branch_target = 100;
-        #10; branch_taken = 0; // Branch
-        jump = 1; jump_target = 200;
-        #10; jump = 0; // Jump
-        #20; $finish;
-    end
-                \end{lstlisting}
+\frametitle{Bộ Nhớ Dữ Liệu Dùng Chung (\texttt {data\_mem.v})}
+\begin{columns}
+        \begin{column}{0.46\textwidth}
+            \centering
+            \textbf{Sơ đồ khối chức năng}
+            \vspace{0.2cm}
+
+            \begin{tikzpicture}[
+                block/.style={draw, thick, fill=blue!10, draw=DeepBlue, minimum width=3.0cm, minimum height=2.4cm, rounded corners, font=\scriptsize\bfseries, align=center},
+                bus/.style={->, >=stealth, double, double distance=1.5pt, thick, DeepBlue},
+                wire/.style={->, >=stealth, thick, DeepBlue}
+            ]
+                % Main Block
+                \node[block] (mem) at (0, 0) {Shared RAM 4KB\\[0.1cm]\tiny (\texttt{data\_mem.v})};
+
+                % Inputs (Left side)
+                \draw[wire] (-2.2, 0.9) -- node[above, font=\tiny\bfseries] {clk} ([yshift=0.9cm]mem.west);
+                \draw[wire] (-2.2, 0.5) -- node[above, font=\tiny\bfseries] {reset} ([yshift=0.5cm]mem.west);
+                \draw[bus] (-2.2, 0.1) -- node[above=0.01cm, font=\tiny\bfseries] {addr[31:0]} ([yshift=0.1cm]mem.west);
+                \draw[bus] (-2.2, -0.4) -- node[above=0.01cm, font=\tiny\bfseries] {wdata[31:0]} ([yshift=-0.4cm]mem.west);
+                \draw[wire] (-2.2, -0.9) -- node[above, font=\tiny\bfseries] {we} ([yshift=-0.9cm]mem.west);
+
+                % Outputs (Right side)
+                \draw[bus] (mem.east) -- node[above=0.01cm, font=\tiny\bfseries] {rdata[31:0]} (2.2, 0);
+            \end{tikzpicture}
+
+            \vspace{0.2cm}
+            \scriptsize
+            \begin{block}{Cơ chế hoạt động bộ nhớ}
+                \begin{itemize}
+                    \item \textbf{Căn lề địa chỉ (Word-aligned):} Lấy 10 bit địa chỉ thực tế \texttt{addr[11:2]} để lập chỉ mục 1024 từ nhớ (mỗi từ 32-bit).
+                    \item \textbf{Đọc tổ hợp (Bất đồng bộ):} Trả về rdata lập tức khi đổi địa chỉ và re=1 (thuận tiện cho kết nối Bus).
+                    \item \textbf{Ghi đồng bộ:} Cập nhật mảng nhớ tại cạnh lên clk khi we=1.
+                \end{itemize}
             \end{block}
         \end{column}
 
-        \begin{column}{0.48\textwidth}
-            \begin{block}{Giám sát tín hiệu \& Lưu dạng sóng}
-                \begin{lstlisting}[language=Verilog, basicstyle=\fontsize{6.5pt}{8.0pt}\selectfont\ttfamily, keywordstyle=\color{blue}, commentstyle=\color{gray}]
-    initial begin
-        $monitor(
-            "Time=%0t | PC=%d | stall=%b | branch=%b | jump=%b",
-            $time, pc, stall, branch_taken, jump
-        );
+        \begin{column}{0.52\textwidth}
+            \begin{block}{Mã nguồn RAM 4KB dùng chung}
+                \begin{lstlisting}[language=Verilog, basicstyle=\fontsize{6.0pt}{6.8pt}\selectfont\ttfamily, keywordstyle=\color{blue}, commentstyle=\color{gray}]
+module data_mem (
+    input  wire        clk, reset,
+    input  wire [31:0] addr, wdata,
+    input  wire        we, re,
+    output reg  [31:0] rdata
+);
+    reg [31:0] mem [0:1023];
+    wire [9:0] word_addr = addr[11:2];
+
+    always @(*) begin
+        if (re)  rdata = mem[word_addr];
+        else     rdata = 32'd0;
     end
 
-    initial begin
-        $dumpfile("pc_logic_tb.vcd");
-        $dumpvars(0, pc_logic_tb);
+    integer i;
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            for (i = 0; i < 1024; i = i + 1)
+                mem[i] <= 32'd0;
+        end else if (we) begin
+            mem[word_addr] <= wdata;
+        end
     end
-
 endmodule
                 \end{lstlisting}
             \end{block}

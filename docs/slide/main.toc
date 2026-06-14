@@ -1,5 +1,21 @@
 \babel@toc {vietnamese}{}\relax 
 \beamer@sectionintoc {1}{Giới Thiệu Đề Tài}{3}{0}{1}
-\beamer@sectionintoc {2}{Kiến Trúc Tập Lệnh (ISA)}{4}{0}{2}
-\beamer@sectionintoc {3}{Thiết Kế Hệ Thống (Design)}{8}{0}{3}
-\beamer@sectionintoc {4}{Chiến Lược Kiểm Thử (Testing)}{19}{0}{4}
+\beamer@subsectionintoc {1}{1}{Đặt vấn đề \& Lý do chọn đề tài}{3}{0}{1}
+\beamer@sectionintoc {2}{Kiến Trúc Tập Lệnh (ISA)}{5}{0}{2}
+\beamer@subsectionintoc {2}{1}{Tập lệnh cơ bản RV32I}{5}{0}{2}
+\beamer@subsectionintoc {2}{2}{Tập lệnh hiện thực trong dự án}{9}{0}{2}
+\beamer@sectionintoc {3}{Thiết Kế Hệ Thống (Design)}{11}{0}{3}
+\beamer@subsectionintoc {3}{1}{Cấu trúc tổng thể}{11}{0}{3}
+\beamer@subsectionintoc {3}{2}{Các khối xử lý logic chức năng}{14}{0}{3}
+\beamer@subsubsectionintoc {3}{2}{1}{Bộ nhớ lệnh (Instruction Memory)}{15}{0}{3}
+\beamer@subsubsectionintoc {3}{2}{2}{Khối PC Logic}{16}{0}{3}
+\beamer@subsubsectionintoc {3}{2}{3}{Khối Tập thanh ghi (Register File)}{21}{0}{3}
+\beamer@subsubsectionintoc {3}{2}{4}{Khối Tính toán Số học \& Logic (ALU)}{22}{0}{3}
+\beamer@subsubsectionintoc {3}{2}{5}{Bộ nhớ dữ liệu (Data Memory)}{25}{0}{3}
+\beamer@subsectionintoc {3}{3}{Cơ chế Pipeline và điều phối hệ thống}{26}{0}{3}
+\beamer@subsubsectionintoc {3}{3}{1}{Thanh ghi đệm (Pipeline Registers)}{27}{0}{3}
+\beamer@subsubsectionintoc {3}{3}{2}{Bộ giải mã lệnh (Control Unit)}{28}{0}{3}
+\beamer@subsubsectionintoc {3}{3}{3}{Bộ xử lý xung đột (Hazard Unit)}{29}{0}{3}
+\beamer@subsubsectionintoc {3}{3}{4}{Bộ phân xử \& Kết nối đa nhân (Interconnect)}{30}{0}{3}
+\beamer@sectionintoc {4}{Chiến Lược Kiểm Thử (Testing)}{31}{0}{4}
+\beamer@subsectionintoc {4}{1}{Kế hoạch \& Trạng thái kiểm thử}{31}{0}{4}
