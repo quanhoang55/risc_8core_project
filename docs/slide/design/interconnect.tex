@@ -1,10 +1,19 @@
 % Sub-section: Interconnect
-\begin{frame}{3.4 Kết Nối Đa Nhân (\texttt{interconnect.v})}
-    Để liên kết \textbf{8 lõi CPU độc lập} tương tác với hệ thống Bộ nhớ dùng chung (Shared Memory):
+\begin{frame}{3.4 Trục Bus \& Phân Xử Đa Nhân (\texttt{arbiter.v} \& \texttt{bus\_ctrl.v})}
+    Để liên kết \textbf{8 lõi CPU} dùng chung RAM 4KB, hệ thống sử dụng cơ chế bus điều phối nguyên tử:
     \vspace{0.2cm}
+    
     \begin{itemize}
-        \item \textbf{Bus Interconnect:} Hệ thống dây dẫn cấu trúc hóa kết nối song song dữ liệu và địa chỉ.
-        \item \textbf{Bus Arbiter (Bộ trọng tài):} Điều phối quyền truy cập Bus bằng thuật toán phân phối (ví dụ \textit{Round-Robin}), ngăn chặn hiện tượng tranh chấp dữ liệu (Collision) và "đói" tài nguyên bộ nhớ giữa các Core.
-        \item Khi Core $A$ chiếm giữ Bus qua tín hiệu \texttt{grant = 1}, các Core khác tự động giữ yêu cầu \texttt{req = 1} và chuyển trạng thái chờ đợi.
+        \item \textbf{Bộ phân xử Arbiter (\texttt{arbiter.v}) - Thuật toán Round-Robin:}
+        \begin{itemize}
+            \item Quét 8 Core từ con trỏ ưu tiên (\texttt{priority\_ptr}). Core đầu tiên gửi yêu cầu (\texttt{request}) sẽ được cấp quyền.
+            \item \textbf{Tín hiệu cấp quyền (\texttt{grant}):} Chỉ kích hoạt trong \textbf{1 chu kỳ xung nhịp (pulse)}, sau đó tự xóa. Con trỏ ưu tiên dịch chuyển tiếp sang nhân bên cạnh (\texttt{priority\_ptr <= winner + 1}) nhằm chia sẻ băng thông công bằng, tránh "đói" tài nguyên.
+            \item Sử dụng mặt nạ \texttt{new\_request = request \& \textasciitilde last\_granted} để ngăn chặn 1 Core liên tục chiếm giữ Bus.
+        \end{itemize}
+        \item \textbf{Bộ điều khiển Bus (\texttt{bus\_ctrl.v}) \& Hỗ trợ Nguyên tử (Atomic):}
+        \begin{itemize}
+            \item Định tuyến song song địa chỉ và dữ liệu giữa Core được cấp quyền (\texttt{grant}) và RAM.
+            \item \textbf{Xử lý khóa nguyên tử (Atomic Locks):} Lưu vết địa chỉ đặt khóa cho các lệnh \texttt{LR.W}/\texttt{SC.W}. Nếu xảy ra xung đột ghi từ Core khác, khóa bị xóa và lệnh \texttt{SC.W} trả về thất bại (kết quả \texttt{1}).
+        \end{itemize}
     \end{itemize}
 \end{frame}

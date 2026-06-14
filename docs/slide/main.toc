@@ -1,5 +1,5 @@
 \babel@toc {vietnamese}{}\relax 
 \beamer@sectionintoc {1}{Giới Thiệu Đề Tài}{3}{0}{1}
 \beamer@sectionintoc {2}{Kiến Trúc Tập Lệnh (ISA)}{4}{0}{2}
-\beamer@sectionintoc {3}{Thiết Kế Hệ Thống (Design)}{5}{0}{3}
-\beamer@sectionintoc {4}{Chiến Lược Kiểm Thử (Testing)}{10}{0}{4}
+\beamer@sectionintoc {3}{Thiết Kế Hệ Thống (Design)}{8}{0}{3}
+\beamer@sectionintoc {4}{Chiến Lược Kiểm Thử (Testing)}{19}{0}{4}

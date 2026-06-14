@@ -22,6 +22,8 @@
 \usepackage{booktabs} % Cho bảng chuẩn dòng
 \usepackage{graphicx}
 \usepackage{listings} % Để chèn code hoặc tên tín hiệu mượt mà
+\usepackage{tikz}
+\usetikzlibrary{positioning}
 
 % --- Thông tin Đề tài ---
 \title[Mô phỏng CPU 8-Core RISC-V]{\textbf{MÔ PHỎNG CPU 8-CORE VỚI KIẾN TRÚC TẬP LỆNH RISC-V}}
@@ -57,17 +59,41 @@
 \section{Thiết Kế Hệ Thống (Design)}
 
 \begin{frame}{3. Thiết Kế Hệ Thống: Cấu Trúc Tổng Thể}
-    \begin{center}
-        \textbf{Sơ đồ phân rã các Module trong mã nguồn Verilog}
-    \end{center}
-    Hệ thống được chia thành 4 phân vùng chính để quản lý và hiện thực hóa trong mã nguồn:
-    \vspace{0.3cm}
-    \begin{enumerate}
-        \item \textbf{Datapath (Single Core):} Trục xương sống dịch chuyển và biến đổi dữ liệu.
-        \item \textbf{Control Unit:} Bộ não điều khiển luồng dữ liệu chạy nhịp nhàng qua Pipeline.
-        \item \textbf{Pipeline Hazard Unit:} Khối cứu nguy và xử lý các xung đột phần cứng.
-        \item \textbf{Interconnect:} Hệ thống trục Bus kết nối, phân xử quyền hạn giữa 8 lõi CPU.
-    \end{enumerate}
+    \centering
+    \begin{tikzpicture}[
+        node distance=0.8cm and 1.2cm,
+        core/.style={draw, fill=blue!10, minimum width=2.2cm, minimum height=0.6cm, font=\scriptsize\bfseries, align=center},
+        bus/.style={draw, fill=orange!15, minimum width=3.2cm, minimum height=1.0cm, font=\scriptsize\bfseries, align=center},
+        arb/.style={draw, fill=green!15, minimum width=3.2cm, minimum height=0.8cm, font=\scriptsize\bfseries, align=center},
+        mem/.style={draw, fill=yellow!15, minimum width=3.2cm, minimum height=1.0cm, font=\scriptsize\bfseries, align=center}
+    ]
+        % Cores
+        \node[core] (c0) at (0, 1.2) {Core 0 (risc\_core)};
+        \node[core] (c1) at (0, 0.4) {Core 1 (risc\_core)};
+        \node[font=\bfseries] (cdot) at (0, -0.3) {\vdots};
+        \node[core] (c7) at (0, -1.0) {Core 7 (risc\_core)};
+        
+        % Bus Controller
+        \node[bus] (busctrl) at (4.8, 0.1) {Bộ Điều Khiển Bus\\(\texttt{bus\_ctrl.v})};
+        
+        % Arbiter
+        \node[arb] (arbiter) at (4.8, -1.4) {Arbiter (Round-Robin)\\(\texttt{arbiter.v})};
+        
+        % Shared Memory
+        \node[mem] (sharedmem) at (9.6, 0.1) {Bộ nhớ dùng chung\\(Shared RAM 4KB)\\(\texttt{data\_mem.v})};
+        
+        % Connections
+        \draw[<->, >=stealth, thick, DeepBlue] (c0.east) -- (2.3, 1.2) -- (2.3, 0.5) -- (busctrl.170);
+        \draw[<->, >=stealth, thick, DeepBlue] (c1.east) -- (busctrl.180);
+        \draw[<->, >=stealth, thick, DeepBlue] (c7.east) -- (2.3, -1.0) -- (2.3, -0.3) -- (busctrl.190);
+        
+        \draw[<->, >=stealth, thick, red!70!black] (arbiter) -- node[right, font=\tiny\bfseries] {req / grant} (busctrl);
+        \draw[<->, >=stealth, thick, green!60!black] (busctrl) -- node[above, font=\tiny\bfseries] {Shared Bus} (sharedmem);
+    \end{tikzpicture}
+    
+    \vspace{0.2cm}
+    \scriptsize
+    Hệ thống kết nối đa nhân: \textbf{8 lõi CPU} hoạt động song song độc lập, thực hiện phân xử quyền truy cập bộ nhớ thông qua bộ phân xử \textbf{Arbiter} và bộ định tuyến bus dữ liệu \textbf{Bus Controller}.
 \end{frame}
 
 

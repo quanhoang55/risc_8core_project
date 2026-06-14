@@ -1,0 +1,42 @@
+\frametitle{3.1f Khối PC Logic - Testbench (Kịch bản kích thích)}
+\begin{columns}[t]
+        \begin{column}{0.48\textwidth}
+            \begin{block}{Kịch bản kích thích chính}
+                \begin{lstlisting}[language=Verilog, basicstyle=\fontsize{6.5pt}{8.0pt}\selectfont\ttfamily, keywordstyle=\color{blue}, commentstyle=\color{gray}]
+    initial begin
+        clk = 0; reset = 1; stall = 0;
+        branch_taken = 0; branch_target = 0;
+        jump = 0; jump_target = 0;
+        #10 reset = 0;
+        #20; // Normal PC increment
+        stall = 1; #10; stall = 0; // Stall
+        branch_taken = 1; branch_target = 100;
+        #10; branch_taken = 0; // Branch
+        jump = 1; jump_target = 200;
+        #10; jump = 0; // Jump
+        #20; $finish;
+    end
+                \end{lstlisting}
+            \end{block}
+        \end{column}
+
+        \begin{column}{0.48\textwidth}
+            \begin{block}{Giám sát tín hiệu \& Lưu dạng sóng}
+                \begin{lstlisting}[language=Verilog, basicstyle=\fontsize{6.5pt}{8.0pt}\selectfont\ttfamily, keywordstyle=\color{blue}, commentstyle=\color{gray}]
+    initial begin
+        $monitor(
+            "Time=%0t | PC=%d | stall=%b | branch=%b | jump=%b",
+            $time, pc, stall, branch_taken, jump
+        );
+    end
+
+    initial begin
+        $dumpfile("pc_logic_tb.vcd");
+        $dumpvars(0, pc_logic_tb);
+    end
+
+endmodule
+                \end{lstlisting}
+            \end{block}
+        \end{column}
+    \end{columns}
