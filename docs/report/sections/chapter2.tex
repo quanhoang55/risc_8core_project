@@ -1,0 +1,574 @@
+\chapter{Phương Pháp Luận \& Kiến Trúc Hệ Thống}
+
+\section{Phương pháp luận thiết kế hệ thống}
+Để xây dựng thành công hệ thống vi xử lý đa lõi 8-Core RISC-V hoạt động ổn định và tối ưu, dự án áp dụng phương pháp luận thiết kế phần cứng hệ thống theo các nguyên tắc cốt lõi sau:
+
+\subsection{Quy trình thiết kế Top-Down kết hợp Bottom-Up}
+Quy trình xây dựng hệ thống kết hợp hài hòa hai cách tiếp cận:
+\begin{itemize}
+    \item \textbf{Thiết kế từ trên xuống (Top-Down Design):} Xuất phát từ yêu cầu hệ thống đa nhân chia sẻ bộ nhớ và sử dụng tập lệnh RISC-V. Hệ thống được phân rã thành các khối chức năng độc lập bao gồm: Lõi đơn nhân (Core), Bộ phân xử (Arbiter), Bộ điều khiển Bus (Bus Controller) và Bộ nhớ dữ liệu dùng chung (Shared RAM). Việc xác định rõ giao tiếp (Interface) giữa các khối này là bước tiên quyết trước khi viết mã RTL.
+    \item \textbf{Tích hợp từ dưới lên (Bottom-Up Integration):} Hiện thực hóa và kiểm thử kỹ lưỡng từ mức linh kiện cơ bản: Đơn vị số học logic (ALU), Tập thanh ghi (Register File), Bộ điều khiển (Control Unit), Logic cập nhật PC. Sau đó tích hợp thành Lõi xử lý đơn (Core) và trục liên kết đa nhân (Interconnect). Cuối cùng là tích hợp toàn hệ thống 8-Core và kiểm chứng bằng testbench hệ thống phức tạp.
+\end{itemize}
+
+\subsection{Mô hình hóa phần cứng ở mức RTL (RTL Modeling)}
+Toàn bộ hệ thống được mô tả bằng ngôn ngữ mô tả phần cứng \textbf{Verilog HDL} (chuẩn IEEE 1364-2001). Phương pháp thiết kế RTL tập trung vào:
+\begin{itemize}
+    \item \textbf{Tách biệt mạch tuần tự và mạch tổ hợp:} Sử dụng sườn lên xung nhịp (\texttt{posedge clk}) để chốt dữ liệu vào các thanh ghi pipeline và bộ đếm chương trình PC. Sử dụng khối \texttt{always @(*)} và \texttt{assign} cho các mạch tổ hợp giải mã lệnh và tính toán ALU.
+    \item \textbf{Thiết kế modular hóa:} Mỗi khối chức năng được đóng gói trong một file riêng biệt, giao tiếp qua các cổng dữ liệu (ports) rõ ràng, giúp dễ dàng bảo trì và kiểm thử độc lập.
+\end{itemize}
+
+\subsection{Quy trình mô phỏng và kiểm chứng dựa trên công cụ mã nguồn mở}
+Kiểm chứng chức năng (Functional Verification) đóng vai trò sống còn. Phương pháp luận kiểm chứng của dự án dựa trên:
+\begin{itemize}
+    \item \textbf{Mô phỏng mức RTL (RTL Simulation):} Sử dụng công cụ mã nguồn mở \textbf{Icarus Verilog} để biên dịch mã nguồn và chạy các testbench. Các kịch bản kiểm thử được thiết kế để bao phủ các tình huống xung đột dữ liệu (data hazard), xung đột điều khiển (control hazard) và tranh chấp bus bộ nhớ.
+    \item \textbf{Phân tích giản đồ dạng sóng (Waveform Analysis):} Xuất tệp dạng sóng định dạng VCD (Value Change Dump) và sử dụng phần mềm trực quan \textbf{GTKWave} để gỡ lỗi (debug) các hành vi phần cứng theo từng chu kỳ xung nhịp.
+\end{itemize}
+
+\subsection{Mô hình hóa chia sẻ tài nguyên và cơ chế đồng bộ}
+Đối với hệ thống 8 lõi dùng chung bộ nhớ:
+\begin{itemize}
+    \item \textbf{Tránh deadlock và starvation:} Áp dụng thuật toán phân xử Round-Robin cho bộ Arbiter nhằm cấp quyền truy cập bus tuần hoàn, công bằng giữa các nhân.
+    \item \textbf{Đồng bộ hóa phần cứng:} Hỗ trợ các chỉ thị lệnh nguyên tử (Atomic) từ nhóm mở rộng A-Extension nhằm giải quyết xung đột ghi/đọc đồng thời từ phần mềm đa nhân.
+\end{itemize}
+
+\section{Kiến trúc tập lệnh RISC-V (ISA) áp dụng trong dự án}
+Trước khi đi vào thiết kế phần cứng ở mức RTL, việc hiểu rõ kiến trúc tập lệnh (Instruction Set Architecture - ISA) là bắt buộc. ISA đóng vai trò là đặc tả giao tiếp giữa phần mềm và phần cứng. Trong dự án này, hệ thống vi xử lý được xây dựng dựa trên tập chỉ thị \textbf{RV32I} kết hợp với một số chỉ thị thuộc nhóm mở rộng nguyên tử \textbf{A-Extension} (RV32IA subset).
+
+\subsection{Tổng quan về tập chỉ thị RV32I}
+RV32I là tập chỉ thị số nguyên cơ bản dạng 32-bit của RISC-V. Đây là tập chỉ thị bắt buộc và là nền tảng cho mọi bộ xử lý RISC-V. Các đặc trưng kỹ thuật chính bao gồm:
+\begin{itemize}
+    \item \textbf{Độ rộng địa chỉ và thanh ghi:} 32-bit cho cả thanh ghi đa năng và không gian địa chỉ bộ nhớ.
+    \item \textbf{Cơ chế nạp/lưu (Load-Store Architecture):} Chỉ các chỉ thị Load (\texttt{LW}) và Store (\texttt{SW}) mới được phép truy cập bộ nhớ dữ liệu. Các phép toán toán học và logic chỉ thực hiện trực tiếp trên tập thanh ghi.
+    \item \textbf{Độ dài lệnh cố định:} Mọi chỉ thị lệnh đều có độ rộng cố định là 32-bit, giúp đơn giản hóa quá trình nạp và giải mã lệnh trong pipeline phần cứng.
+\end{itemize}
+
+\subsection{Tập thanh ghi đa năng (Register File)}
+Bộ xử lý tích hợp 32 thanh ghi đa năng kí hiệu từ \texttt{x0} đến \texttt{x31}. Trong đó, thanh ghi \texttt{x0} (zero) được nối cứng về mức logic 0 ở mức phần cứng và không thể thay đổi giá trị. Bảng \ref{tab:registers} dưới đây mô tả chi tiết chức năng và quy ước đặt tên (ABI) của tập thanh ghi:
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{l l X c}
+\toprule
+\textbf{Thanh ghi} & \textbf{Tên ABI} & \textbf{Mô tả chức năng} & \textbf{Lưu giữ} \\
+\midrule
+\texttt{x0} & \texttt{zero} & Luôn bằng 0 (Hằng số phần cứng) & -- \\
+\texttt{x1} & \texttt{ra} & Địa chỉ trả về của hàm (Return Address) & Caller \\
+\texttt{x2} & \texttt{sp} & Con trỏ ngăn xếp (Stack Pointer) & Callee \\
+\texttt{x3} & \texttt{gp} & Con trỏ toàn cục (Global Pointer) & -- \\
+\texttt{x4} & \texttt{tp} & Con trỏ luồng/tiểu trình (Thread Pointer) & -- \\
+\texttt{x5--x7} & \texttt{t0--t2} & Thanh ghi tạm thời (Temporaries) & Caller \\
+\texttt{x8} & \texttt{s0/fp} & Thanh ghi lưu giữ / Con trỏ khung (Frame Pointer) & Callee \\
+\texttt{x9} & \texttt{s1} & Thanh ghi lưu giữ (Saved register) & Callee \\
+\texttt{x10--x11} & \texttt{a0--a1} & Tham số truyền vào / Kết quả trả về của hàm & Caller \\
+\texttt{x12--x17} & \texttt{a2--a7} & Các tham số truyền vào hàm (Arguments) & Caller \\
+\texttt{x18--x27} & \texttt{s2--s11} & Các thanh ghi lưu giữ (Saved registers) & Callee \\
+\texttt{x28--x31} & \texttt{t3--t6} & Các thanh ghi tạm thời (Temporaries) & Caller \\
+\bottomrule
+\end{tabularx}
+\caption{Quy ước chức năng tập thanh ghi trong kiến trúc RISC-V}
+\label{tab:registers}
+\end{table}
+
+\subsection{Các kiểu định dạng chỉ thị lệnh cơ bản}
+Kiến trúc RISC-V phân chia mã lệnh 32-bit thành 6 kiểu định dạng cơ bản để tối ưu bộ giải mã:
+\begin{itemize}
+    \item \textbf{R-type (Register):} Dành cho các lệnh tính toán số học/logic giữa các thanh ghi nguồn (\texttt{rs1}, \texttt{rs2}) và ghi kết quả vào thanh ghi đích (\texttt{rd}).
+    \item \textbf{I-type (Immediate):} Dành cho các lệnh tính toán với hằng số nạp trực tiếp 12-bit (\texttt{imm}) hoặc lệnh Load bộ nhớ.
+    \item \textbf{S-type (Store):} Dành cho chỉ thị Store lưu dữ liệu từ thanh ghi nguồn vào bộ nhớ.
+    \item \textbf{B-type (Branch):} Dành cho chỉ thị so sánh rẽ nhánh có điều kiện với độ lệch địa chỉ 12-bit.
+    \item \textbf{U-type (Upper Immediate):} Dành cho chỉ thị nạp hằng số lớn 20-bit vào nửa cao của thanh ghi (như \texttt{LUI}, \texttt{AUIPC}).
+    \item \textbf{J-type (Jump):} Dành cho chỉ thị nhảy không điều kiện (\texttt{JAL}).
+\end{itemize}
+
+\subsection{Đặc tả định dạng mã hóa và trường bit của các lệnh thực hiện}
+Bộ xử lý trong dự án này hiện thực một tập con của kiến trúc tập lệnh RV32I cùng nhóm mở rộng nguyên tử A-Extension để điều khiển và đồng bộ tính toán đa lõi. Dưới đây là bảng đặc tả chi tiết mã hóa nhị phân 32-bit cho từng chỉ thị lệnh được triển khai thực tế trong mã nguồn RTL:
+
+\subsubsection{1. Nhóm lệnh định dạng R (R-type)}
+Các lệnh tính toán số học và logic thực thi trực tiếp giữa các thanh ghi nguồn (\texttt{rs1}, \texttt{rs2}) và lưu kết quả vào thanh ghi đích (\texttt{rd}). Chúng sử dụng chung mã opcode là \texttt{0110011} (7'h33). Chi tiết mã hóa các trường bit được trình bày trong Bảng \ref{tab:enc_r}:
+
+\subsubsection{2. Nhóm lệnh định dạng I (I-type)}
+Các lệnh tính toán với hằng số nạp trực tiếp (\texttt{imm}), lệnh nạp dữ liệu từ bộ nhớ (\texttt{LW}), hoặc lệnh nhảy gián tiếp (\texttt{JALR}) có độ dài hằng số là 12-bit.
+\begin{itemize}
+    \item Lệnh tính toán ALU sử dụng opcode \texttt{0010011} (7'h13).
+    \item Lệnh đọc bộ nhớ \texttt{LW} sử dụng opcode \texttt{0000011} (7'h03).
+    \item Lệnh nhảy gián tiếp \texttt{JALR} sử dụng opcode \texttt{1100111} (7'h67).
+\end{itemize}
+Chi tiết mã hóa được trình bày trong Bảng \ref{tab:enc_i}. Đối với hai chỉ thị dịch bit \texttt{SLLI} và \texttt{SRLI}, hằng số dịch (\texttt{shamt}) chỉ có độ rộng 5-bit (để dịch tối đa 31 bit), do đó trường \texttt{imm[11:5]} được nối cứng bằng \texttt{0000000}.
+
+\subsubsection{3. Nhóm lệnh định dạng S (S-type)}
+Định dạng dùng cho lệnh ghi dữ liệu vào bộ nhớ RAM dùng chung. Mã opcode duy nhất của nhóm là \texttt{0100011} (7'h23). Trường hằng số dịch chuyển địa chỉ (\texttt{imm}) được phân tách thành hai phần đặt ở hai vị trí khác nhau để tối ưu hóa đường dây giải mã trong CPU. Chi tiết mã hóa lệnh \texttt{SW} được mô tả trong Bảng \ref{tab:enc_s}:
+
+\subsubsection{4. Nhóm lệnh định dạng B (Branch - B-type)}
+Các lệnh rẽ nhánh có điều kiện so sánh giá trị giữa \texttt{rs1} và \texttt{rs2} để quyết định việc thay đổi địa chỉ PC. Chúng sử dụng chung mã opcode \texttt{1100011} (7'h63). Các bit của hằng số nhảy lệch được phân rã phức tạp nhằm đồng nhất với cấu trúc mạch giải mã của định dạng S. Chi tiết cấu trúc được thể hiện qua Bảng \ref{tab:enc_b}:
+
+\subsubsection{5. Nhóm lệnh định dạng U (U-type) và J (J-type)}
+Các chỉ thị làm việc với hằng số lớn nạp trực tiếp 20-bit vào nửa cao của thanh ghi (\texttt{LUI}, \texttt{AUIPC}) hoặc thực hiện lệnh nhảy không điều kiện tầm xa (\texttt{JAL}). Chi tiết cấu trúc mã hóa được thể hiện qua Bảng \ref{tab:enc_uj}:
+
+\subsubsection{6. Nhóm lệnh nguyên tử đồng bộ (A-Extension)}
+Đặc trưng thiết yếu của hệ thống 8 lõi xử lý chia sẻ RAM dữ liệu là việc đồng bộ hóa đa luồng thông qua các chỉ thị nguyên tử (Atomic). Các chỉ thị này sử dụng chung mã opcode \texttt{0101111} (7'h2F) và trường \texttt{funct3} mặc định là \texttt{010} (độ rộng dữ liệu word 32-bit). Lệnh được phân biệt bởi mã trường 5 bit \texttt{funct5 = instruction[31:27]}. Để đơn giản hóa mạch phần cứng, hai bit điều khiển tính nhất quán bộ nhớ là \texttt{aq} (bit 26) và \texttt{rl} (bit 25) được nối cứng về 0. Chi tiết mã hóa của các lệnh nguyên tử được thể hiện qua Bảng \ref{tab:enc_atomic}:
+
+\subsection{Các bảng tổng hợp đặc tả mã hóa chỉ thị lệnh}
+Dưới đây là toàn bộ các bảng đặc tả mã hóa nhị phân chi tiết cho từng nhóm chỉ thị lệnh được hiện thực hóa trong dự án:
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{l c c c c c c X}
+\toprule
+\textbf{Lệnh} & \makecell{\textbf{funct7} \\ \textbf{[31:25]}} & \makecell{\textbf{rs2} \\ \textbf{[24:20]}} & \makecell{\textbf{rs1} \\ \textbf{[19:15]}} & \makecell{\textbf{funct3} \\ \textbf{[14:12]}} & \makecell{\textbf{rd} \\ \textbf{[11:7]}} & \makecell{\textbf{opcode} \\ \textbf{[6:0]}} & \textbf{Mô tả hoạt động} \\
+\midrule
+\texttt{ADD} & \texttt{0000000} & \texttt{rs2} & \texttt{rs1} & \texttt{000} & \texttt{rd} & \texttt{0110011} & \texttt{R[rd] = R[rs1] + R[rs2]} \\
+\texttt{SUB} & \texttt{0100000} & \texttt{rs2} & \texttt{rs1} & \texttt{000} & \texttt{rd} & \texttt{0110011} & \texttt{R[rd] = R[rs1] - R[rs2]} \\
+\texttt{SLL} & \texttt{0000000} & \texttt{rs2} & \texttt{rs1} & \texttt{001} & \texttt{rd} & \texttt{0110011} & \texttt{R[rd] = R[rs1] << R[rs2][4:0]} \\
+\texttt{SLT} & \texttt{0000000} & \texttt{rs2} & \texttt{rs1} & \texttt{010} & \texttt{rd} & \texttt{0110011} & \texttt{R[rd] = (R[rs1] < R[rs2]) ? 1 : 0} \\
+\texttt{XOR} & \texttt{0000000} & \texttt{rs2} & \texttt{rs1} & \texttt{100} & \texttt{rd} & \texttt{0110011} & \texttt{R[rd] = R[rs1] \textasciicircum\ R[rs2]} \\
+\texttt{SRL} & \texttt{0000000} & \texttt{rs2} & \texttt{rs1} & \texttt{101} & \texttt{rd} & \texttt{0110011} & \texttt{R[rd] = R[rs1] >> R[rs2][4:0]} \\
+\texttt{OR} & \texttt{0000000} & \texttt{rs2} & \texttt{rs1} & \texttt{110} & \texttt{rd} & \texttt{0110011} & \texttt{R[rd] = R[rs1] \textbar\ R[rs2]} \\
+\texttt{AND} & \texttt{0000000} & \texttt{rs2} & \texttt{rs1} & \texttt{111} & \texttt{rd} & \texttt{0110011} & \texttt{R[rd] = R[rs1] \& R[rs2]} \\
+\bottomrule
+\end{tabularx}
+\caption{Mã hóa chi tiết các lệnh định dạng R-type}
+\label{tab:enc_r}
+\end{table}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{l c c c c c X}
+\toprule
+\textbf{Lệnh} & \makecell{\textbf{imm[11:0]} \\ \textbf{[31:20]}} & \makecell{\textbf{rs1} \\ \textbf{[19:15]}} & \makecell{\textbf{funct3} \\ \textbf{[14:12]}} & \makecell{\textbf{rd} \\ \textbf{[11:7]}} & \makecell{\textbf{opcode} \\ \textbf{[6:0]}} & \textbf{Mô tả hoạt động} \\
+\midrule
+\texttt{ADDI} & \texttt{imm[11:0]} & \texttt{rs1} & \texttt{000} & \texttt{rd} & \texttt{0010011} & \texttt{R[rd] = R[rs1] + imm} \\
+\texttt{SLTI} & \texttt{imm[11:0]} & \texttt{rs1} & \texttt{010} & \texttt{rd} & \texttt{0010011} & \texttt{R[rd] = (R[rs1] < imm) ? 1 : 0} \\
+\texttt{XORI} & \texttt{imm[11:0]} & \texttt{rs1} & \texttt{100} & \texttt{rd} & \texttt{0010011} & \texttt{R[rd] = R[rs1] \textasciicircum\ imm} \\
+\texttt{ORI} & \texttt{imm[11:0]} & \texttt{rs1} & \texttt{110} & \texttt{rd} & \texttt{0010011} & \texttt{R[rd] = R[rs1] \textbar\ imm} \\
+\texttt{ANDI} & \texttt{imm[11:0]} & \texttt{rs1} & \texttt{111} & \texttt{rd} & \texttt{0010011} & \texttt{R[rd] = R[rs1] \& imm} \\
+\texttt{SLLI} & \texttt{0000000} \textbar\ \texttt{shamt[4:0]} & \texttt{rs1} & \texttt{001} & \texttt{rd} & \texttt{0010011} & \texttt{R[rd] = R[rs1] << shamt} \\
+\texttt{SRLI} & \texttt{0000000} \textbar\ \texttt{shamt[4:0]} & \texttt{rs1} & \texttt{101} & \texttt{rd} & \texttt{0010011} & \texttt{R[rd] = R[rs1] >> shamt} \\
+\texttt{LW} & \texttt{imm[11:0]} & \texttt{rs1} & \texttt{010} & \texttt{rd} & \texttt{0000011} & \texttt{R[rd] = M[R[rs1] + imm]} \\
+\texttt{JALR} & \texttt{imm[11:0]} & \texttt{rs1} & \texttt{000} & \texttt{rd} & \texttt{1100111} & \texttt{R[rd] = PC + 4; PC = (R[rs1] + imm) \& \textasciitilde 1} \\
+\bottomrule
+\end{tabularx}
+\caption{Mã hóa chi tiết các lệnh định dạng I-type}
+\label{tab:enc_i}
+\end{table}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{l c c c c c c X}
+\toprule
+\textbf{Lệnh} & \makecell{\textbf{imm[11:5]} \\ \textbf{[31:25]}} & \makecell{\textbf{rs2} \\ \textbf{[24:20]}} & \makecell{\textbf{rs1} \\ \textbf{[19:15]}} & \makecell{\textbf{funct3} \\ \textbf{[14:12]}} & \makecell{\textbf{imm[4:0]} \\ \textbf{[11:7]}} & \makecell{\textbf{opcode} \\ \textbf{[6:0]}} & \textbf{Mô tả hoạt động} \\
+\midrule
+\texttt{SW} & \texttt{imm[11:5]} & \texttt{rs2} & \texttt{rs1} & \texttt{010} & \texttt{imm[4:0]} & \texttt{0100011} & \texttt{M[R[rs1] + imm] = R[rs2]} \\
+\bottomrule
+\end{tabularx}
+\caption{Mã hóa chi tiết lệnh định dạng S-type}
+\label{tab:enc_s}
+\end{table}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{l c c c c c c X}
+\toprule
+\textbf{Lệnh} & \makecell{\textbf{imm[12\textbar10:5]} \\ \textbf{[31:25]}} & \makecell{\textbf{rs2} \\ \textbf{[24:20]}} & \makecell{\textbf{rs1} \\ \textbf{[19:15]}} & \makecell{\textbf{funct3} \\ \textbf{[14:12]}} & \makecell{\textbf{imm[4:1\textbar11]} \\ \textbf{[11:7]}} & \makecell{\textbf{opcode} \\ \textbf{[6:0]}} & \textbf{Điều kiện rẽ nhánh} \\
+\midrule
+\texttt{BEQ} & \texttt{imm[12\textbar10:5]} & \texttt{rs2} & \texttt{rs1} & \texttt{000} & \texttt{imm[4:1\textbar11]} & \texttt{1100011} & \texttt{if (R[rs1] == R[rs2]) PC = PC + imm} \\
+\texttt{BNE} & \texttt{imm[12\textbar10:5]} & \texttt{rs2} & \texttt{rs1} & \texttt{001} & \texttt{imm[4:1\textbar11]} & \texttt{1100011} & \texttt{if (R[rs1] != R[rs2]) PC = PC + imm} \\
+\texttt{BLT} & \texttt{imm[12\textbar10:5]} & \texttt{rs2} & \texttt{rs1} & \texttt{100} & \texttt{imm[4:1\textbar11]} & \texttt{1100011} & \texttt{if (R[rs1] < R[rs2]) PC = PC + imm} \\
+\texttt{BGE} & \texttt{imm[12\textbar10:5]} & \texttt{rs2} & \texttt{rs1} & \texttt{101} & \texttt{imm[4:1\textbar11]} & \texttt{1100011} & \texttt{if (R[rs1] >= R[rs2]) PC = PC + imm} \\
+\bottomrule
+\end{tabularx}
+\caption{Mã hóa chi tiết các lệnh định dạng B-type}
+\label{tab:enc_b}
+\end{table}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{l c c c X}
+\toprule
+\textbf{Lệnh} & \makecell{\textbf{imm} \\ \textbf{[31:12]}} & \makecell{\textbf{rd} \\ \textbf{[11:7]}} & \makecell{\textbf{opcode} \\ \textbf{[6:0]}} & \textbf{Mô tả hoạt động} \\
+\midrule
+\texttt{LUI} & \texttt{imm[31:12]} & \texttt{rd} & \texttt{0110111} & \texttt{R[rd] = imm << 12} \\
+\texttt{AUIPC} & \texttt{imm[31:12]} & \texttt{rd} & \texttt{0010111} & \texttt{R[rd] = PC + (imm << 12)} \\
+\texttt{JAL} & \texttt{imm[20\textbar10:1\textbar11\textbar19:12]} & \texttt{rd} & \texttt{1101111} & \texttt{R[rd] = PC + 4; PC = PC + imm} \\
+\bottomrule
+\end{tabularx}
+\caption{Mã hóa chi tiết các lệnh định dạng U-type và J-type}
+\label{tab:enc_uj}
+\end{table}
+
+\begin{table}[H]
+\centering
+\small
+\setlength{\tabcolsep}{3pt}
+\begin{tabularx}{\textwidth}{l c c c c c c c c X}
+\toprule
+\textbf{Lệnh} & \makecell{\textbf{funct5} \\ \textbf{[31:27]}} & \makecell{\textbf{aq} \\ \textbf{[26]}} & \makecell{\textbf{rl} \\ \textbf{[25]}} & \makecell{\textbf{rs2} \\ \textbf{[24:20]}} & \makecell{\textbf{rs1} \\ \textbf{[19:15]}} & \makecell{\textbf{funct3} \\ \textbf{[14:12]}} & \makecell{\textbf{rd} \\ \textbf{[11:7]}} & \makecell{\textbf{opcode} \\ \textbf{[6:0]}} & \textbf{Mô tả hoạt động} \\
+\midrule
+\texttt{LR.W} & \texttt{00010} & \texttt{0} & \texttt{0} & \texttt{00000} & \texttt{rs1} & \texttt{010} & \texttt{rd} & \texttt{0101111} & \texttt{R[rd] = M[R[rs1]] (đặt khóa)} \\
+\texttt{SC.W} & \texttt{00011} & \texttt{0} & \texttt{0} & \texttt{rs2} & \texttt{rs1} & \texttt{010} & \texttt{rd} & \texttt{0101111} & \texttt{R[rd] = SC(M[R[rs1]] = R[rs2])} \\
+\texttt{AMOSWAP.W}& \texttt{00001} & \texttt{0} & \texttt{0} & \texttt{rs2} & \texttt{rs1} & \texttt{010} & \texttt{rd} & \texttt{0101111} & \texttt{R[rd] = M[R[rs1]]; M[R[rs1]] = R[rs2]} \\
+\texttt{AMOADD.W} & \texttt{00000} & \texttt{0} & \texttt{0} & \texttt{rs2} & \texttt{rs1} & \texttt{010} & \texttt{rd} & \texttt{0101111} & \texttt{R[rd] = M[R[rs1]]; M[R[rs1]] = R[rd] + R[rs2]} \\
+\texttt{AMOAND.W} & \texttt{01100} & \texttt{0} & \texttt{0} & \texttt{rs2} & \texttt{rs1} & \texttt{010} & \texttt{rd} & \texttt{0101111} & \texttt{R[rd] = M[R[rs1]]; M[R[rs1]] = R[rd] \& R[rs2]} \\
+\texttt{AMOOR.W} & \texttt{01010} & \texttt{0} & \texttt{0} & \texttt{rs2} & \texttt{rs1} & \texttt{010} & \texttt{rd} & \texttt{0101111} & \texttt{R[rd] = M[R[rs1]]; M[R[rs1]] = R[rd] \textbar\ R[rs2]} \\
+\texttt{AMOXOR.W} & \texttt{00100} & \texttt{0} & \texttt{0} & \texttt{rs2} & \texttt{rs1} & \texttt{010} & \texttt{rd} & \texttt{0101111} & \texttt{R[rd] = M[R[rs1]]; M[R[rs1]] = R[rd] \textasciicircum\ R[rs2]} \\
+\texttt{AMOMIN.W} & \texttt{10000} & \texttt{0} & \texttt{0} & \texttt{rs2} & \texttt{rs1} & \texttt{010} & \texttt{rd} & \texttt{0101111} & \texttt{R[rd] = M[R[rs1]]; M[R[rs1]] = min(R[rd], R[rs2])} \\
+\texttt{AMOMAX.W} & \texttt{10100} & \texttt{0} & \texttt{0} & \texttt{rs2} & \texttt{rs1} & \texttt{010} & \texttt{rd} & \texttt{0101111} & \texttt{R[rd] = M[R[rs1]]; M[R[rs1]] = max(R[rd], R[rs2])} \\
+\texttt{AMOMINU.W}& \texttt{11000} & \texttt{0} & \texttt{0} & \texttt{rs2} & \texttt{rs1} & \texttt{010} & \texttt{rd} & \texttt{0101111} & \texttt{R[rd] = M[R[rs1]]; M[R[rs1]] = min\_u(R[rd], R[rs2])} \\
+\texttt{AMOMAXU.W}& \texttt{11100} & \texttt{0} & \texttt{0} & \texttt{rs2} & \texttt{rs1} & \texttt{010} & \texttt{rd} & \texttt{0101111} & \texttt{R[rd] = M[R[rs1]]; M[R[rs1]] = max\_u(R[rd], R[rs2])} \\
+\bottomrule
+\end{tabularx}
+\caption{Mã hóa chi tiết các lệnh nguyên tử thuộc nhóm A-Extension}
+\label{tab:enc_atomic}
+\end{table}
+
+\section{Sơ đồ cấu trúc tổng thể hệ thống 8-Core}
+Kiến trúc hệ thống bao gồm 8 lõi CPU chạy song song độc lập. Các CPU có bộ nhớ lệnh (Instruction memory) riêng nhằm triệt tiêu xung đột truy cập lệnh, nhưng chia sẻ một khối RAM dữ liệu dùng chung (Shared Data Memory). Sự giao tiếp này được quản lý thông qua hai khối chính là:
+\begin{enumerate}
+    \item \textbf{Bộ phân xử Bus (Arbiter - \texttt{arbiter.v}):} Phân xử quyền truy cập dựa trên thuật toán Round-Robin.
+    \item \textbf{Bộ điều khiển Bus (Bus Controller - \texttt{bus\_ctrl.v}):} Định tuyến các bus địa chỉ, dữ liệu đầu vào và đầu ra đến RAM dữ liệu tương ứng của nhân được cấp quyền.
+\end{enumerate}
+
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}[
+        node distance=0.8cm and 1.2cm,
+        core/.style={draw, fill=blue!10, minimum width=2.5cm, minimum height=0.6cm, font=\scriptsize\bfseries, align=center},
+        bus/.style={draw, fill=orange!15, minimum width=3.5cm, minimum height=1.0cm, font=\scriptsize\bfseries, align=center},
+        arb/.style={draw, fill=green!15, minimum width=3.5cm, minimum height=0.8cm, font=\scriptsize\bfseries, align=center},
+        mem/.style={draw, fill=yellow!15, minimum width=3.5cm, minimum height=1.0cm, font=\scriptsize\bfseries, align=center}
+    ]
+        % Cores
+        \node[core] (c0) at (0, 1.2) {Core 0 (risc\_core)};
+        \node[core] (c1) at (0, 0.4) {Core 1 (risc\_core)};
+        \node[font=\bfseries] (cdot) at (0, -0.3) {\vdots};
+        \node[core] (c7) at (0, -1.0) {Core 7 (risc\_core)};
+        
+        % Bus Controller
+        \node[bus] (busctrl) at (4.8, 0.1) {Bộ Điều Khiển Bus\\(\texttt{bus\_ctrl.v})};
+        
+        % Arbiter
+        \node[arb] (arbiter) at (4.8, -1.4) {Arbiter (Round-Robin)\\(\texttt{arbiter.v})};
+        
+        % Shared Memory
+        \node[mem] (sharedmem) at (9.6, 0.1) {Bộ nhớ dùng chung\\(Shared RAM 4KB)\\(\texttt{data\_mem.v})};
+        
+        % Connections
+        \draw[<->, >=stealth, thick, DeepBlue] (c0.east) -- (2.3, 1.2) -- (2.3, 0.5) -- (busctrl.170);
+        \draw[<->, >=stealth, thick, DeepBlue] (c1.east) -- (busctrl.180);
+        \draw[<->, >=stealth, thick, DeepBlue] (c7.east) -- (2.3, -1.0) -- (2.3, -0.3) -- (busctrl.190);
+        
+        \draw[<->, >=stealth, thick, red!70!black] (arbiter) -- node[right, font=\tiny\bfseries] {req / grant} (busctrl);
+        \draw[<->, >=stealth, thick, green!60!black] (busctrl) -- node[above, font=\tiny\bfseries] {Shared Bus} (sharedmem);
+    \end{tikzpicture}
+    \caption{Sơ đồ cấu trúc kết nối tổng thể hệ thống 8-Core}
+    \label{fig:top_8core}
+\end{figure}
+
+\section{Thiết kế đường truyền dữ liệu (Datapath) đơn nhân}
+Đường truyền dữ liệu (Datapath) của lõi vi xử lý đơn nhân (\texttt{risc\_core.v}) được thiết kế theo kiến trúc Pipeline 5 tầng tuần tự. Dưới đây là mô tả chi tiết dòng chảy dữ liệu, các bộ chọn (Multiplexer) và các tín hiệu điều khiển tương ứng tại từng giai đoạn xử lý:
+
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}[
+        stage/.style={draw=DeepBlue, fill=DeepBlue!6, minimum width=2.0cm, minimum height=1.3cm, rounded corners=4pt, line width=1.2pt, font=\sffamily\scriptsize, text width=1.9cm, align=center},
+        reg/.style={draw=AccentGreen!80!black, fill=AccentGreen!12, minimum width=0.55cm, minimum height=1.9cm, rounded corners=1.5pt, line width=1.2pt, font=\sffamily\tiny\bfseries\color{DeepBlue!90!black}, align=center},
+        arrow/.style={->, >=stealth, line width=1.5pt, DeepBlue!85, shorten >=1.5pt, shorten <=1.5pt}
+    ]
+        % Stages & Registers
+        \node[stage] (if) at (1.0, 0) {\textbf{Fetch (IF)}\\[0.05cm]\tiny\color{black!70}\texttt{pc\_logic}\\[0.02cm]\tiny\color{black!70}\texttt{instr\_mem}};
+        \node[reg] (ifid) at (2.6, 0) {\rotatebox{90}{IF/ID}};
+        
+        \node[stage] (id) at (4.2, 0) {\textbf{Decode (ID)}\\[0.05cm]\tiny\color{black!70}\texttt{control\_unit}\\[0.02cm]\tiny\color{black!70}\texttt{reg\_file}};
+        \node[reg] (idex) at (5.8, 0) {\rotatebox{90}{ID/EX}};
+        
+        \node[stage] (ex) at (7.4, 0) {\textbf{Execute (EX)}\\[0.05cm]\tiny\color{black!70}\texttt{alu}};
+        \node[reg] (exmem) at (9.0, 0) {\rotatebox{90}{EX/MEM}};
+        
+        \node[stage] (mem) at (10.6, 0) {\textbf{Memory (MEM)}\\[0.05cm]\tiny\color{black!70}Liên kết\\[0.02cm]\tiny\color{black!70}\texttt{data\_mem}};
+        \node[reg] (memwb) at (12.2, 0) {\rotatebox{90}{MEM/WB}};
+        
+        \node[stage] (wb) at (13.8, 0) {\textbf{Writeback (WB)}\\[0.05cm]\tiny\color{black!70}Ghi tập\\[0.02cm]\tiny\color{black!70}thanh ghi};
+        
+        % Clock triangles at the bottom of pipeline registers
+        \draw[line width=1.2pt, AccentGreen!80!black] ([xshift=-0.1cm]ifid.south) -- ([yshift=0.12cm]ifid.south) -- ([xshift=0.1cm]ifid.south);
+        \draw[line width=1.2pt, AccentGreen!80!black] ([xshift=-0.1cm]idex.south) -- ([yshift=0.12cm]idex.south) -- ([xshift=0.1cm]idex.south);
+        \draw[line width=1.2pt, AccentGreen!80!black] ([xshift=-0.1cm]exmem.south) -- ([yshift=0.12cm]exmem.south) -- ([xshift=0.1cm]exmem.south);
+        \draw[line width=1.2pt, AccentGreen!80!black] ([xshift=-0.1cm]memwb.south) -- ([yshift=0.12cm]memwb.south) -- ([xshift=0.1cm]memwb.south);
+        
+        % Connections
+        \draw[arrow] (if.east) -- (ifid.west);
+        \draw[arrow] (ifid.east) -- (id.west);
+        \draw[arrow] (id.east) -- (idex.west);
+        \draw[arrow] (idex.east) -- (ex.west);
+        \draw[arrow] (ex.east) -- (exmem.west);
+        \draw[arrow] (exmem.east) -- (mem.west);
+        \draw[arrow] (mem.east) -- (memwb.west);
+        \draw[arrow] (memwb.east) -- (wb.west);
+    \end{tikzpicture}
+    \caption{Phân bố các khối chức năng trên 5 tầng Pipeline đơn nhân}
+    \label{fig:pipeline_stages}
+\end{figure}
+
+\subsection{Tầng Nạp chỉ thị (Instruction Fetch - IF)}
+Nhiệm vụ chính của tầng IF là lấy mã lệnh từ bộ nhớ lệnh riêng (\texttt{instr\_mem.v}) dựa trên địa chỉ của bộ đếm chương trình PC.
+\begin{itemize}
+    \item \textbf{Cơ chế cập nhật PC:} Tại mỗi chu kỳ xung nhịp, PC được cập nhật dựa trên mức độ ưu tiên giảm dần:
+    \begin{enumerate}
+        \item \textit{Reset}: Đưa địa chỉ PC về \texttt{32'd0}.
+        \item \textit{Stall}: Khi phát hiện xung đột nạp dữ liệu (\texttt{load\_use\_stall = 1}) hoặc phải chờ bus bộ nhớ (\texttt{mem\_wait = 1}), PC giữ nguyên giá trị cũ để hoãn pipeline.
+        \item \textit{Branch/Jump Taken}: Khi xảy ra rẽ nhánh hoặc nhảy được xác định tại tầng EX (\texttt{redirect\_taken = 1}), PC sẽ nạp địa chỉ đích mới (\texttt{redirect\_target}).
+        \item \textit{Mặc định}: Tăng tiến địa chỉ đều đặn \texttt{PC <= PC + 32'd4}.
+    \end{enumerate}
+    \item \textbf{Thanh ghi đệm IF/ID:} Cuối chu kỳ IF, mã lệnh lấy ra (\texttt{instr\_from\_mem}) và địa chỉ PC tương ứng được lưu lại vào các thanh ghi đệm \texttt{if\_id\_instr} và \texttt{if\_id\_pc} để đẩy sang tầng tiếp theo.
+\end{itemize}
+
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}[
+        block/.style={draw, thick, fill=blue!10, draw=DeepBlue, minimum width=3.2cm, minimum height=1.8cm, rounded corners, font=\scriptsize\bfseries, align=center},
+        bus/.style={->, >=stealth, double, double distance=1.5pt, thick, DeepBlue}
+    ]
+        % Main Memory Block
+        \node[block] (mem) at (0, 0) {Instruction Memory\\[0.15cm]\tiny (\texttt{instr\_mem.v})\\[0.2cm]\scriptsize Mảng nhớ: 256 $\times$ 32-bit};
+        
+        % Inputs
+        \draw[bus] (-2.6, 0) -- node[above=0.05cm, font=\tiny\bfseries] {addr[31:0]} (mem.west);
+        
+        % Outputs
+        \draw[bus] (mem.east) -- node[above=0.05cm, font=\tiny\bfseries] {instruction[31:0]} (2.6, 0);
+    \end{tikzpicture}
+    \caption{Sơ đồ khối bộ bộ nhớ lệnh (\texttt{instr\_mem.v})}
+    \label{fig:instr_mem}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}[
+        block/.style={draw, thick, fill=blue!10, draw=DeepBlue, minimum width=3.0cm, minimum height=2.8cm, rounded corners, font=\scriptsize\bfseries, align=center},
+        bus/.style={->, >=stealth, double, double distance=1.5pt, thick, DeepBlue},
+        wire/.style={->, >=stealth, thick, DeepBlue}
+    ]
+        % Main Block
+        \node[block] (pc_block) at (0, 0) {PC Logic\\[0.15cm]\tiny (\texttt{pc\_logic.v})};
+        
+        % Inputs (Left side)
+        \draw[wire] (-2.2, 1.05) -- node[above, font=\tiny\bfseries] {clk} ([yshift=1.05cm]pc_block.west);
+        \draw[wire] (-2.2, 0.70) -- node[above, font=\tiny\bfseries] {reset} ([yshift=0.70cm]pc_block.west);
+        \draw[wire] (-2.2, 0.35) -- node[above, font=\tiny\bfseries] {stall} ([yshift=0.35cm]pc_block.west);
+        
+        \draw[wire] (-2.2, -0.15) -- node[above, font=\tiny\bfseries] {branch\_taken} ([yshift=-0.15cm]pc_block.west);
+        \draw[bus] (-2.2, -0.50) -- node[above=0.02cm, font=\tiny\bfseries] {branch\_target} ([yshift=-0.50cm]pc_block.west);
+        
+        \draw[wire] (-2.2, -0.85) -- node[above, font=\tiny\bfseries] {jump} ([yshift=-0.85cm]pc_block.west);
+        \draw[bus] (-2.2, -1.20) -- node[above=0.02cm, font=\tiny\bfseries] {jump\_target} ([yshift=-1.20cm]pc_block.west);
+        
+        % Outputs (Right side)
+        \draw[bus] (pc_block.east) -- node[above=0.05cm, font=\tiny\bfseries] {pc[31:0]} (2.2, 0);
+    \end{tikzpicture}
+    \caption{Sơ đồ khối bộ điều phối PC (\texttt{pc\_logic.v})}
+    \label{fig:pc_logic}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.68\textwidth]{pc_logic_wave.png}
+    \caption{Giản đồ xung mô phỏng của bộ PC Logic (\texttt{pc\_logic\_wave.png})}
+    \label{fig:pc_logic_wave}
+\end{figure}
+
+\subsection{Tầng Giải mã chỉ thị (Instruction Decode - ID)}
+Tầng ID thực hiện giải mã lệnh để trích xuất các tín hiệu điều khiển và chuẩn bị các toán hạng số học.
+\begin{itemize}
+    \item \textbf{Giải mã trung tâm (\texttt{control\_unit.v}):} Trích xuất các trường từ lệnh \texttt{if\_id\_instr} để sinh ra các tín hiệu điều khiển đường truyền dữ liệu (như ghi thanh ghi \texttt{cu\_reg\_write}, chọn nguồn ALU \texttt{cu\_alu\_src}, chọn ghi ngược \texttt{cu\_mem\_to\_reg}, rẽ nhánh \texttt{cu\_branch}, nhảy \texttt{cu\_jump}, các chỉ thị nguyên tử \texttt{cu\_mem\_lr}, \texttt{cu\_mem\_sc}, \texttt{cu\_mem\_amo}).
+    \item \textbf{Bộ tạo hằng số (Immediate Generator):} Giải mã và căn lề dấu (Sign-extend) tạo hằng số mở rộng 32-bit \texttt{cu\_imm} phù hợp với các định dạng lệnh I, S, B, U, J.
+    \item \textbf{Tập thanh ghi (\texttt{reg\_file.v}):} Đọc bất đồng bộ dữ liệu từ hai địa chỉ thanh ghi nguồn \texttt{rs1\_addr} và \texttt{rs2\_addr} để tạo ra hai toán hạng \texttt{rs1\_data} và \texttt{rs2\_data}.
+    \item \textbf{Thanh ghi đệm ID/EX:} Tất cả các tín hiệu điều khiển giải mã cùng dữ liệu toán hạng được chốt lại vào các thanh ghi đệm pipeline \texttt{id\_ex\_*} ở sườn lên clock tiếp theo.
+\end{itemize}
+
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}[
+        block/.style={draw, thick, fill=blue!10, draw=DeepBlue, minimum width=2.8cm, minimum height=2.6cm, rounded corners, font=\scriptsize\bfseries, align=center},
+        bus/.style={->, >=stealth, double, double distance=1.5pt, thick, DeepBlue},
+        wire/.style={->, >=stealth, thick, DeepBlue}
+    ]
+        % Main Block
+        \node[block] (rf) at (0, 0) {Register File\\[0.1cm]\tiny (\texttt{reg\_file.v})};
+        
+        % Inputs (Left side)
+        \draw[wire] (-2.0, 0.9) -- node[above, font=\tiny\bfseries] {clk} ([yshift=0.9cm]rf.west);
+        \draw[bus] (-2.0, 0.4) -- node[above=0.01cm, font=\tiny\bfseries] {rs1\_addr} ([yshift=0.4cm]rf.west);
+        \draw[bus] (-2.0, 0.0) -- node[above=0.01cm, font=\tiny\bfseries] {rs2\_addr} ([yshift=0.0cm]rf.west);
+        \draw[bus] (-2.0, -0.4) -- node[above=0.01cm, font=\tiny\bfseries] {rd\_addr} ([yshift=-0.4cm]rf.west);
+        \draw[bus] (-2.0, -0.9) -- node[above=0.01cm, font=\tiny\bfseries] {wdata} ([yshift=-0.9cm]rf.west);
+        
+        % Control Input (Top side)
+        \draw[wire] (0, 1.7) -- node[right, font=\tiny\bfseries] {reg\_write} (rf.north);
+        
+        % Outputs (Right side)
+        \draw[bus] ([yshift=0.4cm]rf.east) -- node[above=0.01cm, font=\tiny\bfseries] {rs1\_data} (2.0, 0.4);
+        \draw[bus] ([yshift=-0.4cm]rf.east) -- node[above=0.01cm, font=\tiny\bfseries] {rs2\_data} (2.0, -0.4);
+    \end{tikzpicture}
+    \caption{Sơ đồ khối tập thanh ghi (\texttt{reg\_file.v})}
+    \label{fig:reg_file}
+\end{figure}
+
+\subsection{Tầng Thực thi (Execute - EX)}
+Tầng EX là trung tâm xử lý số học và điều khiển luồng chương trình.
+\begin{itemize}
+    \item \textbf{Mạch Forwarding (Bơm tắt kết quả):} Để loại bỏ độ trễ do xung đột dữ liệu, hệ thống tích hợp bộ chọn (MUX) cho hai toán hạng đầu vào ALU. Bộ chọn sẽ ưu tiên bơm kết quả trực tiếp từ tầng trước thay vì đọc từ tập thanh ghi:
+    \begin{itemize}
+        \item Lấy kết quả từ tầng EX/MEM (\texttt{ex\_mem\_result}) nếu lệnh trước đó ghi thanh ghi và trùng địa chỉ nguồn thanh ghi đích.
+        \item Lấy kết quả ghi ngược từ tầng MEM/WB (\texttt{mem\_wb\_write\_data}) nếu lệnh trước nữa trùng địa chỉ nguồn thanh ghi đích.
+        \item Sử dụng toán hạng đọc trực tiếp từ Register File nếu không có xung đột xảy ra.
+    \end{itemize}
+    \item \textbf{Bộ chọn nguồn vào ALU (ALU Source MUX):} Toán hạng thứ nhất của ALU (\texttt{alu\_input\_a}) luôn là dữ liệu nguồn 1 sau khi qua mạch forwarding (\texttt{fwd\_rs1\_data}). Toán hạng thứ hai (\texttt{alu\_input\_b}) được chọn qua bộ MUX 2-sang-1: chọn hằng số \texttt{id\_ex\_imm} nếu tín hiệu \texttt{id\_ex\_alu\_src = 1}, hoặc chọn dữ liệu nguồn 2 sau forwarding (\texttt{fwd\_rs2\_data}) nếu \texttt{id\_ex\_alu\_src = 0}.
+    \item \textbf{Khối ALU (\texttt{alu.v}):} Thực thi tính toán tạo ra kết quả \texttt{alu\_result} và cờ bằng không \texttt{alu\_zero}.
+    \item \textbf{Khối xử lý Rẽ nhánh \& Nhảy:} So sánh hai toán hạng \texttt{fwd\_rs1\_data} và \texttt{fwd\_rs2\_data} (hỗ trợ BEQ, BNE, BLT, BGE). Nếu điều kiện rẽ nhánh thỏa mãn hoặc là lệnh nhảy, tín hiệu chuyển hướng \texttt{redirect\_taken} sẽ được kích hoạt, địa chỉ nhảy \texttt{redirect\_target} được tính toán để đưa ngược về tầng IF. Đồng thời, một lệnh xóa (\texttt{Flush}) được phát đi để làm trống các thanh ghi đệm tầng nạp chỉ thị sai.
+\end{itemize}
+
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}[
+        alu/.style={draw, thick, fill=blue!10, draw=DeepBlue, minimum width=2.4cm, minimum height=1.6cm, font=\scriptsize\bfseries, align=center},
+        bus/.style={->, >=stealth, double, double distance=1.5pt, thick, DeepBlue},
+        wire/.style={->, >=stealth, thick, DeepBlue}
+    ]
+        % Main ALU Block
+        \node[alu] (alu_block) at (0, 0) {ALU\\[0.15cm]\tiny (\texttt{alu.v})};
+        
+        % Inputs
+        \draw[bus] (-2.2, 0.4) -- node[above=0.01cm, font=\tiny\bfseries] {a[31:0]} ([yshift=0.4cm]alu_block.west);
+        \draw[bus] (-2.2, -0.4) -- node[above=0.01cm, font=\tiny\bfseries] {b[31:0]} ([yshift=-0.4cm]alu_block.west);
+        \draw[bus] (0, 1.4) -- node[right, font=\tiny\bfseries] {alu\_control[3:0]} (alu_block.north);
+        
+        % Outputs
+        \draw[bus] ([yshift=0.3cm]alu_block.east) -- node[above=0.01cm, font=\tiny\bfseries] {result[31:0]} (2.2, 0.3);
+        \draw[wire] ([yshift=-0.3cm]alu_block.east) -- node[above=0.01cm, font=\tiny\bfseries] {zero} (2.2, -0.3);
+    \end{tikzpicture}
+    \caption{Sơ đồ khối đơn vị số học \& logic ALU (\texttt{alu.v})}
+    \label{fig:alu}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.68\textwidth]{alu_wave.png}
+    \caption{Giản đồ xung mô phỏng của bộ tính toán ALU (\texttt{alu\_wave.png})}
+    \label{fig:alu_wave}
+\end{figure}
+
+\subsection{Tầng Truy cập bộ nhớ (Memory Access - MEM)}
+Thực hiện các giao dịch đọc và ghi dữ liệu với bộ nhớ dùng chung.
+\begin{itemize}
+    \item \textbf{Định tuyến yêu cầu:} Khi gặp lệnh load/store hoặc atomic, tầng MEM kích hoạt tín hiệu \texttt{mem\_req = 1}, đưa địa chỉ (\texttt{ex\_mem\_result}) và dữ liệu ghi (\texttt{ex\_mem\_store\_data}) ra bus ngoài thông qua bộ liên kết Interconnect.
+    \item \textbf{Đồng bộ hóa đợi Bus (Memory Stall):} Do RAM dữ liệu là tài nguyên dùng chung, lõi CPU phải đợi tín hiệu phản hồi \texttt{mem\_ready = 1} từ Bus Controller. Trong quá trình chờ đợi này, tín hiệu hoãn \texttt{mem\_wait} được kích hoạt làm đóng băng toàn bộ các tầng pipeline phía sau (IF, ID, EX) để dữ liệu không bị ghi đè chéo.
+    \item \textbf{Chốt dữ liệu đọc:} Dữ liệu đọc từ RAM (\texttt{mem\_rdata}) hoặc kết quả ghi điều kiện (\texttt{mem\_sc\_result}) được chốt vào thanh ghi đệm \texttt{mem\_wb\_*} khi bus phản hồi hoàn tất giao dịch.
+\end{itemize}
+
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}[
+        block/.style={draw, thick, fill=blue!10, draw=DeepBlue, minimum width=3.0cm, minimum height=2.4cm, rounded corners, font=\scriptsize\bfseries, align=center},
+        bus/.style={->, >=stealth, double, double distance=1.5pt, thick, DeepBlue},
+        wire/.style={->, >=stealth, thick, DeepBlue}
+    ]
+        % Main Block
+        \node[block] (mem) at (0, 0) {Shared RAM 4KB\\[0.1cm]\tiny (\texttt{data\_mem.v})};
+        
+        % Inputs (Left side)
+        \draw[wire] (-2.2, 0.9) -- node[above, font=\tiny\bfseries] {clk} ([yshift=0.9cm]mem.west);
+        \draw[wire] (-2.2, 0.5) -- node[above, font=\tiny\bfseries] {reset} ([yshift=0.5cm]mem.west);
+        \draw[bus] (-2.2, 0.1) -- node[above=0.01cm, font=\tiny\bfseries] {addr[31:0]} ([yshift=0.1cm]mem.west);
+        \draw[bus] (-2.2, -0.4) -- node[above=0.01cm, font=\tiny\bfseries] {wdata[31:0]} ([yshift=-0.4cm]mem.west);
+        \draw[wire] (-2.2, -0.9) -- node[above, font=\tiny\bfseries] {we} ([yshift=-0.9cm]mem.west);
+        
+        % Outputs (Right side)
+        \draw[bus] (mem.east) -- node[above=0.01cm, font=\tiny\bfseries] {rdata[31:0]} (2.2, 0);
+    \end{tikzpicture}
+    \caption{Sơ đồ khối bộ nhớ chia sẻ dữ liệu (\texttt{data\_mem.v})}
+    \label{fig:data_mem}
+\end{figure}
+
+\subsection{Tầng Ghi ngược (Write Back - WB)}
+Giai đoạn cuối cùng đưa dữ liệu thực thi trở về tập thanh ghi.
+\begin{itemize}
+    \item \textbf{Bộ chọn ghi ngược (Write Back MUX):} Lựa chọn dữ liệu ghi cuối cùng (\texttt{mem\_wb\_write\_data}) từ các nguồn:
+    \begin{itemize}
+        \item Dữ liệu đọc được từ RAM (\texttt{mem\_rdata}) đối với lệnh Load (\texttt{LW}, \texttt{LR.W}).
+        \item Kết quả kiểm tra ghi điều kiện (\texttt{mem\_sc\_result}) đối với lệnh \texttt{SC.W}.
+        \item Kết quả tính toán ALU (\texttt{ex\_mem\_result}) đối với các lệnh tính toán số học hoặc rẽ nhánh, nhảy.
+    \end{itemize}
+    \item \textbf{Cập nhật tập thanh ghi:} Khẳng định tín hiệu \texttt{rf\_write\_en = 1} để ghi đồng bộ dữ liệu vào tập thanh ghi tại sườn lên clock tiếp theo tại địa chỉ thanh ghi đích \texttt{mem\_wb\_rd\_addr} (loại trừ thanh ghi cứng \texttt{x0}).
+\end{itemize}
+
+\section{Thiết kế Khối điều khiển (Control Unit) đơn nhân}
+Khối điều khiển (\texttt{control\_unit.v}) chịu trách nhiệm giải mã mã lệnh 32-bit nhận được từ bộ nhớ chương trình, sinh ra các tín hiệu điều khiển tương ứng để cấu hình đường truyền dữ liệu (Datapath), ALU, khối giao tiếp bộ nhớ và bộ tạo hằng số mở rộng.
+
+\subsection{Danh sách các tín hiệu điều khiển}
+Các tín hiệu điều khiển chính được tạo ra bao gồm:
+\begin{itemize}
+    \item \textbf{\texttt{reg\_write}}: Cho phép ghi kết quả vào tập thanh ghi đa năng.
+    \item \textbf{\texttt{alu\_src}}: Lựa chọn nguồn vào thứ hai (B) cho ALU ($0$: đọc từ thanh ghi nguồn \texttt{rs2\_data}, $1$: sử dụng hằng số mở rộng \texttt{imm}).
+    \item \textbf{\texttt{alu\_control[3:0]}}: Xác định mã phép toán cho bộ ALU thực thi (ví dụ: cộng, trừ, dịch bit, toán tử logic).
+    \item \textbf{\texttt{mem\_read}} / \textbf{\texttt{mem\_write}}: Tín hiệu yêu cầu đọc/ghi dữ liệu tương ứng đối với bộ nhớ RAM chia sẻ.
+    \item \textbf{\texttt{mem\_to\_reg}}: Xác định nguồn ghi ngược trở lại thanh ghi đích \texttt{rd} ($0$: kết quả từ ALU, $1$: dữ liệu đọc lên từ bộ nhớ dữ liệu).
+    \item \textbf{\texttt{branch}} / \textbf{\texttt{branch\_type[2:0]}}: Tín hiệu kích hoạt rẽ nhánh có điều kiện và loại điều kiện rẽ nhánh (BEQ, BNE, BLT, BGE).
+    \item \textbf{\texttt{jump}} / \textbf{\texttt{jalr}}: Tín hiệu điều khiển nhảy không điều kiện (JAL) hoặc nhảy gián tiếp qua thanh ghi (JALR).
+    \item \textbf{\texttt{lui}} / \textbf{\texttt{auipc}}: Các tín hiệu đặc biệt cho các chỉ thị nạp hằng số lớn vào nửa cao thanh ghi.
+    \item \textbf{\texttt{mem\_lr}} / \textbf{\texttt{mem\_sc}} / \textbf{\texttt{mem\_amo}} / \textbf{\texttt{amo\_op[3:0]}}: Các tín hiệu kích hoạt và xác định toán tử nguyên tử tương ứng trong tập lệnh mở rộng nhóm A-Extension để thực hiện đồng bộ đa nhân.
+\end{itemize}
+
+\subsection{Bộ tạo hằng số mở rộng (Immediate Generator)}
+Bộ tạo hằng số tích hợp bên trong khối điều khiển tự động trích xuất các trường bit của lệnh và thực hiện mở rộng dấu (sign-extension) thành số 32-bit hoàn chỉnh tùy theo định dạng của từng nhóm lệnh:
+\begin{itemize}
+    \item \textbf{I-type} (ADDI, LW, JALR): Trích xuất \texttt{instruction[31:20]}.
+    \item \textbf{S-type} (SW): Trích xuất và ghép nối \texttt{\{instruction[31:25], instruction[11:7]\}}.
+    \item \textbf{B-type} (BEQ...): Trích xuất, sắp xếp lại các trường bit và chèn thêm bit $0$ ở cuối để tính địa chỉ rẽ nhánh nửa từ.
+    \item \textbf{U-type} (LUI, AUIPC): Trích xuất \texttt{instruction[31:12]} và nối thêm 12 bit $0$ vào nửa thấp.
+    \item \textbf{J-type} (JAL): Trích xuất và sắp xếp lại các bit của khoảng dịch địa chỉ 20-bit, sau đó dịch trái 1 bit (chèn bit $0$ thấp).
+\end{itemize}
+
+\subsection{Bảng chân trị các tín hiệu điều khiển}
+Giá trị chi tiết của các tín hiệu điều khiển tương ứng với từng opcode được thiết lập theo Bảng \ref{tab:control_truth}:
+
+\begin{table}[H]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\textwidth}{X c c c c c c c c c c}
+\toprule
+\textbf{Nhóm lệnh} & \makecell{\textbf{Opcode} \\ \textbf{[6:0]}} & \makecell{\textbf{Reg} \\ \textbf{Write}} & \makecell{\textbf{ALU} \\ \textbf{Src}} & \makecell{\textbf{ALU} \\ \textbf{Control}} & \makecell{\textbf{Mem} \\ \textbf{Read}} & \makecell{\textbf{Mem} \\ \textbf{Write}} & \makecell{\textbf{Mem} \\ \textbf{toReg}} & \makecell{\textbf{Branch}} & \makecell{\textbf{Jump}} & \makecell{\textbf{Atomic}} \\
+\midrule
+\textbf{R-type} & \texttt{0110011} & $1$ & $0$ & Theo funct & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ \\
+\textbf{I-type} & \texttt{0010011} & $1$ & $1$ & Theo funct & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ \\
+\textbf{Load (LW)} & \texttt{0000011} & $1$ & $1$ & \texttt{ADD} & $1$ & $0$ & $1$ & $0$ & $0$ & $0$ \\
+\textbf{Store (SW)} & \texttt{0100011} & $0$ & $1$ & \texttt{ADD} & $0$ & $1$ & $X$ & $0$ & $0$ & $0$ \\
+\textbf{Branch} & \texttt{1100011} & $0$ & $0$ & \texttt{SUB} & $0$ & $0$ & $X$ & $1$ & $0$ & $0$ \\
+\textbf{JAL} & \texttt{1101111} & $1$ & $X$ & \texttt{ADD} & $0$ & $0$ & $0$ & $0$ & $1$ & $0$ \\
+\textbf{JALR} & \texttt{1100111} & $1$ & $1$ & \texttt{ADD} & $0$ & $0$ & $0$ & $0$ & $1$ & $0$ \\
+\textbf{LUI} & \texttt{0110111} & $1$ & $X$ & $X$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ \\
+\textbf{AUIPC} & \texttt{0010111} & $1$ & $X$ & $X$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ \\
+\textbf{LR.W} & \texttt{0101111} & $1$ & $1$ & \texttt{ADD} & $0$ & $0$ & $1$ & $0$ & $0$ & $1$ \\
+\textbf{SC.W} & \texttt{0101111} & $1$ & $1$ & \texttt{ADD} & $0$ & $0$ & $0$ & $0$ & $0$ & $1$ \\
+\textbf{AMOs} & \texttt{0101111} & $1$ & $1$ & \texttt{ADD} & $0$ & $0$ & $0$ & $0$ & $0$ & $1$ \\
+\bottomrule
+\end{tabularx}
+\caption{Bảng chân trị giải mã tín hiệu điều khiển của Control Unit}
+\label{tab:control_truth}
+\end{table}
+
+\section{Cơ chế xử lý xung đột trong Pipeline}
+\begin{itemize}
+    \item \textbf{Data Hazard:} Giải quyết bằng cách chèn các mạch \textbf{Forwarding} (bơm tắt kết quả từ tầng EX/MEM và MEM/WB trực tiếp về đầu vào ALU tầng EX). Đối với xung đột \textbf{Load-use hazard}, bộ xử lý chèn 1 chu kỳ \textbf{Stall} (hoãn PC và xóa tín hiệu tầng ID/EX).
+    \item \textbf{Control Hazard:} Khi phát hiện branch/jump đi sai hướng, toàn bộ các lệnh đang được nạp dở ở tầng IF/ID và ID/EX sẽ bị xóa (\textbf{Flush}) bằng cách đặt cờ hiệu valid của tầng đệm về 0, chuyển lệnh thành chỉ thị rỗng NOP.
+\end{itemize}
+
+\section{Bộ phân xử Arbiter và giao dịch nguyên tử}
+Bộ phân xử (\texttt{arbiter.v}) sử dụng cơ chế xoay vòng Round-Robin để đảm bảo tính công bằng. Mỗi nhân khi yêu cầu và được cấp bus (\texttt{grant = 1}) chỉ được giữ bus trong đúng 1 chu kỳ xung nhịp.
+Bên cạnh đó, bộ điều khiển bus hỗ trợ các tín hiệu điều khiển của lệnh nguyên tử (\texttt{LR.W} / \texttt{SC.W}) giúp phần mềm đa nhân có thể thực hiện khóa đồng bộ tránh tình trạng xung đột cập nhật dữ liệu.
+

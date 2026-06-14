@@ -1,0 +1,168 @@
+\documentclass[12pt, a4paper]{report}
+
+% --- Cấu hình Tiếng Việt & Phông chữ ---
+\usepackage[utf8]{inputenc}
+\usepackage[vietnamese]{babel}
+\usepackage[left=3.0cm, right=2.0cm, top=2.5cm, bottom=2.5cm]{geometry} % Chuẩn lề Việt Nam / APA
+\usepackage{mathptmx} % Font Times New Roman tương đương cho pdfLaTeX
+
+% --- Các gói lệnh bổ sung ---
+\usepackage{amsmath, amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{setspace}
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+\usepackage{float} % Hỗ trợ định vị float chính xác bằng [H]
+\usepackage{makecell} % Hỗ trợ tạo ô nhiều dòng trong bảng
+
+% --- Hệ màu sắc chuyên nghiệp từ Slide ---
+\definecolor{DeepBlue}{RGB}{0, 43, 77}
+\definecolor{AccentGreen}{RGB}{17, 202, 160}
+\definecolor{LightGray}{RGB}{241, 245, 249}
+
+% --- Khai báo đường dẫn tìm kiếm hình ảnh ---
+\graphicspath{{docs/slide/}{../slide/}{slide/}{./}}
+
+% --- Cấu hình khoảng cách dòng ---
+\onehalfspacing % Dòng cách 1.5 theo chuẩn báo cáo học thuật
+
+% --- Cấu hình Code Listing (Verilog) ---
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{
+  frame=tb,
+  language=Verilog,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=4
+}
+
+% --- Định cấu trúc Header & Footer ---
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small Báo Cáo Kiến Trúc Máy Tính}
+\fancyhead[R]{\small Mô phỏng CPU 8-Core RISC-V}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+\setlength{\headheight}{14.5pt} % Giải quyết cảnh báo headheight quá nhỏ
+
+% --- Điều chỉnh tiêu đề chương ---
+\titleformat{\chapter}[hang]
+  {\normalfont\large\bfseries\color{black}}
+  {\chaptertitlename\ \thechapter:}{1em}{}
+\titlespacing*{\chapter}{0pt}{-20pt}{20pt}
+
+% --- Thiết lập Hyperref ---
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdftitle={Báo cáo cuối kỳ: CPU 8-Core RISC-V},
+    pdfpagemode=FullScreen,
+}
+
+\begin{document}
+
+% ==========================================
+% TRANG BÌA (COVER PAGE)
+% ==========================================
+\begin{titlepage}
+    \centering
+    \begin{center}
+        \large\textbf{TRƯỜNG ĐẠI HỌC BÁCH KHOA HÀ NỘI}\\
+        \large\textbf{KHOA CÔNG NGHỆ THÔNG TIN -- ĐIỆN TỬ}\\
+        -------------------------\\[2.0cm]
+        
+        \Large\textbf{BÁO CÁO CUỐI KỲ DỰ ÁN MÔN HỌC}\\
+        \Large\textbf{KIẾN TRÚC MÁY TÍNH}\\[1.5cm]
+        
+        \large ĐỀ TÀI:\\
+        \huge\textbf{MÔ PHỎNG CPU 8-CORE VỚI\\ KIẾN TRÚC TẬP LỆNH RISC-V}\\
+        \large\textbf{(KIẾN TRÚC PIPELINE 5 TẦNG)}\\[2.0cm]
+    \end{center}
+    
+    \vspace{2.0cm}
+    
+    \begin{flushright}
+        \large
+        \textbf{Nhóm sinh viên thực hiện:}\\
+        Hoàng Anh Quân -- 202418969 \\
+        Trương Tùng Dương -- 202418885 \\
+        Nguyễn Minh Hoàng -- 202418904 \\
+        Bùi Thị Mai Linh -- 20227240 \\[0.5cm]
+        \textbf{Giảng viên hướng dẫn:}\\
+        Hội Đồng Bộ Môn Kiến Trúc Máy Tính
+    \end{flushright}
+    
+    \vfill
+    \begin{center}
+        \large\textbf{Hà Nội, \today}
+    \end{center}
+\end{titlepage}
+
+\newpage
+
+% ==========================================
+% PHẦN TÓM TẮT ĐÓNG GÓP THÀNH VIÊN
+% ==========================================
+\input{sections/contributions}
+
+\newpage
+
+% ==========================================
+% MỤC LỤC
+% ==========================================
+\tableofcontents
+\newpage
+
+% ==========================================
+% CHƯƠNG 1: GIỚI THIỆU
+% ==========================================
+\input{sections/chapter1}
+\newpage
+
+% ==========================================
+% CHƯƠNG 2: PHƯƠNG PHÁP LUẬN & KIẾN TRÚC HỆ THỐNG
+% ==========================================
+\input{sections/chapter2}
+\newpage
+
+% ==========================================
+% CHƯƠNG 3: KẾT QUẢ MÔ PHỎNG VÀ THẢO LUẬN
+% ==========================================
+\input{sections/chapter3}
+\newpage
+
+% ==========================================
+% CHƯƠNG 4: HẠN CHẾ VÀ HƯỚNG PHÁT TRIỂN
+% ==========================================
+\input{sections/chapter4}
+\newpage
+
+% ==========================================
+% TÀI LIỆU THAM KHẢO
+% ==========================================
+\input{sections/references}
+
+\end{document}

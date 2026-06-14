@@ -1,0 +1,15 @@
+\chapter{Giới Thiệu Đề Tài}
+
+\section{Bối cảnh nghiên cứu}
+Trong sự phát triển của kiến trúc máy tính hiện đại, việc cải tiến hiệu năng bộ vi xử lý bằng cách tăng tần số xung nhịp đã đạt tới giới hạn do hiện tượng quá nhiệt và tiêu hao năng lượng cực lớn (Power Wall, Thermal Wall). Giải pháp thay thế tất yếu là chuyển dịch sang kiến trúc tính toán song song, tích hợp nhiều lõi xử lý hoạt động độc lập (Multi-core Processing) trên cùng một chip. Đề tài này mô phỏng một hệ thống đa lõi nhằm giải quyết bài toán giao tiếp, tranh chấp bộ nhớ và đồng bộ giữa các luồng xử lý phần cứng.
+
+\section{Chủ đề của dự án}
+Dự án tập trung nghiên cứu, thiết kế phần cứng ở mức RTL sử dụng ngôn ngữ mô tả phần cứng Verilog HDL để mô phỏng bộ xử lý 8 lõi độc lập. Mỗi lõi CPU được xây dựng dựa trên kiến trúc tập lệnh mã nguồn mở RISC-V (RV32I subset) và áp dụng kỹ thuật thiết kế pipeline 5 tầng nhằm tối ưu hóa thông lượng lệnh thực thi. Hệ thống 8 nhân này sử dụng chung một khối bộ nhớ dữ liệu (Shared Data Memory) thông qua một bộ phân xử Bus dùng chung.
+
+\section{Mục tiêu thiết kế}
+\begin{itemize}
+    \item \textbf{Thiết kế lõi đơn:} Thiết kế lõi xử lý RISC-V có pipeline 5 tầng hoàn chỉnh, xử lý xung đột lệnh một cách tối ưu.
+    \item \textbf{Thiết kế trục bus đa lõi:} Xây dựng cơ chế phân xử công bằng, đảm bảo cả 8 nhân CPU đều có thể ghi/đọc bộ nhớ dùng chung mà không xảy ra xung đột hay deadlock.
+    \item \textbf{Mô phỏng chức năng:} Sử dụng bộ công cụ nguồn mở Icarus Verilog để chạy mô phỏng và GTKWave để phân tích giản đồ thời gian.
+\end{itemize}
+

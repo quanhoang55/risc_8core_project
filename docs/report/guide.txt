@@ -1,0 +1,14 @@
+Việc đánh giá dự án nhóm sẽ dựa trên báo cáo cuối kì và bài thuyết trình.
++) Báo cáo cuối kì PHẢI có 1-2 trang tóm tắt mô tả đóng góp của từng thành viên theo thứ tự từ cao đến thấp. Sau các trang này là phần nội dung chính của báo cáo gồm:
+- Giới thiệu: phần này cần bao gồm tên và mô tả dự án, đề tài/bài toán (ví dụ: phần cứng hoặc các thành phần mà nhóm thiết kế, mô hình hóa và mô phỏng) và các yêu cầu của nó.
+- Phương pháp luận: mô tả cấu trúc và các chức năng chính của sản phẩm, cũng như việc sử dụng ngôn ngữ mô tả phần cứng và các công cụ đã chọn trong quá trình triển khai.
+- Kết quả và bàn luận: trình bày các kết quả thu được, đồng thời đưa ra các phân tích và đánh giá để chứng minh khả năng làm chủ, khai thác, sử dụng phương pháp, công nghệ và công cụ hiện đại cho bài toán/đề tài.
+- Tài liệu tham khảo: liệt kê tất cả các tài liệu đã tham khảo.
+- Phụ lục: trình bày kế hoạch làm việc của nhóm.
+Lưu ý: Báo cáo cuối kì cần được định dạng theo chuẩn, chẳng hạn APA (xem: https://apastyle.apa.org/style-grammar-guidelines/paper-format). Các tài liệu tham khảo và trích dẫn sử dụng kiểu đánh số, chẳng hạn IEEE numerical citation style (https://pitt.libguides.com/citationhelp/ieee).
+ 
++) Bài thuyết trình cần đề cập đến:
+- Bối cảnh và chủ đề của dự án.
+- Bài toán và các giải pháp.
+- Lý do triển khai toàn bộ hoặc một phần sản phẩm.
+- Trình bày/mô phỏng sản phẩm.
