@@ -9,23 +9,27 @@
 `timescale 1ns / 1ps
 
 module control_unit (
-    input  wire [31:0] instruction,  // Mã lệnh 32-bit
+    input  wire [31:0] instruction,
 
     // --- Tín hiệu điều khiển ---
-    output reg         reg_write,    // Ghi vào Register File?
-    output reg         alu_src,      // Nguồn toán hạng B: 0=rs2, 1=immediate
-    output reg  [3:0]  alu_control,  // Mã phép toán cho ALU
-    output reg         mem_read,     // Là lệnh Load? (LW)
-    output reg         mem_write,    // Là lệnh Store? (SW)
-    output reg         mem_to_reg,   // Dữ liệu ghi rd: 0=ALU, 1=mem_data
-    output reg         branch,       // Là lệnh Branch?
-    output reg  [2:0]  branch_type,  // Loại branch: funct3 (BEQ=000, BNE=001, BLT=100, BGE=101)
-    output reg         jump,         // Là lệnh JAL/JALR?
-    output reg         jalr,         // Là JALR? (jump target = rs1 + imm)
-    output reg         lui,          // Là LUI?
-    output reg         auipc,        // Là AUIPC?
-    output reg         mem_lr,       // Là lệnh Load-Reserved?
-    output reg         mem_sc,       // Là lệnh Store-Conditional?
+    output reg         reg_write,    // Register File
+    output reg         alu_src,      // B: 0=rs2, 1=immediate
+    output reg  [3:0]  alu_control,  // Mã phép toán ALU
+
+    output reg         mem_read,     // LW
+    output reg         mem_write,    // SW
+    output reg         mem_to_reg,   // rd: 0=ALU, 1=mem_data
+
+    output reg         branch,       // Branch
+    output reg  [2:0]  branch_type,  // funct3 (BEQ=000, BNE=001, BLT=100, BGE=101)
+
+    output reg         jump,         // JAL/JALR
+    output reg         jalr,         // JALR
+    output reg         lui,          // LUI
+    output reg         auipc,        // AUIPC
+    output reg         mem_lr,       // Load-Reserved
+    output reg         mem_sc,       // Store-Conditional
+
     output reg         mem_amo,      // Là lệnh AMO?
     output reg  [3:0]  amo_op,       // Mã phép toán AMO
 
