@@ -1,32 +1,34 @@
-% Sub-section: Control Unit
-\begin{frame}{3.2 Control Unit \& 5 Giai Đoạn Pipeline (\texttt{control\_unit.v})}
-    Điều khiển luồng dữ liệu chạy gối đầu nhau qua từng chu kỳ clock trên 5 tầng:
+\subsubsection{Bộ giải mã lệnh (Control Unit)}
+\begin{frame}{Bộ Giải Mã Lệnh (\texttt{control\_unit.v})}
+    Bộ điều khiển \texttt{control\_unit.v} là bộ giải mã trung tâm (decoder) hoạt động tại tầng **Decode (ID)**:
     \vspace{0.2cm}
+    
     \begin{columns}
-        \begin{column}{0.31\textwidth}
-            \begin{exampleblock}{1. Fetch (IF)}
-                Lấy mã lệnh từ Instruction Memory dựa trên giá trị bộ đếm \texttt{PC}.
-            \end{exampleblock}
-            \vspace{0.1cm}
-            \begin{exampleblock}{2. Decode (ID)}
-                Giải mã lệnh sinh tín hiệu điều khiển; Đọc dữ liệu từ Register File.
-            \end{exampleblock}
+        \begin{column}{0.5\textwidth}
+            \begin{block}{Giải mã tín hiệu điều khiển}
+                Từ mã lệnh 32-bit, CU trích xuất opcode, funct3, funct7 để sinh:
+                \begin{itemize}
+                    \item \textbf{Đường truyền dữ liệu:} \texttt{reg\_write}, \texttt{alu\_src}, \texttt{mem\_to\_reg}.
+                    \item \textbf{Điều khiển ALU:} \texttt{alu\_control[3:0]} (ADD, SUB, SLL, SRL, AND, OR, XOR, SLT).
+                    \item \textbf{Rẽ nhánh \& Nhảy:} \texttt{branch}, \texttt{branch\_type}, \texttt{jump}, \texttt{jalr}.
+                \end{itemize}
+            \end{block}
         \end{column}
         
-        \begin{column}{0.31\textwidth}
-            \begin{exampleblock}{3. Execute (EX)}
-                Bộ \textbf{ALU} thực thi các phép toán số học hoặc tính toán địa chỉ rẽ nhánh.
-            \end{exampleblock}
-            \vspace{0.1cm}
-            \begin{exampleblock}{4. Memory (MEM)}
-                Đọc/Ghi dữ liệu vào Data Cache / RAM nếu gặp lệnh Load/Store.
-            \end{exampleblock}
-        \end{column}
-        
-        \begin{column}{0.31\textwidth}
-            \begin{exampleblock}{5. Write Back (WB)}
-                Ghi kết quả tính toán cuối cùng từ RAM/ALU ngược về Register File.
-            \end{exampleblock}
+        \begin{column}{0.48\textwidth}
+            \begin{alertblock}{Tín hiệu đa nhân đặc biệt}
+                Hỗ trợ các tín hiệu điều khiển truy cập bộ nhớ và đồng bộ:
+                \begin{itemize}
+                    \item \texttt{mem\_lr} / \texttt{mem\_sc}: Lệnh nguyên tử Load-Reserved / Store-Conditional.
+                    \item \texttt{mem\_amo}: Kích hoạt phép toán nguyên tử trực tiếp trên bộ nhớ.
+                    \item \texttt{amo\_op[3:0]}: Chọn phép toán AMO (swap, add, logic, min/max).
+                \end{itemize}
+            \end{alertblock}
         \end{column}
     \end{columns}
+    \vspace{0.1cm}
+    \begin{center}
+        \scriptsize
+        \textbf{Bộ tạo hằng số (Immediate Generator):} Giải mã và căn lề dấu (sign-extend) hằng số \texttt{imm} cho các định dạng lệnh I, S, B, U, J.
+    \end{center}
 \end{frame}

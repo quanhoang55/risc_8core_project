@@ -3,10 +3,34 @@
 % ==========================================
 \section{Kiến Trúc Tập Lệnh (ISA)}
 
-\begin{frame}{2. Kiến Trúc Tập Lệnh RISC-V 32-bit (RV32I)}
+\subsection{Tập lệnh cơ bản RV32I}
+\begin{frame}{Tổng quan Tập lệnh RISC-V (RV32I)}
+    \begin{block}{RISC-V là gì?}
+        Là một kiến trúc tập lệnh (ISA) mã nguồn mở dựa trên nguyên lý thiết kế máy tính tập lệnh rút gọn (RISC). Cho phép tự do thiết kế, tùy biến và tối ưu hóa phần cứng.
+    \end{block}
+    
+    \vspace{0.2cm}
     \begin{columns}
-        \begin{column}{0.5\textwidth}
-            \textbf{Đặc điểm cốt lõi của RV32I:}
+        \begin{column}{0.65\textwidth}
+            \textbf{Giải nghĩa bộ lệnh cơ bản RV32I:}
+            \begin{itemize}
+                \item \textbf{RV (RISC-V):} Tiêu chuẩn kiến trúc thế hệ thứ 5 từ UC Berkeley.
+                \item \textbf{32 (32-bit):} Độ rộng thanh ghi và không gian địa chỉ 32-bit.
+                \item \textbf{I (Integer):} Tập lệnh số nguyên cơ bản (gồm 40 lệnh). Đây là tập lệnh bắt buộc phải có cho mọi thiết kế chip RISC-V.
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.32\textwidth}
+            \begin{exampleblock}{Mục tiêu lựa chọn}
+                Đơn giản hóa thiết kế lõi đơn để tập trung tối ưu bộ điều khiển phân xử (Arbiter) và kết nối đa lõi (8-Core Interconnect).
+            \end{exampleblock}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Đặc trưng kỹ thuật RV32I}
+    \begin{columns}
+        \begin{column}{0.46\textwidth}
+            \textbf{Các đặc trưng kỹ thuật:}
             \begin{itemize}
                 \item Không gian địa chỉ và độ dài lệnh cố định \textbf{32-bit}.
                 \item Cơ chế \textbf{Load-Store}: Chỉ có lệnh Load/Store mới được truy cập Memory; các phép toán toán học chỉ thực thi trên Tập thanh ghi.
@@ -15,9 +39,136 @@
             \end{itemize}
         \end{column}
         
+        \begin{column}{0.52\textwidth}
+            \begin{exampleblock}{Phân loại Tập thanh ghi (Register File)}
+                \scriptsize
+                \begin{itemize}
+                    \item \textcolor{red!80!black}{\textbf{\texttt{x0} (zero):}} Luôn bằng 0 (hằng số phần cứng).
+                    \item \textcolor{blue!80!black}{\textbf{\texttt{x1} (ra), \texttt{x2} (sp):}} Địa chỉ trả về \& Con trỏ Stack.
+                    \item \textcolor{blue!60!black}{\textbf{\texttt{x3}-\texttt{x4} (gp-tp):}} Con trỏ toàn cục và con trỏ tiểu trình.
+                    \item \textcolor{orange!80!black}{\textbf{\texttt{x10}-\texttt{x17} (a0-a7):}} Tham số truyền vào \& Kết quả hàm.
+                    \item \textcolor{green!60!black}{\textbf{\texttt{x5}-\texttt{x7}, \texttt{x28}-\texttt{x31} (t0-t6):}} Thanh ghi tạm thời.
+                    \item \textcolor{purple!80!black}{\textbf{\texttt{x8}-\texttt{x9}, \texttt{x18}-\texttt{x27} (s0-s11):}} Thanh ghi lưu giữ.
+                \end{itemize}
+            \end{exampleblock}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{6 Kiểu định dạng lệnh cơ bản}
+    \begin{columns}
+        \begin{column}{0.68\textwidth}
+            \centering
+            \begin{tikzpicture}[
+                box/.style={draw, minimum height=0.42cm, font=\scriptsize, align=center, inner sep=0pt},
+                f7/.style={box, fill=cyan!15},
+                rs2/.style={box, fill=orange!20},
+                rs1/.style={box, fill=yellow!20},
+                f3/.style={box, fill=green!15},
+                rd/.style={box, fill=blue!15},
+                op/.style={box, fill=red!15},
+                imm/.style={box, fill=purple!15}
+            ]
+                % Bit indicators
+                \node[anchor=south west, font=\tiny\color{gray}] at (0, 0.18) {31};
+                \node[anchor=south east, font=\tiny\color{gray}] at (1.8, 0.18) {25};
+                \node[anchor=south west, font=\tiny\color{gray}] at (1.8, 0.18) {24};
+                \node[anchor=south east, font=\tiny\color{gray}] at (3.1, 0.18) {20};
+                \node[anchor=south west, font=\tiny\color{gray}] at (3.1, 0.18) {19};
+                \node[anchor=south east, font=\tiny\color{gray}] at (4.4, 0.18) {15};
+                \node[anchor=south west, font=\tiny\color{gray}] at (4.4, 0.18) {14};
+                \node[anchor=south east, font=\tiny\color{gray}] at (5.4, 0.18) {12};
+                \node[anchor=south west, font=\tiny\color{gray}] at (5.4, 0.18) {11};
+                \node[anchor=south east, font=\tiny\color{gray}] at (6.7, 0.18) {7};
+                \node[anchor=south west, font=\tiny\color{gray}] at (6.7, 0.18) {6};
+                \node[anchor=south east, font=\tiny\color{gray}] at (8.5, 0.18) {0};
+
+                % R-type
+                \node[f7, minimum width=1.8cm] at (0.9, 0) {funct7};
+                \node[rs2, minimum width=1.3cm] at (2.45, 0) {rs2};
+                \node[rs1, minimum width=1.3cm] at (3.75, 0) {rs1};
+                \node[f3, minimum width=1.0cm] at (4.9, 0) {funct3};
+                \node[rd, minimum width=1.3cm] at (6.05, 0) {rd};
+                \node[op, minimum width=1.8cm] at (7.6, 0) {opcode};
+                \node[anchor=east, font=\scriptsize\bfseries\color{DeepBlue}] at (-0.2, 0) {R-type};
+
+                % I-type
+                \node[imm, minimum width=3.1cm] at (1.55, -0.55) {imm[11:0]};
+                \node[rs1, minimum width=1.3cm] at (3.75, -0.55) {rs1};
+                \node[f3, minimum width=1.0cm] at (4.9, -0.55) {funct3};
+                \node[rd, minimum width=1.3cm] at (6.05, -0.55) {rd};
+                \node[op, minimum width=1.8cm] at (7.6, -0.55) {opcode};
+                \node[anchor=east, font=\scriptsize\bfseries\color{DeepBlue}] at (-0.2, -0.55) {I-type};
+
+                % S-type
+                \node[imm, minimum width=1.8cm] at (0.9, -1.1) {imm[11:5]};
+                \node[rs2, minimum width=1.3cm] at (2.45, -1.1) {rs2};
+                \node[rs1, minimum width=1.3cm] at (3.75, -1.1) {rs1};
+                \node[f3, minimum width=1.0cm] at (4.9, -1.1) {funct3};
+                \node[imm, minimum width=1.3cm] at (6.05, -1.1) {imm[4:0]};
+                \node[op, minimum width=1.8cm] at (7.6, -1.1) {opcode};
+                \node[anchor=east, font=\scriptsize\bfseries\color{DeepBlue}] at (-0.2, -1.1) {S-type};
+
+                % B-type
+                \node[imm, minimum width=1.8cm] at (0.9, -1.65) {imm[12|10:5]};
+                \node[rs2, minimum width=1.3cm] at (2.45, -1.65) {rs2};
+                \node[rs1, minimum width=1.3cm] at (3.75, -1.65) {rs1};
+                \node[f3, minimum width=1.0cm] at (4.9, -1.65) {funct3};
+                \node[imm, minimum width=1.3cm] at (6.05, -1.65) {imm[4:1|11]};
+                \node[op, minimum width=1.8cm] at (7.6, -1.65) {opcode};
+                \node[anchor=east, font=\scriptsize\bfseries\color{DeepBlue}] at (-0.2, -1.65) {B-type};
+
+                % U-type
+                \node[imm, minimum width=5.4cm] at (2.7, -2.2) {imm[31:12]};
+                \node[rd, minimum width=1.3cm] at (6.05, -2.2) {rd};
+                \node[op, minimum width=1.8cm] at (7.6, -2.2) {opcode};
+                \node[anchor=east, font=\scriptsize\bfseries\color{DeepBlue}] at (-0.2, -2.2) {U-type};
+
+                % J-type
+                \node[imm, minimum width=5.4cm] at (2.7, -2.75) {imm[20|10:1|11|19:12]};
+                \node[rd, minimum width=1.3cm] at (6.05, -2.75) {rd};
+                \node[op, minimum width=1.8cm] at (7.6, -2.75) {opcode};
+                \node[anchor=east, font=\scriptsize\bfseries\color{DeepBlue}] at (-0.2, -2.75) {J-type};
+            \end{tikzpicture}
+        \end{column}
+        
+        \begin{column}{0.31\textwidth}
+            \footnotesize
+            \begin{block}{Giải thích các trường}
+                \begin{itemize}
+                    \item \textcolor{red!80!black}{\textbf{opcode}:} Mã lệnh gốc (7 bit).
+                    \item \textcolor{blue!80!black}{\textbf{rd}:} Thanh ghi đích.
+                    \item \textcolor{green!60!black}{\textbf{funct3/7}:} Mã mở rộng chức năng lệnh.
+                    \item \textcolor{orange!80!black}{\textbf{rs1/rs2}:} Các thanh ghi nguồn.
+                    \item \textcolor{purple!80!black}{\textbf{imm}:} Giá trị hằng số nạp trực tiếp.
+                \end{itemize}
+            \end{block}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\subsection{Tập lệnh hiện thực trong dự án}
+\begin{frame}{Tập lệnh hiện thực trong dự án}
+    \begin{columns}
         \begin{column}{0.5\textwidth}
-            \begin{alertblock}{Định dạng mã máy đồng nhất}
-                Các trường nguồn dữ liệu (\texttt{rs1}, \texttt{rs2}) và đích (\texttt{rd}) luôn nằm ở các vị trí bit cố định $\rightarrow$ Giúp khối \textbf{Decode} phần cứng cực kỳ đơn giản và nhanh chóng.
+            \begin{block}{Tập Lệnh Số Nguyên RV32I Subset}
+                \textbf{40 lệnh cơ bản được hỗ trợ:}
+                \begin{itemize}
+                    \item \textbf{Tính toán (ALU):} \texttt{ADD/SUB}, \texttt{SLL/SRL}, \texttt{AND/OR/XOR}, \texttt{SLT} (bao gồm cả dạng hằng số Imm như \texttt{ADDI}, \texttt{ANDI},...).
+                    \item \textbf{Bộ nhớ:} \texttt{LW} (Load Word), \texttt{SW} (Store Word).
+                    \item \textbf{Điều khiển luồng:} \texttt{BEQ}, \texttt{BNE}, \texttt{BLT}, \texttt{BGE}, \texttt{JAL}, \texttt{JALR}.
+                    \item \textbf{Khác:} \texttt{LUI}, \texttt{AUIPC}.
+                \end{itemize}
+            \end{block}
+        \end{column}
+        
+        \begin{column}{0.48\textwidth}
+            \begin{alertblock}{Đồng Bộ Đa Nhân (A-Extension)}
+                \textbf{Thiết kế riêng cho hệ thống 8-Core:}
+                \begin{itemize}
+                    \item \textbf{Độc quyền truy cập:} \texttt{LR.W} (Load-Reserved) và \texttt{SC.W} (Store-Conditional) để xây dựng cấu trúc đồng bộ (Mutex/Semaphore).
+                    \item \textbf{Phép toán nguyên tử (AMO):} \texttt{AMOSWAP}, \texttt{AMOADD}, \texttt{AMOAND}, \texttt{AMOOR}, \texttt{AMOXOR}, \texttt{AMOMIN/MAX} trực tiếp trên bộ nhớ dùng chung.
+                \end{itemize}
             \end{alertblock}
         \end{column}
     \end{columns}

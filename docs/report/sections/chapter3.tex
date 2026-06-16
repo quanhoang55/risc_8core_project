@@ -1,0 +1,42 @@
+\chapter{Kết Quả Mô Phỏng Và Thảo Luận}
+
+\section{Kết quả kiểm thử đơn nhân}
+Kịch bản mô phỏng chạy trên testbench đơn nhân (\texttt{core\_tb.v}) cho kết quả hoàn tất chính xác với kết quả:
+\begin{itemize}
+    \item \texttt{retired = 67}: Đã hoàn thành và commit 67 chỉ thị lệnh qua pipeline.
+    \item \texttt{load\_use\_stall = 1}: Phát hiện và xử lý chính xác 1 lần xung đột load-use.
+    \item \texttt{flush = 62}: Thực hiện xóa chính xác 62 chỉ thị lệnh rẽ nhánh không hợp lệ.
+    \item \texttt{SUMMARY: 7 PASSED, 0 FAILED}.
+\end{itemize}
+
+\section{Kết quả kiểm thử tích hợp 8 lõi}
+Hệ thống 8 lõi chạy kịch bản kiểm thử ghi và đọc chéo bộ nhớ dùng chung. Các core thực thi ghi giá trị `42` vào `mem[0]` và ghi giá trị hoàn tất `99` vào `mem[1]`.
+
+Kết quả thu được từ màn hình console ghi nhận:
+\begin{verbatim}
+BAT DAU MO PHONG HE THONG 8 LOI PIPELINE
+Kiem tra mem[0] (Ky vong: 42) = 42
+[PASS] Shared memory data dung.
+Kiem tra mem[1] addr 4 (Ky vong: 99) = 99
+[PASS] 8 core hoan thanh chuong trinh khong deadlock.
+
+PIPELINE / BUS EVIDENCE
+Core 0: grant=3 retired=163 mem_stall=13 load_use_stall=0 flush=159
+Core 1: grant=3 retired=163 mem_stall=14 load_use_stall=0 flush=159
+Core 2: grant=3 retired=163 mem_stall=15 load_use_stall=0 flush=158
+Core 3: grant=3 retired=162 mem_stall=16 load_use_stall=0 flush=158
+Core 4: grant=3 retired=162 mem_stall=17 load_use_stall=0 flush=158
+Core 5: grant=3 retired=162 mem_stall=18 load_use_stall=0 flush=157
+Core 6: grant=4 retired=161 mem_stall=19 load_use_stall=0 flush=157
+Core 7: grant=4 retired=161 mem_stall=20 load_use_stall=0 flush=157
+
+TONG KET: 10 PASSED, 0 FAILED
+\end{verbatim}
+
+\section{Thảo luận về hiệu năng hệ thống}
+Từ số liệu thống kê thu được:
+\begin{enumerate}
+    \item \textbf{Tính đúng đắn:} Cả 8 core đều thực thi thành công chương trình mà không xảy ra lỗi dữ liệu hay deadlock.
+    \item \textbf{Đặc trưng Bus trễ:} Số chu kỳ chờ đợi (\texttt{mem\_stall}) tăng dần từ Core 0 (13 chu kỳ) đến Core 7 (20 chu kỳ). Điều này phản ánh chính xác độ trễ do tranh chấp bus vật lý khi nhiều core cùng truy cập RAM dùng chung một thời điểm, chứng minh tính thực tế của mô hình mô phỏng.
+\end{enumerate}
+

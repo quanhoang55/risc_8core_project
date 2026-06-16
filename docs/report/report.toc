@@ -1,0 +1,45 @@
+\babel@toc {vietnamese}{}\relax 
+\contentsline {chapter}{Tóm Tắt Đóng Góp Của Các Thành Viên}{1}{chapter*.1}%
+\contentsline {chapter}{\numberline {1}Giới Thiệu Đề Tài}{4}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Bối cảnh nghiên cứu}{4}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Chủ đề của dự án}{4}{section.1.2}%
+\contentsline {section}{\numberline {1.3}Mục tiêu thiết kế}{4}{section.1.3}%
+\contentsline {chapter}{\numberline {2}Phương Pháp Luận \& Kiến Trúc Hệ Thống}{5}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Phương pháp luận thiết kế hệ thống}{5}{section.2.1}%
+\contentsline {subsection}{\numberline {2.1.1}Quy trình thiết kế Top-Down kết hợp Bottom-Up}{5}{subsection.2.1.1}%
+\contentsline {subsection}{\numberline {2.1.2}Mô hình hóa phần cứng ở mức RTL (RTL Modeling)}{5}{subsection.2.1.2}%
+\contentsline {subsection}{\numberline {2.1.3}Quy trình mô phỏng và kiểm chứng dựa trên công cụ mã nguồn mở}{5}{subsection.2.1.3}%
+\contentsline {subsection}{\numberline {2.1.4}Mô hình hóa chia sẻ tài nguyên và cơ chế đồng bộ}{6}{subsection.2.1.4}%
+\contentsline {section}{\numberline {2.2}Kiến trúc tập lệnh RISC-V (ISA) áp dụng trong dự án}{6}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}Tổng quan về tập chỉ thị RV32I}{6}{subsection.2.2.1}%
+\contentsline {subsection}{\numberline {2.2.2}Tập thanh ghi đa năng (Register File)}{6}{subsection.2.2.2}%
+\contentsline {subsection}{\numberline {2.2.3}Các kiểu định dạng chỉ thị lệnh cơ bản}{7}{subsection.2.2.3}%
+\contentsline {subsection}{\numberline {2.2.4}Đặc tả định dạng mã hóa và trường bit của các lệnh thực hiện}{7}{subsection.2.2.4}%
+\contentsline {subsubsection}{1. Nhóm lệnh định dạng R (R-type)}{8}{subsection.2.2.4}%
+\contentsline {subsubsection}{2. Nhóm lệnh định dạng I (I-type)}{8}{subsection.2.2.4}%
+\contentsline {subsubsection}{3. Nhóm lệnh định dạng S (S-type)}{8}{subsection.2.2.4}%
+\contentsline {subsubsection}{4. Nhóm lệnh định dạng B (Branch - B-type)}{8}{subsection.2.2.4}%
+\contentsline {subsubsection}{5. Nhóm lệnh định dạng U (U-type) và J (J-type)}{8}{subsection.2.2.4}%
+\contentsline {subsubsection}{6. Nhóm lệnh nguyên tử đồng bộ (A-Extension)}{9}{subsection.2.2.4}%
+\contentsline {subsection}{\numberline {2.2.5}Các bảng tổng hợp đặc tả mã hóa chỉ thị lệnh}{9}{subsection.2.2.5}%
+\contentsline {section}{\numberline {2.3}Sơ đồ cấu trúc tổng thể hệ thống 8-Core}{13}{section.2.3}%
+\contentsline {section}{\numberline {2.4}Thiết kế đường truyền dữ liệu (Datapath) đơn nhân}{13}{section.2.4}%
+\contentsline {subsection}{\numberline {2.4.1}Tầng Nạp chỉ thị (Instruction Fetch - IF)}{13}{subsection.2.4.1}%
+\contentsline {subsection}{\numberline {2.4.2}Tầng Giải mã chỉ thị (Instruction Decode - ID)}{14}{subsection.2.4.2}%
+\contentsline {subsection}{\numberline {2.4.3}Tầng Thực thi (Execute - EX)}{15}{subsection.2.4.3}%
+\contentsline {subsection}{\numberline {2.4.4}Tầng Truy cập bộ nhớ (Memory Access - MEM)}{16}{subsection.2.4.4}%
+\contentsline {subsection}{\numberline {2.4.5}Tầng Ghi ngược (Write Back - WB)}{16}{subsection.2.4.5}%
+\contentsline {section}{\numberline {2.5}Thiết kế Khối điều khiển (Control Unit) đơn nhân}{17}{section.2.5}%
+\contentsline {subsection}{\numberline {2.5.1}Danh sách các tín hiệu điều khiển}{17}{subsection.2.5.1}%
+\contentsline {subsection}{\numberline {2.5.2}Bộ tạo hằng số mở rộng (Immediate Generator)}{18}{subsection.2.5.2}%
+\contentsline {subsection}{\numberline {2.5.3}Bảng chân trị các tín hiệu điều khiển}{18}{subsection.2.5.3}%
+\contentsline {section}{\numberline {2.6}Cơ chế xử lý xung đột trong Pipeline}{19}{section.2.6}%
+\contentsline {section}{\numberline {2.7}Bộ phân xử Arbiter và giao dịch nguyên tử}{19}{section.2.7}%
+\contentsline {chapter}{\numberline {3}Kết Quả Mô Phỏng Và Thảo Luận}{20}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Kết quả kiểm thử đơn nhân}{20}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Kết quả kiểm thử tích hợp 8 lõi}{20}{section.3.2}%
+\contentsline {section}{\numberline {3.3}Thảo luận về hiệu năng hệ thống}{21}{section.3.3}%
+\contentsline {chapter}{\numberline {4}Hạn Chế Và Hướng Phát Triển}{22}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Hạn chế hiện tại của đề tài}{22}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Hướng phát triển đề tài}{22}{section.4.2}%
+\contentsline {chapter}{Tài Liệu Tham Khảo}{23}{chapter*.3}%

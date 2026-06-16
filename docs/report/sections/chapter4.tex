@@ -1,0 +1,15 @@
+\chapter{Hạn Chế Và Hướng Phát Triển}
+
+\section{Hạn chế hiện tại của đề tài}
+\begin{itemize}
+    \item \textbf{Hiệu năng kết nối:} Hệ thống chưa trang bị bộ nhớ đệm Cache riêng cho từng lõi CPU dẫn tới tần suất tranh chấp Bus rất cao, gây nghẽn băng thông nghiêm trọng khi chạy các chương trình phức tạp.
+    \item \textbf{Tính đầy đủ của tập lệnh:} Tập lệnh chưa hỗ trợ đầy đủ bộ xử lý RISC-V theo chuẩn công nghiệp (chưa có phép nhân chia phần cứng, CSR, hay ngắt ngoại lệ).
+\end{itemize}
+
+\section{Hướng phát triển đề tài}
+\begin{enumerate}
+    \item Thiết kế bộ nhớ đệm L1 Cache riêng cho từng core.
+    \item Hiện thực hóa bộ điều khiển tính nhất quán bộ nhớ đệm (Cache Coherence Controller) theo giao thức MESI hoặc Snooping.
+    \item Nâng cấp lõi CPU lên kiến trúc RV32IM hoàn chỉnh.
+\end{enumerate}
+
