@@ -1,3 +1,30 @@
+\subsection{Kiến trúc Pipeline và Logic Điều khiển}
+\subsubsection{Thanh ghi đệm (Pipeline Registers)}
+\begin{frame}{Cơ chế hoạt động của Pipeline Registers}
+    Các thanh ghi đệm hoạt động như các "vách ngăn" đồng bộ bằng xung nhịp Clock:
+    \vspace{0.2cm}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \begin{block}{Đồng bộ hóa \& Dịch chuyển}
+                \begin{itemize}
+                    \item \textbf{Lưu giữ trạng thái:} Đảm bảo dữ liệu của lệnh trước không bị đè bởi lệnh sau khi đang xử lý song song.
+                    \item \textbf{Xếp hàng tín hiệu:} Tín hiệu điều khiển từ bộ Decode (\texttt{control\_unit}) được đẩy dọc theo các thanh ghi đệm (\texttt{id\_ex\_reg\_write}, \texttt{ex\_mem\_mem\_read},...) để thực thi đúng thời điểm.
+                \end{itemize}
+            \end{block}
+        \end{column}
+        
+        \begin{column}{0.48\textwidth}
+            \begin{alertblock}{Đường đi tắt (Forwarding Paths)}
+                Bao vây các thanh ghi đệm để giải quyết xung đột dữ liệu:
+                \begin{itemize}
+                    \item Bơm kết quả trực tiếp từ ngõ ra ALU (\texttt{ex\_mem\_result}) hoặc dữ liệu ghi ngược (\texttt{mem\_wb\_write\_data}).
+                    \item Đưa thẳng về ngõ vào ALU tầng \textbf{EX} thông qua các bộ MUX lớn, giảm thiểu số chu kỳ bị Stall.
+                \end{itemize}
+            \end{alertblock}
+        \end{column}
+    \end{columns} 
+\end{frame}
+
 \subsubsection{Bộ giải mã lệnh (Control Unit)}
 \begin{frame}{Bộ Giải Mã Lệnh (\texttt{control\_unit.v})}
     Bộ điều khiển \texttt{control\_unit.v} là bộ giải mã trung tâm (decoder) hoạt động tại tầng **Decode (ID)**:

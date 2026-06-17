@@ -2,48 +2,53 @@
 // control_unit.v - Bộ giải mã lệnh RISC-V (RV32I Subset)
 //
 // Input:  instruction[31:0] - Mã lệnh 32-bit từ Instruction Memory
-// Output: Tất cả tín hiệu điều khiển cho ALU, RegFile, Memory, PC
+// Output: Send Signal for ALU, RegFile, Memory, PC
 //
-// Hỗ trợ: R-type, I-type, S-type, B-type, U-type, J-type
+// R-type, I-type, S-type, B-type, U-type, J-type
 // =============================================================================
 `timescale 1ns / 1ps
 
 module control_unit (
-    input  wire [31:0] instruction,  // Mã lệnh 32-bit
+    input  wire [31:0] instruction,
 
     // --- Tín hiệu điều khiển ---
-    output reg         reg_write,    // Ghi vào Register File?
-    output reg         alu_src,      // Nguồn toán hạng B: 0=rs2, 1=immediate
-    output reg  [3:0]  alu_control,  // Mã phép toán cho ALU
-    output reg         mem_read,     // Là lệnh Load? (LW)
-    output reg         mem_write,    // Là lệnh Store? (SW)
-    output reg         mem_to_reg,   // Dữ liệu ghi rd: 0=ALU, 1=mem_data
-    output reg         branch,       // Là lệnh Branch?
-    output reg  [2:0]  branch_type,  // Loại branch: funct3 (BEQ=000, BNE=001, BLT=100, BGE=101)
-    output reg         jump,         // Là lệnh JAL/JALR?
-    output reg         jalr,         // Là JALR? (jump target = rs1 + imm)
-    output reg         lui,          // Là LUI?
-    output reg         auipc,        // Là AUIPC?
-    output reg         mem_lr,       // Là lệnh Load-Reserved?
-    output reg         mem_sc,       // Là lệnh Store-Conditional?
+    output reg         reg_write,    // Register File
+    output reg         alu_src,      // B: 0=rs2, 1=immediate
+    output reg  [3:0]  alu_control,  // Mã phép toán ALU
+
+    output reg         mem_read,     // LW
+    output reg         mem_write,    // SW
+    output reg         mem_to_reg,   // rd: 0=ALU, 1=mem_data
+
+    output reg         branch,       // Branch
+    output reg  [2:0]  branch_type,  // funct3 (BEQ=000, BNE=001, BLT=100, BGE=101)
+
+    output reg         jump,         // JAL/JALR
+    output reg         jalr,         // JALR
+    output reg         lui,          // LUI
+    output reg         auipc,        // AUIPC
+    output reg         mem_lr,       // Load-Reserved
+    output reg         mem_sc,       // Store-Conditional
+
     output reg         mem_amo,      // Là lệnh AMO?
     output reg  [3:0]  amo_op,       // Mã phép toán AMO
 
     // --- Immediate Generator ---
-    output reg  [31:0] imm,          // Giá trị immediate (sign-extended)
+    output reg  [31:0] imm,          // immediate
 
     // --- Địa chỉ thanh ghi ---
-    output wire [4:0]  rs1_addr,     // Source register 1
-    output wire [4:0]  rs2_addr,     // Source register 2
-    output wire [4:0]  rd_addr       // Destination register
+    output wire [4:0]  rs1_addr,
+    output wire [4:0]  rs2_addr,
+    output wire [4:0]  rd_addr
 );
 
     // =========================================================================
-    // Trích xuất các trường từ instruction
+    // Instruction Part
     // =========================================================================
     wire [6:0] opcode = instruction[6:0];
     wire [2:0] funct3 = instruction[14:12];
     wire [6:0] funct7 = instruction[31:25];
+
     wire [4:0] funct5 = instruction[31:27];
 
     assign rs1_addr = instruction[19:15];
@@ -65,7 +70,7 @@ module control_unit (
     localparam OP_AMO     = 7'b0101111;  // AMO (LR, SC, AMO)
 
     // =========================================================================
-    // ALU control codes (khớp với alu.v)
+    // ALU control codes
     // =========================================================================
     localparam ALU_AND = 4'b0000;
     localparam ALU_OR  = 4'b0001;
@@ -78,7 +83,6 @@ module control_unit (
 
     // =========================================================================
     // Immediate Generator
-    // Tạo giá trị immediate dựa trên instruction type, sign-extended 32-bit
     // =========================================================================
     always @(*) begin
         case (opcode)
@@ -86,7 +90,7 @@ module control_unit (
             OP_I_TYPE, OP_LOAD, OP_JALR:
                 imm = {{20{instruction[31]}}, instruction[31:20]};
 
-            // AMO: Không dùng imm cho tính địa chỉ (imm = 0), rs1 chứa địa chỉ
+            // AMO
             OP_AMO:
                 imm = 32'd0;
 
@@ -114,10 +118,9 @@ module control_unit (
     end
 
     // =========================================================================
-    // Main Decoder: opcode → control signals
+    // Main Decoder: opcode -> control signals
     // =========================================================================
     always @(*) begin
-        // Mặc định: tất cả tắt
         reg_write   = 1'b0;
         alu_src     = 1'b0;
         alu_control = ALU_ADD;
@@ -141,7 +144,7 @@ module control_unit (
             // =================================================================
             OP_R_TYPE: begin
                 reg_write = 1'b1;
-                alu_src   = 1'b0;  // Toán hạng B = rs2
+                alu_src   = 1'b0;
 
                 case (funct3)
                     3'b000: alu_control = (funct7[5]) ? ALU_SUB : ALU_ADD; // ADD/SUB
@@ -275,7 +278,7 @@ module control_unit (
                 endcase
             end
 
-            default: ; // NOP (tất cả outputs đã mặc định = 0)
+            default: ; // NOP
         endcase
     end
 
