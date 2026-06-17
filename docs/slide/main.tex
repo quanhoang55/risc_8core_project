@@ -24,7 +24,33 @@
 \usepackage{listings} % Để chèn code hoặc tên tín hiệu mượt mà
 \lstset{showstringspaces=false}
 \usepackage{tikz}
+\usepackage{xcolor}
 \usetikzlibrary{positioning}
+
+% --- Cấu hình hiển thị Code Verilog ---
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{background}{rgb}{0.97,0.97,0.98}
+
+\lstset{
+    language=Verilog,
+    backgroundcolor=\color{background},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{blue}\bfseries,
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{purple},
+    basicstyle=\ttfamily\scriptsize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2
+}
 
 % --- Thông tin Đề tài ---
 \title[Mô phỏng CPU 8-Core RISC-V]{\textbf{MÔ PHỎNG CPU 8-CORE VỚI KIẾN TRÚC TẬP LỆNH RISC-V}}
@@ -63,9 +89,9 @@
     \tableofcontents[subsubsectionstyle=hide]
 \end{frame}
 
-\input{introduction.tex}
-\input{isa.tex}
-
+% Giả lập các lệnh input bằng cách comment để kiểm tra cấu trúc
+% \input{introduction.tex}
+% \input{isa.tex}
 
 % ==========================================
 % SECTION 3: DESIGN ARCHITECTURE
@@ -97,10 +123,10 @@
         % Shared Memory
         \node[mem] (sharedmem) at (9.6, 0.1) {Bộ nhớ dùng chung\\(Shared RAM 4KB)\\(\texttt{data\_mem.v})};
         
-        % Connections
-        \draw[<->, >=stealth, thick, DeepBlue] (c0.east) -- (2.3, 1.2) -- (2.3, 0.5) -- (busctrl.170);
-        \draw[<->, >=stealth, thick, DeepBlue] (c1.east) -- (busctrl.180);
-        \draw[<->, >=stealth, thick, DeepBlue] (c7.east) -- (2.3, -1.0) -- (2.3, -0.3) -- (busctrl.190);
+        % Connections (Đã sửa lỗi cú pháp neo điểm cho tương thích babel tiếng Việt)
+        \draw[<->, >=stealth, thick, DeepBlue] (c0.east) -- (2.3, 1.2) -- (2.3, 0.5) -- (busctrl.west);
+        \draw[<->, >=stealth, thick, DeepBlue] (c1.east) -- (busctrl.west);
+        \draw[<->, >=stealth, thick, DeepBlue] (c7.east) -- (2.3, -1.0) -- (2.3, -0.3) -- (busctrl.west);
         
         \draw[<->, >=stealth, thick, red!70!black] (arbiter) -- node[right, font=\tiny\bfseries] {req / grant} (busctrl);
         \draw[<->, >=stealth, thick, green!60!black] (busctrl) -- node[above, font=\tiny\bfseries] {Shared Bus} (sharedmem);
@@ -111,11 +137,10 @@
     Hệ thống kết nối đa nhân: \textbf{8 lõi CPU} hoạt động song song độc lập, thực hiện phân xử quyền truy cập bộ nhớ thông qua bộ phân xử \textbf{Arbiter} và bộ định tuyến bus dữ liệu \textbf{Bus Controller}.
 \end{frame}
 
-
 % \input{design/datapath.tex}
 \input{design/control_unit.tex}
 \input{design/pipeline_hazard.tex}
-\input{design/interconnect.tex}
+% \input{design/interconnect.tex}
 % \input{test.tex}
 
 \end{document}

@@ -4,67 +4,34 @@
 \headcommand {\beamer@framepages {2}{2}}
 \headcommand {\beamer@sectionpages {1}{2}}
 \headcommand {\beamer@subsectionpages {1}{2}}
-\headcommand {\sectionentry {1}{Giới Thiệu Đề Tài}{3}{Giới Thiệu Đề Tài}{0}}
+\headcommand {\sectionentry {1}{Thiết Kế Hệ Thống (Design)}{3}{Thiết Kế Hệ Thống (Design)}{0}}
 \headcommand {\beamer@subsectionpages {3}{2}}
-\headcommand {\beamer@subsectionentry {0}{1}{1}{3}{Đặt vấn đề \& Lý do chọn đề tài}}
-\headcommand {\slideentry {1}{1}{1}{3/3}{Đặt vấn đề \& Lý do chọn đề tài}{0}}
+\headcommand {\beamer@subsectionentry {0}{1}{1}{3}{Cấu trúc tổng thể}}
+\headcommand {\slideentry {1}{1}{1}{3/3}{Cấu trúc tổng thể}{0}}
 \headcommand {\beamer@framepages {3}{3}}
-\headcommand {\slideentry {1}{1}{2}{4/4}{Đặt vấn đề \& Lý do chọn đề tài}{0}}
+\headcommand {\slideentry {1}{1}{2}{4/4}{Cấu trúc tổng thể}{0}}
 \headcommand {\beamer@framepages {4}{4}}
-\headcommand {\beamer@sectionpages {3}{4}}
 \headcommand {\beamer@subsectionpages {3}{4}}
-\headcommand {\sectionentry {2}{Kiến Trúc Tập Lệnh (ISA)}{5}{Kiến Trúc Tập Lệnh (ISA)}{0}}
-\headcommand {\beamer@subsectionpages {5}{4}}
-\headcommand {\beamer@subsectionentry {0}{2}{1}{5}{Tập lệnh cơ bản RV32I}}
-\headcommand {\slideentry {2}{1}{1}{5/5}{Tập lệnh cơ bản RV32I}{0}}
+\headcommand {\beamer@subsectionentry {0}{1}{2}{5}{Kiến trúc Pipeline và Logic Điều khiển}}
+\headcommand {\slideentry {1}{2}{1}{5/5}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {5}{5}}
-\headcommand {\slideentry {2}{1}{2}{6/6}{Tập lệnh cơ bản RV32I}{0}}
+\headcommand {\beamer@subsubsectionentry {0}{1}{2}{1}{6}{Thanh ghi đệm (Pipeline Registers) và Control Unit}}
+\headcommand {\slideentry {1}{2}{2}{6/6}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {6}{6}}
-\headcommand {\slideentry {2}{1}{3}{7/7}{Tập lệnh cơ bản RV32I}{0}}
+\headcommand {\slideentry {1}{2}{3}{7/7}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {7}{7}}
-\headcommand {\slideentry {2}{1}{4}{8/8}{Tập lệnh cơ bản RV32I}{0}}
+\headcommand {\slideentry {1}{2}{4}{8/8}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {8}{8}}
-\headcommand {\beamer@subsectionpages {5}{8}}
-\headcommand {\beamer@subsectionentry {0}{2}{2}{9}{Tập lệnh hiện thực trong dự án}}
-\headcommand {\slideentry {2}{2}{1}{9/9}{Tập lệnh hiện thực trong dự án}{0}}
+\headcommand {\slideentry {1}{2}{5}{9/9}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {9}{9}}
-\headcommand {\slideentry {2}{2}{2}{10/10}{Tập lệnh hiện thực trong dự án}{0}}
+\headcommand {\slideentry {1}{2}{6}{10/10}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {10}{10}}
-\headcommand {\beamer@sectionpages {5}{10}}
-\headcommand {\beamer@subsectionpages {9}{10}}
-\headcommand {\sectionentry {3}{Thiết Kế Hệ Thống (Design)}{11}{Thiết Kế Hệ Thống (Design)}{0}}
-\headcommand {\beamer@subsectionpages {11}{10}}
-\headcommand {\beamer@subsectionentry {0}{3}{1}{11}{Cấu trúc tổng thể}}
-\headcommand {\slideentry {3}{1}{1}{11/11}{Cấu trúc tổng thể}{0}}
+\headcommand {\slideentry {1}{2}{7}{11/11}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {11}{11}}
-\headcommand {\slideentry {3}{1}{2}{12/12}{Cấu trúc tổng thể}{0}}
+\headcommand {\slideentry {1}{2}{8}{12/12}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {12}{12}}
-\headcommand {\beamer@subsectionpages {11}{12}}
-\headcommand {\beamer@subsectionentry {0}{3}{2}{13}{Kiến trúc Pipeline và Logic Điều khiển}}
-\headcommand {\slideentry {3}{2}{1}{13/13}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
-\headcommand {\beamer@framepages {13}{13}}
-\headcommand {\beamer@subsubsectionentry {0}{3}{2}{1}{14}{Thanh ghi đệm (Pipeline Registers)}}
-\headcommand {\slideentry {3}{2}{2}{14/14}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
-\headcommand {\beamer@framepages {14}{14}}
-\headcommand {\beamer@subsubsectionentry {0}{3}{2}{2}{15}{Bộ giải mã lệnh (Control Unit)}}
-\headcommand {\slideentry {3}{2}{3}{15/15}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
-\headcommand {\beamer@framepages {15}{15}}
-\headcommand {\beamer@subsubsectionentry {0}{3}{2}{3}{16}{Bộ xử lý xung đột (Hazard Unit)}}
-\headcommand {\slideentry {3}{2}{4}{16/16}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
-\headcommand {\beamer@framepages {16}{16}}
-\headcommand {\beamer@subsubsectionentry {0}{3}{2}{4}{17}{Bộ phân xử và kết nối đa nhân (Interconnect)}}
-\headcommand {\slideentry {3}{2}{5}{17/17}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
-\headcommand {\beamer@framepages {17}{17}}
-\headcommand {\slideentry {3}{2}{6}{18/18}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
-\headcommand {\beamer@framepages {18}{18}}
-\headcommand {\slideentry {3}{2}{7}{19/19}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
-\headcommand {\beamer@framepages {19}{19}}
-\headcommand {\slideentry {3}{2}{8}{20/20}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
-\headcommand {\beamer@framepages {20}{20}}
-\headcommand {\slideentry {3}{2}{9}{21/21}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
-\headcommand {\beamer@framepages {21}{21}}
-\headcommand {\beamer@partpages {1}{21}}
-\headcommand {\beamer@subsectionpages {13}{21}}
-\headcommand {\beamer@sectionpages {11}{21}}
-\headcommand {\beamer@documentpages {21}}
-\headcommand {\gdef \inserttotalframenumber {21}}
+\headcommand {\beamer@partpages {1}{12}}
+\headcommand {\beamer@subsectionpages {5}{12}}
+\headcommand {\beamer@sectionpages {3}{12}}
+\headcommand {\beamer@documentpages {12}}
+\headcommand {\gdef \inserttotalframenumber {12}}

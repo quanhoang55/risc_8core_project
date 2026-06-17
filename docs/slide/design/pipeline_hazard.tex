@@ -1,27 +1,119 @@
-\subsubsection{Bộ xử lý xung đột (Hazard Unit)}
-\begin{frame}{Quản lý xung đột trong Pipeline (\texttt{hazard\_unit})}
-    Quá trình chạy gối đầu lệnh (Pipelining) sinh ra các xung đột dữ liệu và điều khiển, được xử lý trực tiếp bên trong \texttt{risc\_core.v}:
-    \vspace{0.2cm}
+% =============================================================================
+% SLIDE 2: HAZARD DETECTION
+% =============================================================================
+\begin{frame}[fragile]{2.3.3 Hazard Detection (Cơ chế đóng băng Pipeline)}
+    \begin{itemize}
+        \item \textbf{Nhiệm vụ:} Phát hiện xung đột dữ liệu không thể cứu bằng Forwarding (Load-Use) và quản lý trạng thái đóng băng toàn bộ CPU khi Bus bộ nhớ bận (\texttt{mem\_wait}).
+    \end{itemize}
     
-    \begin{columns}
-        \begin{column}{0.5\textwidth}
-            \begin{block}{1. Xung đột dữ liệu (Data Hazard)}
-                Xảy ra khi lệnh sau cần đọc giá trị thanh ghi mà lệnh trước chưa ghi xong.
-                \begin{itemize}
-                    \item \textbf{Mạch Forwarding (Bơm tắt):} Chuyển kết quả trực tiếp từ ngõ ra \texttt{EX/MEM} hoặc \texttt{MEM/WB} về ngõ vào ALU mà không cần chờ Write Back.
-                    \item \textbf{Load-use Stall:} Với lệnh Load, kích hoạt tín hiệu \texttt{load\_use\_stall} để hoãn Pipeline 1 chu kỳ khi lệnh kề sau sử dụng kết quả Load.
-                \end{itemize}
-            \end{block}
+    \begin{block}{Mã nguồn Verilog - Phát hiện và Quản lý chốt chặn}
+\begin{lstlisting}
+// --- PASTE CODE LOGIC LOAD-USE STALL VA` QUAN LY' HOLD/CLEAR TAI DAY ---
+
+\end{lstlisting}
+    \end{block}
+    
+    \begin{itemize}
+        \item \textbf{Giải thuật:} Khi xảy ra xung đột, tầng \texttt{IF/ID} bị giữ nguyên trạng thái (\texttt{hold}), đồng thời chèn một bong bóng \texttt{NOP} bằng cách xóa tầng \texttt{ID/EX} (\texttt{clear}).
+    \end{itemize}
+\end{frame}
+
+% =============================================================================
+% SLIDE 3: FORWARDING LOGIC
+% =============================================================================
+\begin{frame}[fragile]{2.3.4 Forwarding (Mạch đi tắt dữ liệu)}
+    \begin{itemize}
+        \item \textbf{Nhiệm vụ:} Tránh Stall bừa bãi bằng cách bơm trực tiếp kết quả từ tầng \texttt{EX/MEM} hoặc \texttt{MEM/WB} về đầu vào ALU nếu phát hiện lệnh sau đọc thanh ghi mà lệnh trước chuẩn bị ghi.
+    \end{itemize}
+
+    \begin{block}{Mã nguồn Verilog - Khối tổ hợp Forwarding chọn toán hạng ALU}
+\begin{lstlisting}
+// --- PASTE CODE LOGIC KIEM TRA DIEU KIEN FORWARD (CO' CHECK x0) TAI DAY ---
+
+\end{lstlisting}
+    \end{block}
+
+    \begin{alertblock}{Đặc điểm cốt lõi}
+        Bắt buộc phải kiểm tra điều kiện loại trừ thanh ghi đặc biệt \textbf{\texttt{x0}} (\texttt{rd\_addr != 5'd0}). Nếu lệnh trước ghi vào \texttt{x0}, mạch bỏ qua không forward để bảo toàn giá trị $0$ tuyệt đối của kiến trúc RISC-V.
+    \end{alertblock}
+\end{frame}
+
+% =============================================================================
+% SLIDE 4: RISC_CORE INTEGRATION
+% =============================================================================
+\begin{frame}[fragile]{2.3.5 risc\_core Integration (Bẻ nhỏ ruột, giữ nguyên vỏ)}
+    \begin{columns}[T]
+        \begin{column}{0.45\textwidth}
+            \textbf{Nguyên tắc đóng gói:}
+            \begin{itemize}
+                \item Giữ nguyên $100\%$ giao tiếp Ports ra ngoài hệ thống Bus và mô hình đa nhân (8 cores) của nhóm.
+                \item Bên trong ruột gọi (instantiate) 6 module con độc lập và thực hiện kết nối bằng dây dẫn (\texttt{wire}).
+            \end{itemize}
         \end{column}
         
-        \begin{column}{0.48\textwidth}
-            \begin{alertblock}{2. Xung đột điều khiển (Control)}
-                Xảy ra khi các lệnh nhảy hoặc rẽ nhánh thay đổi dòng chảy địa chỉ \texttt{PC}.
-                \begin{itemize}
-                    \item Khi tín hiệu \texttt{redirect\_taken} kích hoạt (do Branch hoặc Jump).
-                    \item \textbf{Cơ chế Flush (Xóa):} Reset các thanh ghi đệm tầng nạp sai lệnh (\texttt{if\_id\_valid <= 0}, \texttt{id\_ex\_valid <= 0}), đưa các tín hiệu điều khiển về 0 (tạo lệnh rỗng \texttt{NOP}).
-                \end{itemize}
-            \end{alertblock}
+        \begin{column}{0.55\textwidth}
+            \begin{block}{Cấu trúc đấu nối Hazard Controller trong Core}
+\begin{lstlisting}
+// --- PASTE DOAN CODE INSTANTIATE HAZARD_CONTROLLER TRONG CORE TAI DAY ---
+
+\end{lstlisting}
+            \end{block}
         \end{column}
     \end{columns}
+\end{frame}
+
+% =============================================================================
+% SLIDE 5: UNIT TESTING - PART 1
+% =============================================================================
+\begin{frame}{2.3.6 Unit Testing - Kiểm thử vách ngăn IF/ID và ID/EX}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{block}{1. Kết quả mô phỏng \texttt{pipe\_reg\_if\_id}}
+                \centering
+                \includegraphics[width=0.9\textwidth]{design/test/if_id.png}
+            \end{block}
+            \textbf{Phân tích:} Minh chứng phản hồi chính xác khi tín hiệu \texttt{hold} dựng lên, giá trị PC và lệnh được khóa cứng qua xung clock.
+        \end{column}
+        
+        \begin{column}{0.5\textwidth}
+            \begin{block}{2. Kết quả mô phỏng \texttt{pipe\_reg\_id\_ex}}
+                \centering
+                \includegraphics[width=0.9\textwidth]{design/test/id_ex.png}
+            \end{block}
+            \textbf{Phân tích:} Tín hiệu \texttt{clear} (Flush) kích hoạt thành công, xóa sạch các cờ điều khiển rác về bằng $0$ ngay chu kỳ sau.
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% =============================================================================
+% SLIDE 6: UNIT TESTING - PART 2
+% =============================================================================
+\begin{frame}{2.3.6 Unit Testing - Kiểm thử vách ngăn EX/MEM và MEM/WB}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{block}{3. Kết quả mô phỏng \texttt{pipe\_reg\_ex\_mem}}
+                \centering
+                \includegraphics[width=0.9\textwidth]{design/test/ex_mem.png}
+            \end{block}
+            \textbf{Phân tích:} Dữ liệu địa chỉ và toán hạng lưu trữ từ ALU được đồng bộ đẩy sang bộ nhớ chính xác theo sườn lên của Clock.
+        \end{column}
+        
+        \begin{column}{0.5\textwidth}
+            \begin{block}{4. Kết quả mô phỏng \texttt{pipe\_reg\_mem\_wb}}
+                \centering
+                \includegraphics[width=0.9\textwidth]{design/test/mem_wb.png}
+            \end{block}
+            \textbf{Phân tích:} Sửa lỗi sập hầm bằng chân \texttt{hold} thay thế \texttt{clear}. Khi gặp \texttt{mem\_wait}, tầng ghi được giữ nguyên, bảo toàn dữ liệu.
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% =============================================================================
+% SLIDE KẾT THÚC
+% =============================================================================
+\begin{frame}
+    \centering
+    \Huge \color{blue}\bfseries CẢM ƠN THẦY CÔ VÀ CÁC BẠN\\ĐÃ LẮNG NGHE!\\
+    \vspace{0.5cm}
+    \large \color{black} Q\&A Session
 \end{frame}

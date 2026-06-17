@@ -1,61 +1,30 @@
 \subsection{Kiến trúc Pipeline và Logic Điều khiển}
-\subsubsection{Thanh ghi đệm (Pipeline Registers)}
-\begin{frame}{Cơ chế hoạt động của Pipeline Registers}
-    Các thanh ghi đệm hoạt động như các "vách ngăn" đồng bộ bằng xung nhịp Clock:
-    \vspace{0.2cm}
-    \begin{columns}
-        \begin{column}{0.5\textwidth}
-            \begin{block}{Đồng bộ hóa \& Dịch chuyển}
-                \begin{itemize}
-                    \item \textbf{Lưu giữ trạng thái:} Đảm bảo dữ liệu của lệnh trước không bị đè bởi lệnh sau khi đang xử lý song song.
-                    \item \textbf{Xếp hàng tín hiệu:} Tín hiệu điều khiển từ bộ Decode (\texttt{control\_unit}) được đẩy dọc theo các thanh ghi đệm (\texttt{id\_ex\_reg\_write}, \texttt{ex\_mem\_mem\_read},...) để thực thi đúng thời điểm.
-                \end{itemize}
-            \end{block}
-        \end{column}
-        
-        \begin{column}{0.48\textwidth}
-            \begin{alertblock}{Đường đi tắt (Forwarding Paths)}
-                Bao vây các thanh ghi đệm để giải quyết xung đột dữ liệu:
-                \begin{itemize}
-                    \item Bơm kết quả trực tiếp từ ngõ ra ALU (\texttt{ex\_mem\_result}) hoặc dữ liệu ghi ngược (\texttt{mem\_wb\_write\_data}).
-                    \item Đưa thẳng về ngõ vào ALU tầng \textbf{EX} thông qua các bộ MUX lớn, giảm thiểu số chu kỳ bị Stall.
-                \end{itemize}
-            \end{alertblock}
-        \end{column}
-    \end{columns} 
-\end{frame}
+\subsubsection{Thanh ghi đệm (Pipeline Registers) và Control Unit}
+% =============================================================================
+% SLIDE 1: TỔNG QUAN KIẾN TRÚC MODULAR
+% =============================================================================
+\begin{frame}{2.3.1 Pipeline Registers \& 2.3.2 Control Unit}
+    \begin{block}{Tư duy thiết kế: Phân rã cấu trúc (Structural Separation)}
+        Tách biệt hoàn toàn giữa \textbf{Datapath} (Đường dữ liệu), \textbf{Control Unit} (Khối điều khiển tổ hợp), và \textbf{Pipeline Registers} (Vách ngăn đồng bộ).
+    \end{block}
 
-\subsubsection{Bộ giải mã lệnh (Control Unit)}
-\begin{frame}{Bộ Giải Mã Lệnh (\texttt{control\_unit.v})}
-    Bộ điều khiển \texttt{control\_unit.v} là bộ giải mã trung tâm (decoder) hoạt động tại tầng **Decode (ID)**:
-    \vspace{0.2cm}
-    
-    \begin{columns}
+    \begin{columns}[T]
         \begin{column}{0.5\textwidth}
-            \begin{block}{Giải mã tín hiệu điều khiển}
-                Từ mã lệnh 32-bit, CU trích xuất opcode, funct3, funct7 để sinh:
-                \begin{itemize}
-                    \item \textbf{Đường truyền dữ liệu:} \texttt{reg\_write}, \texttt{alu\_src}, \texttt{mem\_to\_reg}.
-                    \item \textbf{Điều khiển ALU:} \texttt{alu\_control[3:0]} (ADD, SUB, SLL, SRL, AND, OR, XOR, SLT).
-                    \item \textbf{Rẽ nhánh \& Nhảy:} \texttt{branch}, \texttt{branch\_type}, \texttt{jump}, \texttt{jalr}.
-                \end{itemize}
-            \end{block}
+            \textbf{Control Unit (Thuần tổ hợp):}
+            \begin{itemize}
+                \item Giải mã mã lệnh 32-bit từ tầng IF.
+                \item Sinh tín hiệu điều khiển 1-bit ($reg\_write, mem\_read,\dots$).
+                \item \textit{[Bạn sẽ paste code Control Unit tại đây hoặc slide phụ]}
+            \end{itemize}
         \end{column}
         
-        \begin{column}{0.48\textwidth}
-            \begin{alertblock}{Tín hiệu đa nhân đặc biệt}
-                Hỗ trợ các tín hiệu điều khiển truy cập bộ nhớ và đồng bộ:
-                \begin{itemize}
-                    \item \texttt{mem\_lr} / \texttt{mem\_sc}: Lệnh nguyên tử Load-Reserved / Store-Conditional.
-                    \item \texttt{mem\_amo}: Kích hoạt phép toán nguyên tử trực tiếp trên bộ nhớ.
-                    \item \texttt{amo\_op[3:0]}: Chọn phép toán AMO (swap, add, logic, min/max).
-                \end{itemize}
-            \end{alertblock}
+        \begin{column}{0.5\textwidth}
+            \textbf{Pipeline Registers (Chốt chặn Clock):}
+            \begin{itemize}
+                \item 4 khối đệm: \texttt{IF/ID}, \texttt{ID/EX}, \texttt{EX/MEM}, \texttt{MEM/WB}.
+                \item Đóng vai trò là vách ngăn phân chia 5 tầng xử lý.
+                \item Tích hợp chân \texttt{hold} (Stall) và \texttt{clear} (Flush).
+            \end{itemize}
         \end{column}
     \end{columns}
-    \vspace{0.1cm}
-    \begin{center}
-        \scriptsize
-        \textbf{Bộ tạo hằng số (Immediate Generator):} Giải mã và căn lề dấu (sign-extend) hằng số \texttt{imm} cho các định dạng lệnh I, S, B, U, J.
-    \end{center}
 \end{frame}
