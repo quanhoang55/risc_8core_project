@@ -1,19 +1,225 @@
-\subsubsection{Bộ phân xử \& Kết nối đa nhân (Interconnect)}
-\begin{frame}{Trục Bus \& Phân Xử Đa Nhân (\texttt{arbiter.v} \& \texttt{bus\_ctrl.v})}
-    Để liên kết \textbf{8 lõi CPU} dùng chung RAM 4KB, hệ thống sử dụng cơ chế bus điều phối nguyên tử:
-    \vspace{0.2cm}
-    
-    \begin{itemize}
-        \item \textbf{Bộ phân xử Arbiter (\texttt{arbiter.v}) - Thuật toán Round-Robin:}
-        \begin{itemize}
-            \item Quét 8 Core từ con trỏ ưu tiên (\texttt{priority\_ptr}). Core đầu tiên gửi yêu cầu (\texttt{request}) sẽ được cấp quyền.
-            \item \textbf{Tín hiệu cấp quyền (\texttt{grant}):} Chỉ kích hoạt trong \textbf{1 chu kỳ xung nhịp (pulse)}, sau đó tự xóa. Con trỏ ưu tiên dịch chuyển tiếp sang nhân bên cạnh (\texttt{priority\_ptr <= winner + 1}) nhằm chia sẻ băng thông công bằng, tránh "đói" tài nguyên.
-            \item Sử dụng mặt nạ \texttt{new\_request = request \& \textasciitilde last\_granted} để ngăn chặn 1 Core liên tục chiếm giữ Bus.
-        \end{itemize}
-        \item \textbf{Bộ điều khiển Bus (\texttt{bus\_ctrl.v}) \& Hỗ trợ Nguyên tử (Atomic):}
-        \begin{itemize}
-            \item Định tuyến song song địa chỉ và dữ liệu giữa Core được cấp quyền (\texttt{grant}) và RAM.
-            \item \textbf{Xử lý khóa nguyên tử (Atomic Locks):} Lưu vết địa chỉ đặt khóa cho các lệnh \texttt{LR.W}/\texttt{SC.W}. Nếu xảy ra xung đột ghi từ Core khác, khóa bị xóa và lệnh \texttt{SC.W} trả về thất bại (kết quả \texttt{1}).
-        \end{itemize}
-    \end{itemize}
+\subsubsection{Bộ phân xử và kết nối đa nhân (Interconnect)}
+
+\begin{frame}{Vai Trò Của Interconnect Trong Hệ Thống 8 Core}
+    \small
+    Khi 8 core cùng cần đọc/ghi \texttt{data\_mem}, interconnect đóng vai trò cầu nối để chọn đúng core, đúng địa chỉ và trả phản hồi về đúng nơi.
+
+    \vspace{0.15cm}
+    \begin{columns}[T]
+        \begin{column}{0.58\textwidth}
+            \centering
+            \begin{tikzpicture}[
+                core/.style={draw=DeepBlue, fill=blue!8, minimum width=1.7cm, minimum height=0.48cm, font=\scriptsize\bfseries, align=center},
+                bus/.style={draw=orange!80!black, fill=orange!13, minimum width=2.55cm, minimum height=0.9cm, font=\scriptsize\bfseries, align=center},
+                arb/.style={draw=AccentGreen!80!black, fill=AccentGreen!12, minimum width=2.55cm, minimum height=0.65cm, font=\scriptsize\bfseries, align=center},
+                mem/.style={draw=yellow!60!black, fill=yellow!16, minimum width=2.35cm, minimum height=0.9cm, font=\scriptsize\bfseries, align=center},
+                arrow/.style={->, >=stealth, thick, DeepBlue!85}
+            ]
+                \node[core] (c0) at (0, 1.0) {Core 0};
+                \node[core] (c1) at (0, 0.35) {Core 1};
+                \node[font=\bfseries] (dots) at (0, -0.2) {\vdots};
+                \node[core] (c7) at (0, -0.85) {Core 7};
+
+                \node[bus] (busctrl) at (3.4, 0.08) {\texttt{bus\_ctrl.v}\\Bus Controller};
+                \node[arb] (arbiter) at (3.4, -1.35) {\texttt{arbiter.v}\\Round-Robin};
+                \node[mem] (mem) at (6.65, 0.08) {\texttt{data\_mem.v}\\Shared RAM};
+
+                \draw[arrow] (c0.east) -- (1.35, 1.0) -- (1.35, 0.42) -- (busctrl.165);
+                \draw[arrow] (c1.east) -- (busctrl.180);
+                \draw[arrow] (c7.east) -- (1.35, -0.85) -- (1.35, -0.28) -- (busctrl.195);
+                \draw[<->, >=stealth, thick, red!70!black] (busctrl) -- node[right, font=\tiny\bfseries] {request/grant} (arbiter);
+                \draw[<->, >=stealth, thick, green!55!black] (busctrl) -- node[above, font=\tiny\bfseries] {addr/data/control} (mem);
+            \end{tikzpicture}
+        \end{column}
+
+        \begin{column}{0.4\textwidth}
+            \begin{block}{Nhóm tín hiệu chính}
+                \scriptsize
+                \begin{itemize}
+                    \item Core yêu cầu: \texttt{core\_mem\_req}, \texttt{core\_addr}, \texttt{core\_wdata}.
+                    \item Kiểu giao dịch: \texttt{core\_we}, \texttt{core\_re}, \texttt{core\_lr}, \texttt{core\_sc}, \texttt{core\_amo}.
+                    \item Phản hồi: \texttt{core\_ready}, \texttt{core\_rdata}, \texttt{core\_sc\_result}.
+                \end{itemize}
+            \end{block}
+            \begin{alertblock}{Ý chính}
+                \scriptsize
+                Interconnect không xử lý hazard pipeline; nó cấp quyền truy cập RAM và tạo tín hiệu sẵn sàng để core tiếp tục chạy.
+            \end{alertblock}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Arbiter Round-Robin: Chia Quyền Truy Cập Bus}
+    \small
+    \texttt{arbiter.v} nhận vector \texttt{request[7:0]} và chọn một core được cấp bus trong mỗi lượt cấp quyền.
+
+    \vspace{0.15cm}
+    \begin{columns}[T]
+        \begin{column}{0.49\textwidth}
+            \begin{block}{Cơ chế cấp quyền}
+                \scriptsize
+                \begin{itemize}
+                    \item \texttt{grant[7:0]} là one-hot, chỉ core thắng arbitration được bật bit.
+                    \item \texttt{grant\_valid} báo grant hợp lệ trong một chu kỳ.
+                    \item \texttt{grant\_id} cho \texttt{bus\_ctrl} biết core nào đang được phục vụ.
+                    \item \texttt{priority\_ptr} dịch sang core kế tiếp sau mỗi grant.
+                    \item \texttt{last\_granted} tránh cấp lại ngay cho cùng request cũ.
+                \end{itemize}
+            \end{block}
+        \end{column}
+
+        \begin{column}{0.49\textwidth}
+            \centering
+            \scriptsize
+            \begin{tikzpicture}[
+                box/.style={draw=DeepBlue, fill=blue!7, minimum width=1.55cm, minimum height=0.42cm, font=\tiny\bfseries, align=center},
+                gbox/.style={draw=AccentGreen!80!black, fill=AccentGreen!14, minimum width=1.55cm, minimum height=0.42cm, font=\tiny\bfseries, align=center},
+                arrow/.style={->, >=stealth, thick}
+            ]
+                \node[box] (r0) at (0, 0) {Cycle 1\\req: C0,C2,C5};
+                \node[gbox] (g0) at (2.2, 0) {grant\\C0};
+                \node[box] (r1) at (0, -0.75) {Cycle 2\\req: C2,C5};
+                \node[gbox] (g1) at (2.2, -0.75) {grant\\C2};
+                \node[box] (r2) at (0, -1.5) {Cycle 3\\req: C5};
+                \node[gbox] (g2) at (2.2, -1.5) {grant\\C5};
+
+                \draw[arrow] (r0) -- (g0);
+                \draw[arrow] (r1) -- (g1);
+                \draw[arrow] (r2) -- (g2);
+                \draw[->, >=stealth, thick, red!70!black] (g0.south) -- (g1.north);
+                \draw[->, >=stealth, thick, red!70!black] (g1.south) -- (g2.north);
+            \end{tikzpicture}
+
+            \vspace{0.15cm}
+            \begin{alertblock}{Mục tiêu}
+                \scriptsize
+                Chia sẻ RAM công bằng hơn giữa các core, giảm nguy cơ một core chiếm bus liên tục.
+            \end{alertblock}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Bus Controller: Định Tuyến Giao Dịch Read/Write}
+    \small
+    Sau khi arbiter cấp quyền, \texttt{bus\_ctrl.v} chọn tín hiệu của core thắng và điều khiển giao tiếp với \texttt{data\_mem}.
+
+    \vspace{0.15cm}
+    \begin{center}
+        \begin{tikzpicture}[
+            step/.style={draw=DeepBlue, fill=blue!8, minimum width=2.05cm, minimum height=0.58cm, font=\scriptsize\bfseries, align=center},
+            arrow/.style={->, >=stealth, thick, DeepBlue!80}
+        ]
+            \node[step] (s1) at (0, 0) {Core request};
+            \node[step] (s2) at (2.65, 0) {Arbiter grant};
+            \node[step] (s3) at (5.3, 0) {\texttt{bus\_ctrl}\\chọn core};
+            \node[step] (s4) at (7.95, 0) {\texttt{data\_mem}\\read/write};
+            \node[step] (s5) at (10.6, 0) {\texttt{core\_ready}};
+            \draw[arrow] (s1) -- (s2);
+            \draw[arrow] (s2) -- (s3);
+            \draw[arrow] (s3) -- (s4);
+            \draw[arrow] (s4) -- (s5);
+        \end{tikzpicture}
+    \end{center}
+
+    \vspace{0.15cm}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{block}{Read}
+                \scriptsize
+                \begin{itemize}
+                    \item Bật \texttt{dm\_re} và đưa \texttt{dm\_addr} sang RAM.
+                    \item Nhận \texttt{dm\_rdata} từ memory interface.
+                    \item Ghi dữ liệu vào \texttt{core\_rdata[grant\_id]} và bật \texttt{core\_ready}.
+                \end{itemize}
+            \end{block}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \begin{block}{Write}
+                \scriptsize
+                \begin{itemize}
+                    \item Bật \texttt{dm\_we}, đưa \texttt{dm\_addr} và \texttt{dm\_wdata}.
+                    \item \texttt{data\_mem} ghi dữ liệu theo cạnh clock.
+                    \item \texttt{bus\_ctrl} báo \texttt{core\_ready} để core kết thúc giao dịch.
+                \end{itemize}
+            \end{block}
+        \end{column}
+    \end{columns}
+
+    \vspace{0.05cm}
+    \centering
+    \scriptsize
+    Trong thiết kế hiện tại, read ở memory interface là combinational/async; write là synchronous trong \texttt{data\_mem}.
+\end{frame}
+
+\begin{frame}{Atomic LR/SC Và AMO Trong Interconnect}
+    \small
+    Interconnect có primitive phần cứng cho đồng bộ đa lõi thông qua reservation và phép toán nguyên tử trên RAM dùng chung.
+
+    \vspace{0.15cm}
+    \begin{columns}[T]
+        \begin{column}{0.49\textwidth}
+            \begin{block}{LR/SC Reservation}
+                \scriptsize
+                \begin{itemize}
+                    \item \texttt{LR.W}: đọc memory và đặt \texttt{reservation\_valid[core]} tại \texttt{reservation\_addr[core]}.
+                    \item \texttt{SC.W} thành công nếu reservation còn đúng địa chỉ; khi đó RAM được ghi và kết quả trả về là thành công.
+                    \item Nếu core khác ghi cùng địa chỉ, reservation bị invalidate; \texttt{SC.W} sau đó thất bại.
+                \end{itemize}
+            \end{block}
+        \end{column}
+
+        \begin{column}{0.49\textwidth}
+            \begin{alertblock}{AMO}
+                \scriptsize
+                \begin{itemize}
+                    \item AMO đọc giá trị cũ từ RAM.
+                    \item \texttt{bus\_ctrl} tính giá trị mới theo \texttt{amo\_op}: add, swap, and, or, xor, min/max.
+                    \item RAM nhận giá trị mới; core nhận lại old value qua \texttt{core\_rdata}.
+                \end{itemize}
+            \end{alertblock}
+        \end{column}
+    \end{columns}
+
+    \vspace{0.15cm}
+    \begin{center}
+        \scriptsize
+        Đây là nền tảng phần cứng để xây dựng cơ chế đồng bộ; slide này không trình bày như một mutex/semaphore phần mềm hoàn chỉnh.
+    \end{center}
+\end{frame}
+
+\begin{frame}{Testbench Và Kết Quả Kiểm Chứng Interconnect}
+    \small
+    Kiểm chứng tập trung ở \texttt{tb/interconnect\_tb.v}, tách riêng khỏi pipeline core để kiểm tra trực tiếp \texttt{arbiter}, \texttt{bus\_ctrl} và \texttt{data\_mem}.
+
+    \vspace{0.12cm}
+    \begin{table}
+        \centering
+        \scriptsize
+        \begin{tabular}{p{2.6cm} p{5.1cm} p{2.4cm}}
+            \toprule
+            \textbf{Test} & \textbf{Mục tiêu kiểm chứng} & \textbf{Kết quả} \\
+            \midrule
+            Round-Robin Write/Read & 4 core ghi/đọc các địa chỉ khác nhau qua bus dùng chung. & PASS \\
+            LR/SC success & Core thực hiện \texttt{LR.W} rồi \texttt{SC.W} khi không có core khác ghi chen vào. & PASS \\
+            LR/SC fail & Core khác ghi cùng địa chỉ làm reservation bị xóa trước \texttt{SC.W}. & PASS \\
+            AMOADD & Hai core cộng nguyên tử, RAM cuối cùng nhận đúng tổng giá trị. & PASS \\
+            \bottomrule
+        \end{tabular}
+    \end{table}
+
+    \vspace{-0.05cm}
+    \begin{columns}[T]
+        \begin{column}{0.46\textwidth}
+            \begin{alertblock}{Kết quả mô phỏng}
+                \centering
+                \texttt{SUMMARY: 10 PASSED, 0 FAILED}
+            \end{alertblock}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{block}{Tín hiệu nên mở trong GTKWave}
+                \scriptsize
+                \texttt{core\_mem\_req}, \texttt{arb\_request}, \texttt{arb\_grant}, \texttt{grant\_id}, \texttt{dm\_addr}, \texttt{dm\_we}, \texttt{dm\_re}, \texttt{core\_ready}, \texttt{core\_sc\_result}.
+            \end{block}
+        \end{column}
+    \end{columns}
 \end{frame}
