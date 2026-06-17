@@ -1,0 +1,156 @@
+$date
+	Wed Jun 17 21:31:16 2026
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1ps
+$end
+$scope module tb_ex_mem $end
+$var wire 1 ! mem_valid $end
+$var wire 32 " mem_store_data [31:0] $end
+$var wire 32 # mem_result [31:0] $end
+$var wire 1 $ mem_reg_write $end
+$var wire 5 % mem_rd_addr [4:0] $end
+$var wire 1 & mem_mem_write $end
+$var wire 1 ' mem_mem_to_reg $end
+$var wire 1 ( mem_mem_sc $end
+$var wire 1 ) mem_mem_read $end
+$var wire 1 * mem_mem_lr $end
+$var wire 1 + mem_mem_amo $end
+$var wire 4 , mem_amo_op [3:0] $end
+$var reg 1 - clk $end
+$var reg 4 . ex_amo_op [3:0] $end
+$var reg 1 / ex_mem_amo $end
+$var reg 1 0 ex_mem_lr $end
+$var reg 1 1 ex_mem_read $end
+$var reg 1 2 ex_mem_sc $end
+$var reg 1 3 ex_mem_to_reg $end
+$var reg 1 4 ex_mem_write $end
+$var reg 5 5 ex_rd_addr [4:0] $end
+$var reg 1 6 ex_reg_write $end
+$var reg 32 7 ex_result [31:0] $end
+$var reg 32 8 ex_store_data [31:0] $end
+$var reg 1 9 ex_valid $end
+$var reg 1 : hold $end
+$var reg 1 ; reset $end
+$scope module dut $end
+$var wire 1 - clk $end
+$var wire 4 < ex_amo_op [3:0] $end
+$var wire 1 / ex_mem_amo $end
+$var wire 1 0 ex_mem_lr $end
+$var wire 1 1 ex_mem_read $end
+$var wire 1 2 ex_mem_sc $end
+$var wire 1 3 ex_mem_to_reg $end
+$var wire 1 4 ex_mem_write $end
+$var wire 5 = ex_rd_addr [4:0] $end
+$var wire 1 6 ex_reg_write $end
+$var wire 32 > ex_result [31:0] $end
+$var wire 32 ? ex_store_data [31:0] $end
+$var wire 1 9 ex_valid $end
+$var wire 1 : hold $end
+$var wire 1 ; reset $end
+$var reg 4 @ mem_amo_op [3:0] $end
+$var reg 1 + mem_mem_amo $end
+$var reg 1 * mem_mem_lr $end
+$var reg 1 ) mem_mem_read $end
+$var reg 1 ( mem_mem_sc $end
+$var reg 1 ' mem_mem_to_reg $end
+$var reg 1 & mem_mem_write $end
+$var reg 5 A mem_rd_addr [4:0] $end
+$var reg 1 $ mem_reg_write $end
+$var reg 32 B mem_result [31:0] $end
+$var reg 32 C mem_store_data [31:0] $end
+$var reg 1 ! mem_valid $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+$end
+#0
+$dumpvars
+b0 C
+b0 B
+b0 A
+b0 @
+bx ?
+bx >
+bx =
+bx <
+1;
+0:
+x9
+bx 8
+bx 7
+x6
+bx 5
+x4
+x3
+x2
+x1
+x0
+x/
+bx .
+0-
+b0 ,
+0+
+0*
+0)
+0(
+0'
+0&
+b0 %
+0$
+b0 #
+b0 "
+0!
+$end
+#5000
+1-
+#10000
+0-
+b1010 5
+b1010 =
+b111001000 8
+b111001000 ?
+b1111011 7
+b1111011 >
+b0 .
+b0 <
+0/
+02
+00
+03
+04
+01
+16
+19
+0;
+#15000
+b1010 %
+b1010 A
+b111001000 "
+b111001000 C
+b1111011 #
+b1111011 B
+1$
+1!
+1-
+#20000
+0-
+b1111100111 7
+b1111100111 >
+1:
+#25000
+1-
+#30000
+0-
+0:
+#35000
+b1111100111 #
+b1111100111 B
+1-
+#40000
+0-
