@@ -28,10 +28,8 @@
 \headcommand {\beamer@framepages {10}{10}}
 \headcommand {\slideentry {1}{2}{7}{11/11}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {11}{11}}
-\headcommand {\slideentry {1}{2}{8}{12/12}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
-\headcommand {\beamer@framepages {12}{12}}
-\headcommand {\beamer@partpages {1}{12}}
-\headcommand {\beamer@subsectionpages {5}{12}}
-\headcommand {\beamer@sectionpages {3}{12}}
-\headcommand {\beamer@documentpages {12}}
-\headcommand {\gdef \inserttotalframenumber {12}}
+\headcommand {\beamer@partpages {1}{11}}
+\headcommand {\beamer@subsectionpages {5}{11}}
+\headcommand {\beamer@sectionpages {3}{11}}
+\headcommand {\beamer@documentpages {11}}
+\headcommand {\gdef \inserttotalframenumber {11}}
