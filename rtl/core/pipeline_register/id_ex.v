@@ -21,12 +21,12 @@ module id_ex (
 );
     always @(posedge clk or posedge reset) begin
         if (reset || clear) begin
-            ex_valid <= 1'b0; ex_pc <= 32'0; ex_rs1_data <= 32'0; ex_rs2_data <= 32'0; ex_imm <= 32'0;
-            ex_rs1_addr <= 5'0; ex_rs2_addr <= 5'0; ex_rd_addr <= 5'0; ex_alu_control <= 4'0;
-            ex_branch_type <= 3'0; ex_amo_op <= 4'0; ex_reg_write <= 1'0; ex_alu_src <= 1'0;
-            ex_mem_read <= 1'0; ex_mem_write <= 1'0; ex_mem_to_reg <= 1'0; ex_branch <= 1'0;
-            ex_jump <= 1'0; ex_jalr <= 1'0; ex_lui <= 1'0; ex_auipc <= 1'0; ex_mem_lr <= 1'0;
-            ex_mem_sc <= 1'0; ex_mem_amo <= 1'0;
+            ex_valid <= 1'b0; ex_pc <= 32'd0; ex_rs1_data <= 32'd0; ex_rs2_data <= 32'd0; ex_imm <= 32'd0;
+            ex_rs1_addr <= 5'd0; ex_rs2_addr <= 5'd0; ex_rd_addr <= 5'd0; ex_alu_control <= 4'd0;
+            ex_branch_type <= 3'd0; ex_amo_op <= 4'd0; ex_reg_write <= 1'b0; ex_alu_src <= 1'b0;
+            ex_mem_read <= 1'b0; ex_mem_write <= 1'b0; ex_mem_to_reg <= 1'b0; ex_branch <= 1'b0;
+            ex_jump <= 1'b0; ex_jalr <= 1'b0; ex_lui <= 1'b0; ex_auipc <= 1'b0; ex_mem_lr <= 1'b0;
+            ex_mem_sc <= 1'b0; ex_mem_amo <= 1'b0;
         end else if (!hold) begin
             ex_valid <= id_valid; ex_pc <= id_pc; ex_rs1_data <= id_rs1_data; ex_rs2_data <= id_rs2_data; ex_imm <= id_imm;
             ex_rs1_addr <= id_rs1_addr; ex_rs2_addr <= id_rs2_addr; ex_rd_addr <= id_rd_addr; ex_alu_control <= id_alu_control;

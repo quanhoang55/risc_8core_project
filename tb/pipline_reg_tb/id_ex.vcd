@@ -1,0 +1,320 @@
+$date
+	Wed Jun 17 21:21:38 2026
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1ps
+$end
+$scope module tb_id_ex $end
+$var wire 1 ! ex_valid $end
+$var wire 32 " ex_rs2_data [31:0] $end
+$var wire 5 # ex_rs2_addr [4:0] $end
+$var wire 32 $ ex_rs1_data [31:0] $end
+$var wire 5 % ex_rs1_addr [4:0] $end
+$var wire 1 & ex_reg_write $end
+$var wire 5 ' ex_rd_addr [4:0] $end
+$var wire 32 ( ex_pc [31:0] $end
+$var wire 1 ) ex_mem_write $end
+$var wire 1 * ex_mem_to_reg $end
+$var wire 1 + ex_mem_sc $end
+$var wire 1 , ex_mem_read $end
+$var wire 1 - ex_mem_lr $end
+$var wire 1 . ex_mem_amo $end
+$var wire 1 / ex_lui $end
+$var wire 1 0 ex_jump $end
+$var wire 1 1 ex_jalr $end
+$var wire 32 2 ex_imm [31:0] $end
+$var wire 3 3 ex_branch_type [2:0] $end
+$var wire 1 4 ex_branch $end
+$var wire 1 5 ex_auipc $end
+$var wire 4 6 ex_amo_op [3:0] $end
+$var wire 1 7 ex_alu_src $end
+$var wire 4 8 ex_alu_control [3:0] $end
+$var reg 1 9 clear $end
+$var reg 1 : clk $end
+$var reg 1 ; hold $end
+$var reg 4 < id_alu_control [3:0] $end
+$var reg 1 = id_alu_src $end
+$var reg 4 > id_amo_op [3:0] $end
+$var reg 1 ? id_auipc $end
+$var reg 1 @ id_branch $end
+$var reg 3 A id_branch_type [2:0] $end
+$var reg 32 B id_imm [31:0] $end
+$var reg 1 C id_jalr $end
+$var reg 1 D id_jump $end
+$var reg 1 E id_lui $end
+$var reg 1 F id_mem_amo $end
+$var reg 1 G id_mem_lr $end
+$var reg 1 H id_mem_read $end
+$var reg 1 I id_mem_sc $end
+$var reg 1 J id_mem_to_reg $end
+$var reg 1 K id_mem_write $end
+$var reg 32 L id_pc [31:0] $end
+$var reg 5 M id_rd_addr [4:0] $end
+$var reg 1 N id_reg_write $end
+$var reg 5 O id_rs1_addr [4:0] $end
+$var reg 32 P id_rs1_data [31:0] $end
+$var reg 5 Q id_rs2_addr [4:0] $end
+$var reg 32 R id_rs2_data [31:0] $end
+$var reg 1 S id_valid $end
+$var reg 1 T reset $end
+$scope module dut $end
+$var wire 1 9 clear $end
+$var wire 1 : clk $end
+$var wire 1 ; hold $end
+$var wire 4 U id_alu_control [3:0] $end
+$var wire 1 = id_alu_src $end
+$var wire 4 V id_amo_op [3:0] $end
+$var wire 1 ? id_auipc $end
+$var wire 1 @ id_branch $end
+$var wire 3 W id_branch_type [2:0] $end
+$var wire 32 X id_imm [31:0] $end
+$var wire 1 C id_jalr $end
+$var wire 1 D id_jump $end
+$var wire 1 E id_lui $end
+$var wire 1 F id_mem_amo $end
+$var wire 1 G id_mem_lr $end
+$var wire 1 H id_mem_read $end
+$var wire 1 I id_mem_sc $end
+$var wire 1 J id_mem_to_reg $end
+$var wire 1 K id_mem_write $end
+$var wire 32 Y id_pc [31:0] $end
+$var wire 5 Z id_rd_addr [4:0] $end
+$var wire 1 N id_reg_write $end
+$var wire 5 [ id_rs1_addr [4:0] $end
+$var wire 32 \ id_rs1_data [31:0] $end
+$var wire 5 ] id_rs2_addr [4:0] $end
+$var wire 32 ^ id_rs2_data [31:0] $end
+$var wire 1 S id_valid $end
+$var wire 1 T reset $end
+$var reg 4 _ ex_alu_control [3:0] $end
+$var reg 1 7 ex_alu_src $end
+$var reg 4 ` ex_amo_op [3:0] $end
+$var reg 1 5 ex_auipc $end
+$var reg 1 4 ex_branch $end
+$var reg 3 a ex_branch_type [2:0] $end
+$var reg 32 b ex_imm [31:0] $end
+$var reg 1 1 ex_jalr $end
+$var reg 1 0 ex_jump $end
+$var reg 1 / ex_lui $end
+$var reg 1 . ex_mem_amo $end
+$var reg 1 - ex_mem_lr $end
+$var reg 1 , ex_mem_read $end
+$var reg 1 + ex_mem_sc $end
+$var reg 1 * ex_mem_to_reg $end
+$var reg 1 ) ex_mem_write $end
+$var reg 32 c ex_pc [31:0] $end
+$var reg 5 d ex_rd_addr [4:0] $end
+$var reg 1 & ex_reg_write $end
+$var reg 5 e ex_rs1_addr [4:0] $end
+$var reg 32 f ex_rs1_data [31:0] $end
+$var reg 5 g ex_rs2_addr [4:0] $end
+$var reg 32 h ex_rs2_data [31:0] $end
+$var reg 1 ! ex_valid $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+$end
+#0
+$dumpvars
+b0 h
+b0 g
+b0 f
+b0 e
+b0 d
+b0 c
+b0 b
+b0 a
+b0 `
+b0 _
+bx ^
+bx ]
+bx \
+bx [
+bx Z
+bx Y
+bx X
+bx W
+bx V
+bx U
+1T
+xS
+bx R
+bx Q
+bx P
+bx O
+xN
+bx M
+bx L
+xK
+xJ
+xI
+xH
+xG
+xF
+xE
+xD
+xC
+bx B
+bx A
+x@
+x?
+bx >
+x=
+bx <
+0;
+0:
+09
+b0 8
+07
+b0 6
+05
+04
+b0 3
+b0 2
+01
+00
+0/
+0.
+0-
+0,
+0+
+0*
+0)
+b0 (
+b0 '
+0&
+b0 %
+b0 $
+b0 #
+b0 "
+0!
+$end
+#5000
+1:
+#10000
+0:
+0F
+0I
+0G
+0?
+0E
+0C
+0D
+0@
+0J
+0K
+0H
+1=
+1N
+b0 >
+b0 V
+b0 A
+b0 W
+b1 <
+b1 U
+b11 M
+b11 Z
+b10 Q
+b10 ]
+b1 O
+b1 [
+b100 B
+b100 X
+b10100 R
+b10100 ^
+b1010 P
+b1010 \
+b1000000000000 L
+b1000000000000 Y
+1S
+0T
+#15000
+17
+1&
+b1 8
+b1 _
+b11 '
+b11 d
+b10 #
+b10 g
+b1 %
+b1 e
+b100 2
+b100 b
+b10100 "
+b10100 h
+b1010 $
+b1010 f
+b1000000000000 (
+b1000000000000 c
+1!
+1:
+#20000
+0:
+b10000000000000 L
+b10000000000000 Y
+1;
+#25000
+1:
+#30000
+0:
+0;
+#35000
+b10000000000000 (
+b10000000000000 c
+1:
+#40000
+0:
+19
+#45000
+07
+0&
+b0 8
+b0 _
+b0 '
+b0 d
+b0 #
+b0 g
+b0 %
+b0 e
+b0 2
+b0 b
+b0 "
+b0 h
+b0 $
+b0 f
+b0 (
+b0 c
+0!
+1:
+#50000
+0:
+09
+#55000
+17
+1&
+b1 8
+b1 _
+b11 '
+b11 d
+b10 #
+b10 g
+b1 %
+b1 e
+b100 2
+b100 b
+b10100 "
+b10100 h
+b1010 $
+b1010 f
+b10000000000000 (
+b10000000000000 c
+1!
+1:
+#60000
+0:

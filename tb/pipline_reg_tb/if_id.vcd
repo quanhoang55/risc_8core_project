@@ -1,0 +1,115 @@
+$date
+	Wed Jun 17 21:10:46 2026
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1ps
+$end
+$scope module tb_if_id $end
+$var wire 1 ! id_valid $end
+$var wire 32 " id_pc [31:0] $end
+$var wire 32 # id_instr [31:0] $end
+$var reg 1 $ clear $end
+$var reg 1 % clk $end
+$var reg 1 & hold $end
+$var reg 32 ' if_instr [31:0] $end
+$var reg 32 ( if_pc [31:0] $end
+$var reg 1 ) reset $end
+$scope module dut $end
+$var wire 1 $ clear $end
+$var wire 1 % clk $end
+$var wire 1 & hold $end
+$var wire 32 * if_instr [31:0] $end
+$var wire 32 + if_pc [31:0] $end
+$var wire 1 ) reset $end
+$var reg 32 , id_instr [31:0] $end
+$var reg 32 - id_pc [31:0] $end
+$var reg 1 ! id_valid $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+$end
+#0
+$dumpvars
+b0 -
+b0 ,
+b0 +
+b0 *
+1)
+b0 (
+b0 '
+0&
+0%
+0$
+b0 #
+b0 "
+0!
+$end
+#5000
+1%
+#10000
+0%
+b10001000100010001000100010001 '
+b10001000100010001000100010001 *
+0)
+#15000
+b10001000100010001000100010001 #
+b10001000100010001000100010001 ,
+1!
+1%
+#20000
+0%
+b100010001000100010001000100010 '
+b100010001000100010001000100010 *
+b100 (
+b100 +
+#25000
+b100010001000100010001000100010 #
+b100010001000100010001000100010 ,
+b100 "
+b100 -
+1%
+#30000
+0%
+b110011001100110011001100110011 '
+b110011001100110011001100110011 *
+b1000 (
+b1000 +
+1&
+#35000
+1%
+#40000
+0%
+0&
+#45000
+b110011001100110011001100110011 #
+b110011001100110011001100110011 ,
+b1000 "
+b1000 -
+1%
+#50000
+0%
+1$
+#55000
+b0 #
+b0 ,
+b0 "
+b0 -
+0!
+1%
+#60000
+0%
+0$
+#65000
+b110011001100110011001100110011 #
+b110011001100110011001100110011 ,
+b1000 "
+b1000 -
+1!
+1%
+#70000
+0%
