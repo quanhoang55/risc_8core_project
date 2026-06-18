@@ -1,5 +1,0 @@
-\babel@toc {vietnamese}{}\relax 
-\beamer@sectionintoc {1}{Thiết Kế Hệ Thống (Design)}{3}{0}{1}
-\beamer@subsectionintoc {1}{1}{Cấu trúc tổng thể}{3}{0}{1}
-\beamer@subsectionintoc {1}{2}{Kiến trúc Pipeline và Logic Điều khiển}{5}{0}{1}
-\beamer@subsubsectionintoc {1}{2}{1}{Thanh ghi đệm Pipeline Registers và Control Unit}{6}{0}{1}

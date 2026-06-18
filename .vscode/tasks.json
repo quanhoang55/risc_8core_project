@@ -1,0 +1,22 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "LaTeX: Build Slides",
+            "type": "shell",
+            "command": "latexmk -cd -pdf docs/slide/main.tex",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "LaTeX: Watch Slides (Auto-compile)",
+            "type": "shell",
+            "command": "latexmk -cd -pvc -pdf -interaction=nonstopmode docs/slide/main.tex",
+            "group": "build",
+            "problemMatcher": []
+        }
+    ]
+}

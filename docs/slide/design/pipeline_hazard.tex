@@ -1,9 +1,94 @@
 % =============================================================================
-% SLIDE: HAZARD DETECTION & FORWARDING
+% SLIDE 4: RISC_CORE INTEGRATION
 % =============================================================================
-\begin{frame}{Hazard Detection\& Forwarding}
+\begin{frame}{RISC\_Core Integration}
+    \begin{columns}[T]
+        \begin{column}{0.4\textwidth}
+            \textbf{Nguyên tắc đóng gói:}
+            \begin{itemize}
+                \item Giữ nguyên $100\%$ giao tiếp \texttt{Ports} ra hệ thống \texttt{Shared Bus} ngoại vi và mô hình \texttt{8-Core}.
+                \item Thực hiện \texttt{instantiate} 6 module con độc lập bên trong ruột và kết nối đồng bộ bằng mạng lưới \texttt{wire}.
+            \end{itemize}
+        \end{column}
+        
+        \begin{column}{0.6\textwidth}
+            \begin{block}{Sơ đồ kết nối khối điều khiển trung tâm trong Core}
+                \centering
+                \begin{tikzpicture}[
+                    block/.style={draw, thick, fill=blue!10, draw=DeepBlue, minimum width=2.8cm, minimum height=1.6cm, rounded corners, font=\scriptsize\bfseries, align=center},
+                    hz_block/.style={draw, thick, fill=orange!10, draw=orange!80!black, minimum width=2.5cm, minimum height=1.6cm, rounded corners, font=\scriptsize\bfseries, align=center},
+                    wire/.style={->, >=stealth, thick, DeepBlue},
+                    ctrl/.style={->, >=stealth, thick, red!70!black}
+                ]
+                    % Các khối mô phỏng trong core
+                    \node[block] (dp) at (0, 0) {Datapath Units\\[0.1cm]\tiny(ALU, RegFile,\dots)};
+                    \node[hz_block] (hz) at (4.0, 0) {Hazard Controller\\[0.1cm]\tiny(\texttt{hazard\_controller.v})};
+                    
+                    % Tuyến dây giám sát (Datapath -> Hazard)
+                    \draw[wire] (dp.15) -- node[above, font=\tiny\bfseries] {rs / rd addresses} (hz.165);
+                    \draw[wire] (dp.-15) -- node[below, font=\tiny\bfseries] {redirect / status} (hz.195);
+                    
+                    % Tuyến dây điều khiển phản hồi (Hazard -> Datapath)
+                    \draw[ctrl] (hz.140) -- node[above, font=\tiny\bfseries] {forward\_a / b} (dp.40);
+                    \draw[ctrl] (hz.220) -- node[below, font=\tiny\bfseries] {pipeline\_hold / clear} (dp.320);
+                \end{tikzpicture}
+            \end{block}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% =============================================================================
+% SLIDE 5: UNIT TESTING - PART 1
+% =============================================================================
+\begin{frame}{Pipeline Registers Unit Testing - IF/ID và ID/EX}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{block}{1. Kết quả Simulation \texttt{pipe\_reg\_if\_id}}
+                \centering
+                \includegraphics[width=0.9\textwidth]{design/test/if_id.png}
+            \end{block}
+            \textbf{Phân tích Waveform:} Xác thực phản hồi chính xác khi tín hiệu \texttt{hold} dựng lên, giá trị \texttt{PC} và \texttt{Instruction} được khóa cứng, không bị ảnh hưởng bởi sườn Clock.
+        \end{column}
+        
+        \begin{column}{0.5\textwidth}
+            \begin{block}{2. Kết quả Simulation \texttt{pipe\_reg\_id\_ex}}
+                \centering
+                \includegraphics[width=0.9\textwidth]{design/test/id_ex.png}
+            \end{block}
+            \textbf{Phân tích Waveform:} Tín hiệu \texttt{clear} (\texttt{Flush}) kích hoạt thành công, xóa sạch các cờ điều khiển về trạng thái $0$ (\texttt{NOP Bubble}) ngay chu kỳ kế tiếp.
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% =============================================================================
+% SLIDE 6: UNIT TESTING - PART 2
+% =============================================================================
+\begin{frame}{Pipeline Registers Unit Testing - EX/MEM và MEM/WB}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{block}{3. Kết quả Simulation \texttt{pipe\_reg\_ex\_mem}}
+                \centering
+                \includegraphics[width=0.9\textwidth]{design/test/ex_mem.png}
+            \end{block}
+            \textbf{Phân tích Waveform:} Các toán hạng từ \texttt{ALU} và dữ liệu \texttt{Store} được chốt giữ và chuyển giao đồng bộ sang \texttt{Data Memory} theo sườn lên của Clock.
+        \end{column}
+        
+        \begin{column}{0.5\textwidth}
+            \begin{block}{4. Kết quả Simulation \texttt{pipe\_reg\_mem\_wb}}
+                \centering
+                \includegraphics[width=0.9\textwidth]{design/test/mem_wb.png}
+            \end{block}
+            \textbf{Phân tích Waveform:} Cơ chế vá lỗi thực tế; sử dụng chân \texttt{hold} thay vì \texttt{clear}. Khi xảy ra \texttt{Memory Stall} (\texttt{mem\_wait}), dữ liệu tầng này đứng im để bảo toàn tính toàn vẹn.
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% =============================================================================
+% SLIDE 7: HAZARD DETECTION & FORWARDING
+% =============================================================================
+\begin{frame}{Hazard Detection \& Forwarding}
     \begin{itemize}
-        \item \textbf{Tư duy tích hợp:} Gom toàn bộ logic phát hiện Load-Use Stall, cứu dữ liệu (Forwarding) và quản lý bộ nhớ bận (\texttt{mem\_wait}) vào một bộ điều khiển tập trung để tối ưu tài nguyên.
+        \item \textbf{Tư duy tích hợp:} Tập trung hóa (Centralized Control) toàn bộ logic xử lý \texttt{Load-Use Stall}, đi tắt dữ liệu (\texttt{Forwarding}) và quản lý trạng thái bận hệ thống (\texttt{mem\_wait}) vào một bộ điều khiển duy nhất nhằm tối ưu tài nguyên phần cứng.
     \end{itemize}
 
     \begin{block}{Sơ đồ khối điều khiển trung tâm hệ thống - Hazard Controller}
@@ -28,74 +113,4 @@
             \draw[wire_out] (hz.-15) -- node[below, font=\tiny\bfseries, xshift=0.1cm] {ex\_mem\_hold} (3.5, -0.45);
         \end{tikzpicture}
     \end{block}
-\end{frame}
-
-% =============================================================================
-% SLIDE 4: RISC_CORE INTEGRATION
-% =============================================================================
-\begin{frame}[fragile]{RISC\_Core Integration}
-    \begin{columns}[T]
-        \begin{column}{0.45\textwidth}
-            \textbf{Nguyên tắc đóng gói:}
-            \begin{itemize}
-                \item Giữ nguyên $100\%$ giao tiếp Ports ra ngoài hệ thống Bus và mô hình đa nhân (8 cores) của nhóm.
-                \item Bên trong ruột gọi (instantiate) 6 module con độc lập và thực hiện kết nối bằng dây dẫn (\texttt{wire}).
-            \end{itemize}
-        \end{column}
-        
-        \begin{column}{0.55\textwidth}
-            \begin{block}{Cấu trúc đấu nối Hazard Controller trong Core}
-\begin{lstlisting}
-// --- PASTE DOAN CODE INSTANTIATE HAZARD_CONTROLLER TRONG CORE TAI DAY ---
-
-\end{lstlisting}
-            \end{block}
-        \end{column}
-    \end{columns}
-\end{frame}
-
-% =============================================================================
-% SLIDE 5: UNIT TESTING - PART 1
-% =============================================================================
-\begin{frame}{Pipeline Register Unit Testing - IF/ID và ID/EX}
-    \begin{columns}[T]
-        \begin{column}{0.5\textwidth}
-            \begin{block}{1. Kết quả mô phỏng \texttt{pipe\_reg\_if\_id}}
-                \centering
-                \includegraphics[width=0.9\textwidth]{design/test/if_id.png}
-            \end{block}
-            \textbf{Phân tích:} Minh chứng phản hồi chính xác khi tín hiệu \texttt{hold} dựng lên, giá trị PC và lệnh được khóa cứng qua xung clock.
-        \end{column}
-        
-        \begin{column}{0.5\textwidth}
-            \begin{block}{2. Kết quả mô phỏng \texttt{pipe\_reg\_id\_ex}}
-                \centering
-                \includegraphics[width=0.9\textwidth]{design/test/id_ex.png}
-            \end{block}
-            \textbf{Phân tích:} Tín hiệu \texttt{clear} (Flush) kích hoạt thành công, xóa sạch các cờ điều khiển rác về bằng $0$ ngay chu kỳ sau.
-        \end{column}
-    \end{columns}
-\end{frame}
-
-% =============================================================================
-% SLIDE 6: UNIT TESTING - PART 2
-% =============================================================================
-\begin{frame}{Pipeline Register Unit Testing EX/MEM và MEM/WB}
-    \begin{columns}[T]
-        \begin{column}{0.5\textwidth}
-            \begin{block}{3. Kết quả mô phỏng \texttt{pipe\_reg\_ex\_mem}}
-                \centering
-                \includegraphics[width=0.9\textwidth]{design/test/ex_mem.png}
-            \end{block}
-            \textbf{Phân tích:} Dữ liệu địa chỉ và toán hạng lưu trữ từ ALU được đồng bộ đẩy sang bộ nhớ chính xác theo sườn lên của Clock.
-        \end{column}
-        
-        \begin{column}{0.5\textwidth}
-            \begin{block}{4. Kết quả mô phỏng \texttt{pipe\_reg\_mem\_wb}}
-                \centering
-                \includegraphics[width=0.9\textwidth]{design/test/mem_wb.png}
-            \end{block}
-            \textbf{Phân tích:} Sửa lỗi sập hầm bằng chân \texttt{hold} thay thế \texttt{clear}. Khi gặp \texttt{mem\_wait}, tầng ghi được giữ nguyên, bảo toàn dữ liệu.
-        \end{column}
-    \end{columns}
 \end{frame}
