@@ -127,6 +127,14 @@
     \end{block}
 \end{frame}
 
+\begin{frame}{Pipeline Registers Unit Testing - IF/ID}
+    \begin{block}{1. Kết quả Simulation \texttt{pipe\_reg\_if\_id}}
+        \centering
+        \includegraphics[width=0.9\textwidth]{design/test/if_id.png}
+    \end{block}
+    \textbf{Phân tích Waveform:} Xác thực phản hồi chính xác khi tín hiệu \texttt{hold} dựng lên, giá trị \texttt{PC} và \texttt{Instruction} được khóa cứng, không bị ảnh hưởng bởi sườn Clock.
+\end{frame}
+
 % --- TẦNG 2: ID/EX ---
 \begin{frame}{PIPELINE REGISTERS Decode / Execute (ID/EX Register)}
     \begin{itemize}
@@ -162,6 +170,22 @@
     \end{block}
 \end{frame}
 
+\begin{frame}
+    \begin{block}{2. Kết quả Simulation \texttt{pipe\_reg\_id\_ex}}
+        \centering
+        \begin{columns}
+            \begin{column}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{design/test/id_ex_1.png}
+            \end{column}
+
+            \begin{column}{0.5\textwidth}
+                \includegraphics[width=\textwidth]{design/test/id_ex_2.png}
+            \end{column}
+        \end{columns}
+    \end{block}
+    \textbf{Phân tích Waveform:} Tín hiệu \texttt{clear} (\texttt{Flush}) kích hoạt thành công, xóa sạch các cờ điều khiển về trạng thái $0$ (\texttt{NOP Bubble}) ngay chu kỳ kế tiếp.
+\end{frame}
+
 % --- TẦNG 3: EX/MEM ---
 \begin{frame}{PIPELINE REGISTERS Execute / Memory (EX/MEM Register)}
     \begin{itemize}
@@ -195,6 +219,14 @@
     \end{block}
 \end{frame}
 
+\begin{frame}{Pipeline Registers Unit Testing - EX/MEM}
+    \begin{block}{3. Kết quả Simulation \texttt{pipe\_reg\_ex\_mem}}
+        \centering
+        \includegraphics[width=0.9\textwidth]{design/test/ex_mem.png}
+    \end{block}
+    \textbf{Phân tích Waveform:} Các toán hạng từ \texttt{ALU} và dữ liệu \texttt{Store} được chốt giữ và chuyển giao đồng bộ sang \texttt{Data Memory} theo sườn lên của Clock.
+\end{frame}
+
 % --- TẦNG 4: MEM/WB ---
 \begin{frame}{PIPELINE REGISTERS Memory / Writeback (MEM/WB Register)}
     \begin{itemize}
@@ -224,4 +256,12 @@
             \draw[ctrl] (0.5, -1.4) -- node[right, font=\tiny\bfseries] {clear~(fixed~0)} (0.5, -1.0);
         \end{tikzpicture}
     \end{block}
+\end{frame}
+
+\begin{frame}{Pipeline Registers Unit Testing - MEM\\WB}
+    \begin{block}{4. Kết quả Simulation \texttt{pipe\_reg\_mem\_wb}}
+        \centering
+        \includegraphics[width=0.9\textwidth]{design/test/mem_wb.png}
+    \end{block}
+    \textbf{Phân tích Waveform:} Cơ chế vá lỗi thực tế; sử dụng chân \texttt{hold} thay vì \texttt{clear}. Khi xảy ra \texttt{Memory Stall} (\texttt{mem\_wait}), dữ liệu tầng này đứng im để bảo toàn tính toàn vẹn.
 \end{frame}
