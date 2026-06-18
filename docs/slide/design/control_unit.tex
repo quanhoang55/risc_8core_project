@@ -102,7 +102,7 @@
         \item \textbf{Cơ chế Hazard:} Nhận tín hiệu \texttt{hold} khi kích hoạt \texttt{Load-Use Stall} hoặc \texttt{Memory Stall} để đóng băng trạng thái; nhận tín hiệu \texttt{clear} để thực hiện \texttt{Flush} lệnh rác khi rẽ nhánh \texttt{Taken} sai.
     \end{itemize}
 
-    \begin{block}{Sơ đồ cổng giao tiếp (Black Box) - \texttt{pipe\_reg\_if\_id.v}}
+    \begin{block}{Sơ đồ Input Output- \texttt{pipe\_reg\_if\_id.v}}
         \centering
         \begin{tikzpicture}[
             block/.style={draw, thick, fill=blue!10, draw=DeepBlue, minimum width=3.2cm, minimum height=1.8cm, rounded corners, font=\small\bfseries, align=center},
@@ -142,7 +142,7 @@
         \item \textbf{Cơ chế Hazard:} Nhận tín hiệu \texttt{clear = 1} để chủ động chèn một \texttt{Bubble} (\texttt{NOP}) vào tầng \texttt{Execute} khi xảy ra xung đột \texttt{Load-Use}.
     \end{itemize}
 
-    \begin{block}{Sơ đồ cổng giao tiếp (Black Box) - \texttt{pipe\_reg\_id\_ex.v}}
+    \begin{block}{Sơ đồ Input Output - \texttt{pipe\_reg\_id\_ex.v}}
         \centering
         \begin{tikzpicture}[
             block/.style={draw, thick, fill=blue!10, draw=DeepBlue, minimum width=3.2cm, minimum height=2.2cm, rounded corners, font=\small\bfseries, align=center},
@@ -193,7 +193,7 @@
         \item \textbf{Cơ chế Hazard:} Nhận tín hiệu \texttt{hold} từ mạch \texttt{Memory Stall} (\texttt{mem\_wait}) nhằm giữ nguyên thông tin khi \texttt{Shared Bus} đang bận phân xử quyền truy cập bộ nhớ đa nhân.
     \end{itemize}
 
-    \begin{block}{Sơ đồ cổng giao tiếp (Black Box) - \texttt{pipe\_reg\_ex\_mem.v}}
+    \begin{block}{Sơ đồ Input Output - \texttt{pipe\_reg\_ex\_mem.v}}
         \centering
         \begin{tikzpicture}[
             block/.style={draw, thick, fill=blue!10, draw=DeepBlue, minimum width=3.2cm, minimum height=2.0cm, rounded corners, font=\small\bfseries, align=center},
@@ -234,7 +234,7 @@
         \item \textbf{Cơ chế Hazard (Đã vá lỗi):} Loại bỏ hoàn toàn chân \texttt{clear} độc hại, chuyển sang sử dụng chân \texttt{hold} đồng bộ. Khi gặp \texttt{Memory Stall}, dữ liệu tầng này đứng im để bảo toàn dữ liệu, tránh lỗi mất thông tin trên \texttt{Pipeline}.
     \end{itemize}
 
-    \begin{block}{Sơ đồ cổng giao tiếp (Black Box) - \texttt{pipe\_reg\_mem\_wb.v}}
+    \begin{block}{Sơ đồ Input Output - \texttt{pipe\_reg\_mem\_wb.v}}
         \centering
         \begin{tikzpicture}[
             block/.style={draw, thick, fill=blue!10, draw=DeepBlue, minimum width=3.2cm, minimum height=2.0cm, rounded corners, font=\small\bfseries, align=center},
