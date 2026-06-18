@@ -199,7 +199,7 @@
             \toprule
             \textbf{Test} & \textbf{Mục tiêu kiểm chứng} & \textbf{Kết quả} \\
             \midrule
-            Round-Robin Write/Read & 4 core ghi/đọc các địa chỉ khác nhau qua bus dùng chung. & PASS \\
+            RR Write/Read & 4 core ghi/đọc các địa chỉ khác nhau qua bus dùng chung. & PASS \\
             LR/SC success & Core thực hiện \texttt{LR.W} rồi \texttt{SC.W} khi không có core khác ghi chen vào. & PASS \\
             LR/SC fail & Core khác ghi cùng địa chỉ làm reservation bị xóa trước \texttt{SC.W}. & PASS \\
             AMOADD & Hai core cộng nguyên tử, RAM cuối cùng nhận đúng tổng giá trị. & PASS \\
@@ -216,10 +216,55 @@
             \end{alertblock}
         \end{column}
         \begin{column}{0.5\textwidth}
-            \begin{block}{Tín hiệu nên mở trong GTKWave}
+            \begin{block}{Tín hiệu kiểm chứng chính}
                 \scriptsize
                 \texttt{core\_mem\_req}, \texttt{arb\_request}, \texttt{arb\_grant}, \texttt{grant\_id}, \texttt{dm\_addr}, \texttt{dm\_we}, \texttt{dm\_re}, \texttt{core\_ready}, \texttt{core\_sc\_result}.
             \end{block}
         \end{column}
     \end{columns}
+\end{frame}
+
+\begin{frame}{Waveform Kiểm Chứng Interconnect}
+    \centering
+    \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{design/test/interconnect.png}
+
+    \vspace{0.04cm}
+    \scriptsize
+    Minh chứng luồng \texttt{core\_mem\_req -> arb\_grant -> dm\_we/dm\_re -> core\_ready} và kết quả \texttt{10 PASSED, 0 FAILED}.
+\end{frame}
+
+\begin{frame}{Phân Tích Kết Quả Kiểm Chứng Interconnect}
+    \small
+    Dựa trên kết quả mô phỏng từ \texttt{interconnect\_tb.vcd}, khối interconnect vượt qua 10/10 kiểm tra trong testbench riêng, chứng minh đúng các chức năng chính trong phạm vi đồ án:
+
+    \vspace{0.15cm}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{block}{1. Chia sẻ Bus (Round-Robin)}
+                \scriptsize
+                Các core gửi request ghi/đọc qua bus dùng chung. Tín hiệu \texttt{arb\_grant} cấp quyền theo lượt, cho thấy arbiter chọn đúng core đang yêu cầu và không để một request hợp lệ bị bỏ qua trong test.
+            \end{block}
+            \begin{block}{2. Định tuyến dữ liệu (Bus Control)}
+                \scriptsize
+                Tín hiệu \texttt{dm\_addr}, \texttt{dm\_we}, \texttt{dm\_wdata} được định tuyến từ core được grant tới Shared RAM. Khi giao dịch hoàn tất, \texttt{core\_ready} bật để báo core nhận được phản hồi.
+            \end{block}
+        \end{column}
+
+        \begin{column}{0.48\textwidth}
+            \begin{block}{3. Đồng bộ hóa đa lõi (LR/SC \& AMO)}
+                \scriptsize
+                \begin{itemize}
+                    \item \textbf{Thành công nguyên tử:} Lệnh \texttt{SC} ghi thành công khi không có can thiệp.
+                    \item \textbf{Phát hiện xung đột:} Khi C0 đang giữ reservation (LR), C1 ghi đè vào địa chỉ đó. Bộ điều khiển lập tức xóa reservation, khiến lệnh \texttt{SC} tiếp theo của C0 \textbf{thất bại an toàn}, bảo vệ tính toàn vẹn dữ liệu dùng chung.
+                    \item \textbf{AMOADD:} Hai phép cộng nguyên tử cập nhật RAM đúng kết quả cuối $42 + 58 = 100$.
+                \end{itemize}
+            \end{block}
+        \end{column}
+    \end{columns}
+
+    \vspace{0.15cm}
+    \begin{alertblock}{Kết Luận}
+        \scriptsize
+        Trong phạm vi testbench, interconnect đã chứng minh được ba nhiệm vụ chính: phân xử bus, định tuyến dữ liệu bộ nhớ và hỗ trợ primitive đồng bộ LR/SC/AMOADD.
+    \end{alertblock}
 \end{frame}
