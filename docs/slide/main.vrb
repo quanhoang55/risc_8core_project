@@ -1,4 +1,4 @@
-\frametitle{2.3.5 risc\_core Integration (Bẻ nhỏ ruột, giữ nguyên vỏ)}
+\frametitle{risc\_core Integration}
 \begin{columns}[T]
         \begin{column}{0.45\textwidth}
             \textbf{Nguyên tắc đóng gói:}

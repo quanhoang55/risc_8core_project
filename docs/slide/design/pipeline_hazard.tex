@@ -1,7 +1,7 @@
 % =============================================================================
 % SLIDE 2: HAZARD DETECTION
 % =============================================================================
-\begin{frame}[fragile]{2.3.3 Hazard Detection (Cơ chế đóng băng Pipeline)}
+\begin{frame}[fragile]{Hazard Detection}
     \begin{itemize}
         \item \textbf{Nhiệm vụ:} Phát hiện xung đột dữ liệu không thể cứu bằng Forwarding (Load-Use) và quản lý trạng thái đóng băng toàn bộ CPU khi Bus bộ nhớ bận (\texttt{mem\_wait}).
     \end{itemize}
@@ -21,7 +21,7 @@
 % =============================================================================
 % SLIDE 3: FORWARDING LOGIC
 % =============================================================================
-\begin{frame}[fragile]{2.3.4 Forwarding (Mạch đi tắt dữ liệu)}
+\begin{frame}[fragile]{Forwarding}
     \begin{itemize}
         \item \textbf{Nhiệm vụ:} Tránh Stall bừa bãi bằng cách bơm trực tiếp kết quả từ tầng \texttt{EX/MEM} hoặc \texttt{MEM/WB} về đầu vào ALU nếu phát hiện lệnh sau đọc thanh ghi mà lệnh trước chuẩn bị ghi.
     \end{itemize}
@@ -41,7 +41,7 @@
 % =============================================================================
 % SLIDE 4: RISC_CORE INTEGRATION
 % =============================================================================
-\begin{frame}[fragile]{2.3.5 risc\_core Integration (Bẻ nhỏ ruột, giữ nguyên vỏ)}
+\begin{frame}[fragile]{risc\_core Integration}
     \begin{columns}[T]
         \begin{column}{0.45\textwidth}
             \textbf{Nguyên tắc đóng gói:}
@@ -65,7 +65,7 @@
 % =============================================================================
 % SLIDE 5: UNIT TESTING - PART 1
 % =============================================================================
-\begin{frame}{2.3.6 Unit Testing - Kiểm thử vách ngăn IF/ID và ID/EX}
+\begin{frame}{Unit Testing - Kiểm thử vách ngăn IF/ID và ID/EX}
     \begin{columns}[T]
         \begin{column}{0.5\textwidth}
             \begin{block}{1. Kết quả mô phỏng \texttt{pipe\_reg\_if\_id}}
@@ -88,7 +88,7 @@
 % =============================================================================
 % SLIDE 6: UNIT TESTING - PART 2
 % =============================================================================
-\begin{frame}{2.3.6 Unit Testing - Kiểm thử vách ngăn EX/MEM và MEM/WB}
+\begin{frame}{Unit Testing - Kiểm thử vách ngăn EX/MEM và MEM/WB}
     \begin{columns}[T]
         \begin{column}{0.5\textwidth}
             \begin{block}{3. Kết quả mô phỏng \texttt{pipe\_reg\_ex\_mem}}
