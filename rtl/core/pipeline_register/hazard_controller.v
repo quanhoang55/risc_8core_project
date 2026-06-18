@@ -34,9 +34,10 @@ module hazard_controller (
 );
 
     // =========================================================================
-    // 1. Mạch Forwarding (Đã sửa lỗi so sánh nhầm ex_rs1_addr ở vế B)
+    // 1. Mạch Forwarding (Đã dùng always @* của Verilog tiêu chuẩn)
     // =========================================================================
-    always_comb begin
+    always @* begin
+        // Mặc định dùng dữ liệu gốc từ Register File
         forward_a = 2'b00; 
         forward_b = 2'b00;
 
@@ -48,7 +49,7 @@ module hazard_controller (
             forward_a = 2'b01; 
         end
 
-        // Xử lý Forwarding cho Toán hạng B (Đã sửa thành ex_rs2_addr)
+        // Xử lý Forwarding cho Toán hạng B (Đã sửa ex_rs2_addr)
         if (mem_can_forward && (mem_rd_addr != 5'd0) && (mem_rd_addr == ex_rs2_addr)) begin
             forward_b = 2'b10; 
         end 
@@ -64,13 +65,13 @@ module hazard_controller (
                             ((ex_rd_addr == cu_rs1_addr) || (ex_rd_addr == cu_rs2_addr));
 
     // =========================================================================
-    // 3. Quản lý các chốt chặn (Đã vá lỗi chặn Clear khi đang Memory Stall)
+    // 3. Quản lý các chốt chặn (Hold / Clear) - Đã vá lỗi chặn Clear khi Memory Stall
     // =========================================================================
     assign if_id_hold   = load_use_stall || mem_wait;
-    assign if_id_clear  = redirect_taken && !mem_wait; // Bảo vệ lệnh khi bận RAM
+    assign if_id_clear  = redirect_taken && !mem_wait; 
     
     assign id_ex_hold   = mem_wait;
-    assign id_ex_clear  = (redirect_taken || load_use_stall) && !mem_wait; // Bảo vệ lệnh khi bận RAM
+    assign id_ex_clear  = (redirect_taken || load_use_stall) && !mem_wait; 
 
     assign ex_mem_hold  = mem_wait;
     assign mem_wb_hold  = mem_wait; 

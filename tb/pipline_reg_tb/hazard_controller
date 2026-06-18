@@ -1,0 +1,367 @@
+#! /opt/homebrew/Cellar/icarus-verilog/13.0/bin/vvp
+:ivl_version "13.0 (stable)" "(v13_0)";
+:ivl_delay_selection "TYPICAL";
+:vpi_time_precision - 12;
+:vpi_module "/opt/homebrew/Cellar/icarus-verilog/13.0/lib/ivl/system.vpi";
+:vpi_module "/opt/homebrew/Cellar/icarus-verilog/13.0/lib/ivl/vhdl_sys.vpi";
+:vpi_module "/opt/homebrew/Cellar/icarus-verilog/13.0/lib/ivl/vhdl_textio.vpi";
+:vpi_module "/opt/homebrew/Cellar/icarus-verilog/13.0/lib/ivl/v2005_math.vpi";
+:vpi_module "/opt/homebrew/Cellar/icarus-verilog/13.0/lib/ivl/va_math.vpi";
+S_0x1047fd3a0 .scope module, "tb_hazard_controller" "tb_hazard_controller" 2 3;
+ .timescale -9 -12;
+v0x86f084dc0_0 .var "cu_rs1_addr", 4 0;
+v0x86f084e60_0 .var "cu_rs2_addr", 4 0;
+v0x86f084f00_0 .var "ex_load_like", 0 0;
+v0x86f084fa0_0 .net "ex_mem_hold", 0 0, L_0x1048047a0;  1 drivers
+v0x86f085040_0 .var "ex_rd_addr", 4 0;
+v0x86f0850e0_0 .var "ex_reg_write", 0 0;
+v0x86f085180_0 .var "ex_rs1_addr", 4 0;
+v0x86f085220_0 .var "ex_rs2_addr", 4 0;
+v0x86f0852c0_0 .var "ex_valid", 0 0;
+v0x86f085360_0 .net "forward_a", 1 0, v0x86f084460_0;  1 drivers
+v0x86f085400_0 .net "forward_b", 1 0, v0x86f084500_0;  1 drivers
+v0x86f0854a0_0 .net "id_ex_clear", 0 0, L_0x86ec5c310;  1 drivers
+v0x86f085540_0 .net "id_ex_hold", 0 0, L_0x104802630;  1 drivers
+v0x86f0855e0_0 .var "id_valid", 0 0;
+v0x86f085680_0 .net "if_id_clear", 0 0, L_0x86ec5c230;  1 drivers
+v0x86f085720_0 .net "if_id_hold", 0 0, L_0x86ec5c1c0;  1 drivers
+v0x86f0857c0_0 .net "load_use_stall", 0 0, L_0x86ec5c150;  1 drivers
+v0x86f085860_0 .var "mem_can_forward", 0 0;
+v0x86f085900_0 .var "mem_rd_addr", 4 0;
+v0x86f0859a0_0 .var "mem_wait", 0 0;
+v0x86f085a40_0 .net "mem_wb_hold", 0 0, L_0x1047fd6a0;  1 drivers
+v0x86f085ae0_0 .var "redirect_taken", 0 0;
+v0x86f085b80_0 .var "wb_can_forward", 0 0;
+v0x86f085c20_0 .var "wb_rd_addr", 4 0;
+S_0x1047fd520 .scope module, "uut" "hazard_controller" 2 23, 3 2 0, S_0x1047fd3a0;
+ .timescale -9 -12;
+    .port_info 0 /INPUT 1 "ex_valid";
+    .port_info 1 /INPUT 1 "ex_reg_write";
+    .port_info 2 /INPUT 5 "ex_rs1_addr";
+    .port_info 3 /INPUT 5 "ex_rs2_addr";
+    .port_info 4 /INPUT 1 "mem_can_forward";
+    .port_info 5 /INPUT 5 "mem_rd_addr";
+    .port_info 6 /INPUT 1 "wb_can_forward";
+    .port_info 7 /INPUT 5 "wb_rd_addr";
+    .port_info 8 /INPUT 1 "id_valid";
+    .port_info 9 /INPUT 5 "cu_rs1_addr";
+    .port_info 10 /INPUT 5 "cu_rs2_addr";
+    .port_info 11 /INPUT 1 "ex_load_like";
+    .port_info 12 /INPUT 5 "ex_rd_addr";
+    .port_info 13 /INPUT 1 "mem_wait";
+    .port_info 14 /INPUT 1 "redirect_taken";
+    .port_info 15 /OUTPUT 2 "forward_a";
+    .port_info 16 /OUTPUT 2 "forward_b";
+    .port_info 17 /OUTPUT 1 "load_use_stall";
+    .port_info 18 /OUTPUT 1 "if_id_hold";
+    .port_info 19 /OUTPUT 1 "if_id_clear";
+    .port_info 20 /OUTPUT 1 "id_ex_hold";
+    .port_info 21 /OUTPUT 1 "id_ex_clear";
+    .port_info 22 /OUTPUT 1 "ex_mem_hold";
+    .port_info 23 /OUTPUT 1 "mem_wb_hold";
+L_0x86ec5c000 .functor AND 1, v0x86f0855e0_0, v0x86f084f00_0, C4<1>, C4<1>;
+L_0x86ec5c070 .functor AND 1, L_0x86ec5c000, L_0x86f05c0a0, C4<1>, C4<1>;
+L_0x86ec5c0e0 .functor OR 1, L_0x86f05c140, L_0x86f05c1e0, C4<0>, C4<0>;
+L_0x86ec5c150 .functor AND 1, L_0x86ec5c070, L_0x86ec5c0e0, C4<1>, C4<1>;
+L_0x86ec5c1c0 .functor OR 1, L_0x86ec5c150, v0x86f0859a0_0, C4<0>, C4<0>;
+L_0x86ec5c230 .functor AND 1, v0x86f085ae0_0, L_0x86f085cc0, C4<1>, C4<1>;
+L_0x104802630 .functor BUFZ 1, v0x86f0859a0_0, C4<0>, C4<0>, C4<0>;
+L_0x86ec5c2a0 .functor OR 1, v0x86f085ae0_0, L_0x86ec5c150, C4<0>, C4<0>;
+L_0x86ec5c310 .functor AND 1, L_0x86ec5c2a0, L_0x86f085d60, C4<1>, C4<1>;
+L_0x1048047a0 .functor BUFZ 1, v0x86f0859a0_0, C4<0>, C4<0>, C4<0>;
+L_0x1047fd6a0 .functor BUFZ 1, v0x86f0859a0_0, C4<0>, C4<0>, C4<0>;
+v0x104804700_0 .net *"_ivl_1", 0 0, L_0x86ec5c000;  1 drivers
+v0x104802ce0_0 .net *"_ivl_10", 0 0, L_0x86f05c1e0;  1 drivers
+v0x104802ab0_0 .net *"_ivl_13", 0 0, L_0x86ec5c0e0;  1 drivers
+v0x104802590_0 .net *"_ivl_19", 0 0, L_0x86f085cc0;  1 drivers
+L_0x86e854010 .functor BUFT 1, C4<00000>, C4<0>, C4<0>, C4<0>;
+v0x1048022d0_0 .net/2u *"_ivl_2", 4 0, L_0x86e854010;  1 drivers
+v0x1047f6db0_0 .net *"_ivl_25", 0 0, L_0x86ec5c2a0;  1 drivers
+v0x1047f6e50_0 .net *"_ivl_27", 0 0, L_0x86f085d60;  1 drivers
+v0x1047f6ef0_0 .net *"_ivl_4", 0 0, L_0x86f05c0a0;  1 drivers
+v0x1047f6f90_0 .net *"_ivl_7", 0 0, L_0x86ec5c070;  1 drivers
+v0x1047f7030_0 .net *"_ivl_8", 0 0, L_0x86f05c140;  1 drivers
+v0x104804e70_0 .net "cu_rs1_addr", 4 0, v0x86f084dc0_0;  1 drivers
+v0x104804f10_0 .net "cu_rs2_addr", 4 0, v0x86f084e60_0;  1 drivers
+v0x86f084000_0 .net "ex_load_like", 0 0, v0x86f084f00_0;  1 drivers
+v0x86f0840a0_0 .net "ex_mem_hold", 0 0, L_0x1048047a0;  alias, 1 drivers
+v0x86f084140_0 .net "ex_rd_addr", 4 0, v0x86f085040_0;  1 drivers
+v0x86f0841e0_0 .net "ex_reg_write", 0 0, v0x86f0850e0_0;  1 drivers
+v0x86f084280_0 .net "ex_rs1_addr", 4 0, v0x86f085180_0;  1 drivers
+v0x86f084320_0 .net "ex_rs2_addr", 4 0, v0x86f085220_0;  1 drivers
+v0x86f0843c0_0 .net "ex_valid", 0 0, v0x86f0852c0_0;  1 drivers
+v0x86f084460_0 .var "forward_a", 1 0;
+v0x86f084500_0 .var "forward_b", 1 0;
+v0x86f0845a0_0 .net "id_ex_clear", 0 0, L_0x86ec5c310;  alias, 1 drivers
+v0x86f084640_0 .net "id_ex_hold", 0 0, L_0x104802630;  alias, 1 drivers
+v0x86f0846e0_0 .net "id_valid", 0 0, v0x86f0855e0_0;  1 drivers
+v0x86f084780_0 .net "if_id_clear", 0 0, L_0x86ec5c230;  alias, 1 drivers
+v0x86f084820_0 .net "if_id_hold", 0 0, L_0x86ec5c1c0;  alias, 1 drivers
+v0x86f0848c0_0 .net "load_use_stall", 0 0, L_0x86ec5c150;  alias, 1 drivers
+v0x86f084960_0 .net "mem_can_forward", 0 0, v0x86f085860_0;  1 drivers
+v0x86f084a00_0 .net "mem_rd_addr", 4 0, v0x86f085900_0;  1 drivers
+v0x86f084aa0_0 .net "mem_wait", 0 0, v0x86f0859a0_0;  1 drivers
+v0x86f084b40_0 .net "mem_wb_hold", 0 0, L_0x1047fd6a0;  alias, 1 drivers
+v0x86f084be0_0 .net "redirect_taken", 0 0, v0x86f085ae0_0;  1 drivers
+v0x86f084c80_0 .net "wb_can_forward", 0 0, v0x86f085b80_0;  1 drivers
+v0x86f084d20_0 .net "wb_rd_addr", 4 0, v0x86f085c20_0;  1 drivers
+E_0x86f000700/0 .event anyedge, v0x86f084960_0, v0x86f084a00_0, v0x86f084280_0, v0x86f084c80_0;
+E_0x86f000700/1 .event anyedge, v0x86f084d20_0, v0x86f084320_0;
+E_0x86f000700 .event/or E_0x86f000700/0, E_0x86f000700/1;
+L_0x86f05c0a0 .cmp/ne 5, v0x86f085040_0, L_0x86e854010;
+L_0x86f05c140 .cmp/eq 5, v0x86f085040_0, v0x86f084dc0_0;
+L_0x86f05c1e0 .cmp/eq 5, v0x86f085040_0, v0x86f084e60_0;
+L_0x86f085cc0 .reduce/nor v0x86f0859a0_0;
+L_0x86f085d60 .reduce/nor v0x86f0859a0_0;
+    .scope S_0x1047fd520;
+T_0 ;
+    %wait E_0x86f000700;
+    %pushi/vec4 0, 0, 2;
+    %store/vec4 v0x86f084460_0, 0, 2;
+    %pushi/vec4 0, 0, 2;
+    %store/vec4 v0x86f084500_0, 0, 2;
+    %load/vec4 v0x86f084960_0;
+    %flag_set/vec4 10;
+    %flag_get/vec4 10;
+    %jmp/0 T_0.3, 10;
+    %load/vec4 v0x86f084a00_0;
+    %pushi/vec4 0, 0, 5;
+    %cmp/ne;
+    %flag_get/vec4 4;
+    %and;
+T_0.3;
+    %flag_set/vec4 9;
+    %flag_get/vec4 9;
+    %jmp/0 T_0.2, 9;
+    %load/vec4 v0x86f084a00_0;
+    %load/vec4 v0x86f084280_0;
+    %cmp/e;
+    %flag_get/vec4 4;
+    %and;
+T_0.2;
+    %flag_set/vec4 8;
+    %jmp/0xz  T_0.0, 8;
+    %pushi/vec4 2, 0, 2;
+    %store/vec4 v0x86f084460_0, 0, 2;
+    %jmp T_0.1;
+T_0.0 ;
+    %load/vec4 v0x86f084c80_0;
+    %flag_set/vec4 10;
+    %flag_get/vec4 10;
+    %jmp/0 T_0.7, 10;
+    %load/vec4 v0x86f084d20_0;
+    %pushi/vec4 0, 0, 5;
+    %cmp/ne;
+    %flag_get/vec4 4;
+    %and;
+T_0.7;
+    %flag_set/vec4 9;
+    %flag_get/vec4 9;
+    %jmp/0 T_0.6, 9;
+    %load/vec4 v0x86f084d20_0;
+    %load/vec4 v0x86f084280_0;
+    %cmp/e;
+    %flag_get/vec4 4;
+    %and;
+T_0.6;
+    %flag_set/vec4 8;
+    %jmp/0xz  T_0.4, 8;
+    %pushi/vec4 1, 0, 2;
+    %store/vec4 v0x86f084460_0, 0, 2;
+T_0.4 ;
+T_0.1 ;
+    %load/vec4 v0x86f084960_0;
+    %flag_set/vec4 10;
+    %flag_get/vec4 10;
+    %jmp/0 T_0.11, 10;
+    %load/vec4 v0x86f084a00_0;
+    %pushi/vec4 0, 0, 5;
+    %cmp/ne;
+    %flag_get/vec4 4;
+    %and;
+T_0.11;
+    %flag_set/vec4 9;
+    %flag_get/vec4 9;
+    %jmp/0 T_0.10, 9;
+    %load/vec4 v0x86f084a00_0;
+    %load/vec4 v0x86f084320_0;
+    %cmp/e;
+    %flag_get/vec4 4;
+    %and;
+T_0.10;
+    %flag_set/vec4 8;
+    %jmp/0xz  T_0.8, 8;
+    %pushi/vec4 2, 0, 2;
+    %store/vec4 v0x86f084500_0, 0, 2;
+    %jmp T_0.9;
+T_0.8 ;
+    %load/vec4 v0x86f084c80_0;
+    %flag_set/vec4 10;
+    %flag_get/vec4 10;
+    %jmp/0 T_0.15, 10;
+    %load/vec4 v0x86f084d20_0;
+    %pushi/vec4 0, 0, 5;
+    %cmp/ne;
+    %flag_get/vec4 4;
+    %and;
+T_0.15;
+    %flag_set/vec4 9;
+    %flag_get/vec4 9;
+    %jmp/0 T_0.14, 9;
+    %load/vec4 v0x86f084d20_0;
+    %load/vec4 v0x86f084320_0;
+    %cmp/e;
+    %flag_get/vec4 4;
+    %and;
+T_0.14;
+    %flag_set/vec4 8;
+    %jmp/0xz  T_0.12, 8;
+    %pushi/vec4 1, 0, 2;
+    %store/vec4 v0x86f084500_0, 0, 2;
+T_0.12 ;
+T_0.9 ;
+    %jmp T_0;
+    .thread T_0, $push;
+    .scope S_0x1047fd3a0;
+T_1 ;
+    %vpi_call 2 27 "$dumpfile", "hazard_waveform.vcd" {0 0 0};
+    %vpi_call 2 28 "$dumpvars", 32'sb00000000000000000000000000000000, S_0x1047fd3a0 {0 0 0};
+    %end;
+    .thread T_1;
+    .scope S_0x1047fd3a0;
+T_2 ;
+    %pushi/vec4 1, 0, 1;
+    %store/vec4 v0x86f0852c0_0, 0, 1;
+    %pushi/vec4 1, 0, 1;
+    %store/vec4 v0x86f0855e0_0, 0, 1;
+    %pushi/vec4 0, 0, 1;
+    %store/vec4 v0x86f0850e0_0, 0, 1;
+    %pushi/vec4 0, 0, 5;
+    %store/vec4 v0x86f085180_0, 0, 5;
+    %pushi/vec4 0, 0, 5;
+    %store/vec4 v0x86f085220_0, 0, 5;
+    %pushi/vec4 0, 0, 1;
+    %store/vec4 v0x86f085860_0, 0, 1;
+    %pushi/vec4 0, 0, 5;
+    %store/vec4 v0x86f085900_0, 0, 5;
+    %pushi/vec4 0, 0, 1;
+    %store/vec4 v0x86f085b80_0, 0, 1;
+    %pushi/vec4 0, 0, 5;
+    %store/vec4 v0x86f085c20_0, 0, 5;
+    %pushi/vec4 0, 0, 5;
+    %store/vec4 v0x86f084dc0_0, 0, 5;
+    %pushi/vec4 0, 0, 5;
+    %store/vec4 v0x86f084e60_0, 0, 5;
+    %pushi/vec4 0, 0, 1;
+    %store/vec4 v0x86f084f00_0, 0, 1;
+    %pushi/vec4 0, 0, 5;
+    %store/vec4 v0x86f085040_0, 0, 5;
+    %pushi/vec4 0, 0, 1;
+    %store/vec4 v0x86f0859a0_0, 0, 1;
+    %pushi/vec4 0, 0, 1;
+    %store/vec4 v0x86f085ae0_0, 0, 1;
+    %vpi_call 2 42 "$display", "--- BAT DAU UNIT TESTING HAZARD CONTROLLER ---" {0 0 0};
+    %delay 10000, 0;
+    %vpi_call 2 46 "$display", "[TEST 1] K\303\255ch ho\341\272\241t Forwarding t\341\272\247ng EX/MEM cho to\303\241n h\341\272\241ng B" {0 0 0};
+    %pushi/vec4 12, 0, 5;
+    %store/vec4 v0x86f085220_0, 0, 5;
+    %pushi/vec4 1, 0, 1;
+    %store/vec4 v0x86f085860_0, 0, 1;
+    %pushi/vec4 12, 0, 5;
+    %store/vec4 v0x86f085900_0, 0, 5;
+    %delay 10000, 0;
+    %load/vec4 v0x86f085400_0;
+    %cmpi/e 2, 0, 2;
+    %jmp/0xz  T_2.0, 4;
+    %vpi_call 2 51 "$display", "-> TEST 1 PASSED: M\341\272\241ch Forwarding B nh\341\272\255n di\341\273\207n ch\303\255nh x\303\241c." {0 0 0};
+    %jmp T_2.1;
+T_2.0 ;
+    %vpi_call 2 52 "$error", "-> TEST 1 FAILED: Ch\306\260a s\341\273\255a l\341\273\227i rs1_addr/rs2_addr \341\273\237 v\341\272\277 B!" {0 0 0};
+T_2.1 ;
+    %pushi/vec4 0, 0, 1;
+    %store/vec4 v0x86f085860_0, 0, 1;
+    %pushi/vec4 0, 0, 5;
+    %store/vec4 v0x86f085220_0, 0, 5;
+    %pushi/vec4 0, 0, 5;
+    %store/vec4 v0x86f085900_0, 0, 5;
+    %delay 10000, 0;
+    %vpi_call 2 59 "$display", "[TEST 2] Gi\341\272\243 l\341\272\255p Memory Stall (mem_wait=1) tr\303\271ng v\341\273\233i R\341\272\275 nh\303\241nh (redirect_taken=1)" {0 0 0};
+    %pushi/vec4 1, 0, 1;
+    %store/vec4 v0x86f085ae0_0, 0, 1;
+    %pushi/vec4 1, 0, 1;
+    %store/vec4 v0x86f0859a0_0, 0, 1;
+    %delay 10000, 0;
+    %load/vec4 v0x86f085720_0;
+    %pad/u 32;
+    %cmpi/e 1, 0, 32;
+    %flag_get/vec4 4;
+    %jmp/0 T_2.6, 4;
+    %load/vec4 v0x86f085540_0;
+    %pad/u 32;
+    %pushi/vec4 1, 0, 32;
+    %cmp/e;
+    %flag_get/vec4 4;
+    %and;
+T_2.6;
+    %flag_set/vec4 10;
+    %flag_get/vec4 10;
+    %jmp/0 T_2.5, 10;
+    %load/vec4 v0x86f084fa0_0;
+    %pad/u 32;
+    %pushi/vec4 1, 0, 32;
+    %cmp/e;
+    %flag_get/vec4 4;
+    %and;
+T_2.5;
+    %flag_set/vec4 9;
+    %flag_get/vec4 9;
+    %jmp/0 T_2.4, 9;
+    %load/vec4 v0x86f085a40_0;
+    %pad/u 32;
+    %pushi/vec4 1, 0, 32;
+    %cmp/e;
+    %flag_get/vec4 4;
+    %and;
+T_2.4;
+    %flag_set/vec4 8;
+    %jmp/0xz  T_2.2, 8;
+    %vpi_call 2 65 "$display", "-> K\341\273\213ch b\341\272\243n kh\303\263a: To\303\240n b\341\273\231 h\341\273\207 th\341\273\221ng v\303\241ch ng\304\203n \304\221\303\243 \304\221\306\260\341\273\243c \304\221\303\263ng b\304\203ng th\303\240nh c\303\264ng." {0 0 0};
+    %jmp T_2.3;
+T_2.2 ;
+    %vpi_call 2 67 "$error", "-> TEST 2 FAILED: H\341\273\207 th\341\273\221ng kh\303\264ng th\341\273\203 \304\221\303\263ng b\304\203ng \304\221\341\273\223ng b\341\273\231!" {0 0 0};
+T_2.3 ;
+    %load/vec4 v0x86f085680_0;
+    %pad/u 32;
+    %cmpi/e 0, 0, 32;
+    %flag_get/vec4 4;
+    %jmp/0 T_2.9, 4;
+    %load/vec4 v0x86f0854a0_0;
+    %pad/u 32;
+    %pushi/vec4 0, 0, 32;
+    %cmp/e;
+    %flag_get/vec4 4;
+    %and;
+T_2.9;
+    %flag_set/vec4 8;
+    %jmp/0xz  T_2.7, 8;
+    %vpi_call 2 72 "$display", "-> TEST 2 PASSED: C\341\273\235 Clear \304\221\303\243 b\341\273\213 ch\341\272\267n an to\303\240n. D\341\273\257 li\341\273\207u l\341\273\207nh kh\303\264ng b\341\273\213 x\303\263a m\341\272\245t." {0 0 0};
+    %jmp T_2.8;
+T_2.7 ;
+    %vpi_call 2 74 "$error", "-> CRITICAL BUG FAILED: L\341\273\207nh \304\221ang ch\341\273\235 b\341\273\231 nh\341\273\233 b\341\273\213 x\303\263a s\341\272\241ch do clear=1! CPU s\341\272\275 b\341\273\213 treo!" {0 0 0};
+T_2.8 ;
+    %delay 10000, 0;
+    %pushi/vec4 0, 0, 1;
+    %store/vec4 v0x86f0859a0_0, 0, 1;
+    %pushi/vec4 0, 0, 1;
+    %store/vec4 v0x86f085ae0_0, 0, 1;
+    %delay 10000, 0;
+    %vpi_call 2 82 "$display", "--- K\341\272\276T TH\303\232C M\303\224 PH\341\273\216NG V\303\200 XU\341\272\244T FILE S\303\223NG VCD ---" {0 0 0};
+    %vpi_call 2 83 "$finish" {0 0 0};
+    %end;
+    .thread T_2;
+# The file index is used to find the file name in the following table.
+:file_names 4;
+    "N/A";
+    "<interactive>";
+    "tb/pipline_reg_tb/tb_hazard_controller.v";
+    "rtl/core/pipeline_register/hazard_controller.v";

@@ -2,10 +2,11 @@
 module if_id (
     input wire clk,
     input wire reset,
-    input wire clear, // Flush khi rẽ nhánh sai
-    input wire hold,  // Stall khi gặp Load-Use
+    input wire clear,
+    input wire hold,
     input wire [31:0] if_pc,
     input wire [31:0] if_instr,
+    
     output reg        id_valid,
     output reg [31:0] id_pc,
     output reg [31:0] id_instr

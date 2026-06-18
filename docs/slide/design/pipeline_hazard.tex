@@ -114,3 +114,43 @@
         \end{tikzpicture}
     \end{block}
 \end{frame}
+
+% =============================================================================
+% SLIDE 8: HAZARD CONTROLLER INTEGRATION TESTING
+% =============================================================================
+\begin{frame}{Hazard Controller Unit Testing}
+    \begin{columns}[T]
+        \begin{column}{0.55\textwidth}
+            \begin{block}{Kết quả Simulation trên GTKWave}
+                \centering
+                \includegraphics[width=1\textwidth]{design/test/Hazard_controller.png}
+            \end{block}
+            \begin{itemize}
+                \item \tiny Thử nghiệm thành công trên hai kịch bản tới hạn (Critical Scenarios).
+            \end{itemize}
+        \end{column}
+        
+        \begin{column}{0.45\textwidth}
+            \textbf{Phân tích định thời Waveform:}
+            
+            \begin{block}{1. Data Forwarding Interval}
+                \scriptsize
+                Tại khoảng thời gian \texttt{10ns - 20ns}:
+                \begin{itemize}
+                    \item Cặp cổng giám sát phát hiện \texttt{ex\_rs2\_addr} trùng với \texttt{mem\_rd\_addr} (\texttt{0x0C}).
+                    \item \texttt{forward\_b} ngay lập tức phản hồi mã \texttt{2'b10}, thực hiện đi tắt dữ liệu từ tầng \texttt{EX/MEM}.
+                \end{itemize}
+            \end{block}
+
+            \begin{block}{2. Memory Stall \& Control Flush}
+                \scriptsize
+                Tại khoảng thời gian \texttt{30ns - 50ns}:
+                \begin{itemize}
+                    \item Khi \texttt{mem\_wait} và \texttt{redirect\_taken} đồng loạt dựng lên mức $1$.
+                    \item Hệ thống dựng toàn bộ các cờ \texttt{hold} để đóng băng \texttt{Pipeline}.
+                    \item Cờ \texttt{clear} bị chặn về $0$, bảo vệ an toàn lệnh chờ bộ nhớ khỏi bị xóa nhầm.
+                \end{itemize}
+            \end{block}
+        \end{column}
+    \end{columns}
+\end{frame}
