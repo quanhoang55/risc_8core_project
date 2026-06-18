@@ -3,18 +3,61 @@
 % ==========================================
 \section{Giới Thiệu Đề Tài}
 
-\subsection{Đặt vấn đề \& Lý do chọn đề tài}
-\begin{frame}{Giới Thiệu \& Lý Do Chọn Đề Tài}
-    \begin{block}{Xu thế Đa Nhân (Multi-core Processing)}
-        Giới hạn vật lý về tần số xung nhịp buộc kiến trúc máy tính hiện đại phải chuyển dịch sang kiến trúc đa nhân nhằm tối ưu hóa hiệu năng tính toán song song.
+% --- SLIDE 1: BỐI CẢNH NGHIÊN CỨU ---
+\subsection{Bối cảnh nghiên cứu}
+\begin{frame}{Bối Cảnh Nghiên Cứu \& Lý Do Chọn Đề Tài}
+    \begin{block}{Giới hạn vật lý của CPU lõi đơn (Single-core)}
+        \small
+        Việc tăng hiệu năng bộ vi xử lý bằng cách tăng tần số xung nhịp đã đạt tới giới hạn vật lý do hiện tượng quá nhiệt và tiêu hao năng lượng cực lớn (\textbf{Power Wall, Thermal Wall}).
     \end{block}
     
-    \vspace{0.3cm}
+    \vspace{0.15cm}
     
-    \begin{block}{Tại sao chọn RISC-V?}
-        \begin{itemize}
-            \item Kiến trúc tập lệnh (ISA) dạng mở, tinh gọn, có tính ứng dụng cao.
-            \item Cấu trúc định dạng lệnh cố định, tạo điều kiện thuận lợi cho việc thiết kế phần cứng bằng ngôn ngữ mô tả phần cứng (Verilog HDL).
-        \end{itemize}
+    \begin{block}{Chuyển dịch tất yếu sang Đa lõi (Multi-core)}
+        \small
+        Tích hợp nhiều lõi xử lý hoạt động độc lập trên cùng một chip để tối ưu hiệu năng tính toán song song.
     \end{block}
+
+    \vspace{0.15cm}
+
+    \begin{alertblock}{Bài toán đặt ra}
+        \small
+        Giải quyết các vấn đề phức tạp về giao tiếp liên lõi, tranh chấp bus bộ nhớ dùng chung (memory contention) và đồng bộ giữa các luồng xử lý phần cứng.
+    \end{alertblock}
+\end{frame}
+
+% --- SLIDE 2: CHỦ ĐỀ DỰ ÁN ---
+\subsection{Chủ đề của dự án}
+\begin{frame}{Chủ Đề Của Dự Án}
+    Dự án tập trung nghiên cứu, thiết kế phần cứng ở mức RTL sử dụng ngôn ngữ mô tả phần cứng \textbf{Verilog HDL} để mô phỏng bộ xử lý 8 lõi độc lập:
+    
+    \vspace{0.2cm}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{block}{Kiến trúc nhân đơn}
+                \small
+                Mỗi lõi CPU dựa trên kiến trúc tập lệnh mở \textbf{RISC-V} (\textbf{RV32I subset}) áp dụng kỹ thuật \textbf{pipeline 5 tầng} nhằm tối ưu hóa thông lượng lệnh thực thi.
+            \end{block}
+        \end{column}
+        
+        \begin{column}{0.48\textwidth}
+            \begin{block}{Kiến trúc đa nhân}
+                \small
+                Cả 8 nhân CPU kết nối và sử dụng chung một khối bộ nhớ dữ liệu (\textbf{Shared Data Memory}) thông qua một bộ điều khiển Bus và phân xử tập trung.
+            \end{block}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% --- SLIDE 3: MỤC TIÊU THIẾT KẾ ---
+\subsection{Mục tiêu thiết kế}
+\begin{frame}{Mục Tiêu Thiết Kế}
+    Dự án đề ra ba mục tiêu cốt lõi cần đạt được:
+    
+    \vspace{0.25cm}
+    \begin{itemize}
+        \item \textbf{Thiết kế lõi đơn:} Thiết kế lõi xử lý RISC-V có pipeline 5 tầng hoàn chỉnh, xử lý xung đột lệnh (data/control hazards) một cách tối ưu bằng Forwarding, Stall và Flush.
+        \item \textbf{Thiết kế trục bus đa lõi:} Xây dựng cơ chế phân xử công bằng (Round-Robin Arbiter), đảm bảo cả 8 nhân CPU đều có thể ghi/đọc bộ nhớ dùng chung mà không xảy ra xung đột hay deadlock.
+        \item \textbf{Mô phỏng chức năng:} Sử dụng bộ công cụ nguồn mở \textbf{Icarus Verilog} để chạy mô phỏng hệ thống và \textbf{GTKWave} để phân tích giản đồ thời gian (waveform).
+    \end{itemize}
 \end{frame}

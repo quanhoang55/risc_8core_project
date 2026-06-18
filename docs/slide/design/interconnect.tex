@@ -106,14 +106,14 @@
     \vspace{0.15cm}
     \begin{center}
         \begin{tikzpicture}[
-            step/.style={draw=DeepBlue, fill=blue!8, minimum width=2.05cm, minimum height=0.58cm, font=\scriptsize\bfseries, align=center},
+            stepbox/.style={draw=DeepBlue, fill=blue!8, minimum width=2.05cm, minimum height=0.58cm, font=\scriptsize\bfseries, align=center},
             arrow/.style={->, >=stealth, thick, DeepBlue!80}
         ]
-            \node[step] (s1) at (0, 0) {Core request};
-            \node[step] (s2) at (2.65, 0) {Arbiter grant};
-            \node[step] (s3) at (5.3, 0) {\texttt{bus\_ctrl}\\chọn core};
-            \node[step] (s4) at (7.95, 0) {\texttt{data\_mem}\\read/write};
-            \node[step] (s5) at (10.6, 0) {\texttt{core\_ready}};
+            \node[stepbox] (s1) at (0, 0) {Core request};
+            \node[stepbox] (s2) at (2.65, 0) {Arbiter grant};
+            \node[stepbox] (s3) at (5.3, 0) {\texttt{bus\_ctrl}\\chọn core};
+            \node[stepbox] (s4) at (7.95, 0) {\texttt{data\_mem}\\read/write};
+            \node[stepbox] (s5) at (10.6, 0) {\texttt{core\_ready}};
             \draw[arrow] (s1) -- (s2);
             \draw[arrow] (s2) -- (s3);
             \draw[arrow] (s3) -- (s4);
