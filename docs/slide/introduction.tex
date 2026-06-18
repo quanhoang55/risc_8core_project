@@ -61,3 +61,74 @@
         \item \textbf{Mô phỏng chức năng:} Sử dụng bộ công cụ nguồn mở \textbf{Icarus Verilog} để chạy mô phỏng hệ thống và \textbf{GTKWave} để phân tích giản đồ thời gian (waveform).
     \end{itemize}
 \end{frame}
+
+% --- SLIDE 4: TẠI SAO CHỌN PIPELINE? ---
+\subsection{Tại sao chọn Pipeline?}
+\begin{frame}{Tại Sao Chọn Kiến Trúc Pipeline 5 Tầng?}
+    \small
+    So sánh 3 kiến trúc thực thi lệnh cơ bản:
+
+    \vspace{0.15cm}
+    \begin{center}
+        \scriptsize
+        \begin{tikzpicture}[
+            stage/.style={draw=DeepBlue, fill=blue!8, minimum width=0.7cm, minimum height=0.35cm, font=\tiny\bfseries, align=center},
+            idle/.style={draw=gray!40, fill=gray!5, minimum width=0.7cm, minimum height=0.35cm, font=\tiny, align=center},
+            lbl/.style={font=\tiny\bfseries, align=right}
+        ]
+            % --- Single-cycle ---
+            \node[lbl, anchor=east] at (-0.15, 0) {Single-cycle};
+            \node[stage, minimum width=3.5cm, fill=blue!15] (sc1) at (1.6, 0) {Lệnh 1 (toàn bộ 1 chu kỳ dài)};
+            \node[stage, minimum width=3.5cm, fill=orange!15] (sc2) at (5.35, 0) {Lệnh 2 (toàn bộ 1 chu kỳ dài)};
+
+            % --- Multi-cycle ---
+            \node[lbl, anchor=east] at (-0.15, -0.75) {Multi-cycle};
+            \foreach \i/\c in {0/IF,1/ID,2/EX,3/MEM,4/WB} {
+                \node[stage] at (0.35*\i + 0.175, -0.75) {\c};
+            }
+            \foreach \i/\c in {0/IF,1/ID,2/EX,3/MEM,4/WB} {
+                \node[stage, fill=orange!12] at (0.35*\i + 1.925, -0.75) {\c};
+            }
+
+            % --- Pipeline ---
+            \node[lbl, anchor=east] at (-0.15, -1.85) {Pipeline};
+            % Instruction 1
+            \foreach \i/\c in {0/IF,1/ID,2/EX,3/MEM,4/WB} {
+                \node[stage, fill=blue!12] at (0.35*\i + 0.175, -1.5) {\c};
+            }
+            % Instruction 2 (shifted by 1)
+            \foreach \i/\c in {0/IF,1/ID,2/EX,3/MEM,4/WB} {
+                \node[stage, fill=orange!12] at (0.35*\i + 0.525, -1.85) {\c};
+            }
+            % Instruction 3 (shifted by 2)
+            \foreach \i/\c in {0/IF,1/ID,2/EX,3/MEM,4/WB} {
+                \node[stage, fill=green!12] at (0.35*\i + 0.875, -2.2) {\c};
+            }
+        \end{tikzpicture}
+    \end{center}
+
+    \vspace{0.1cm}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{block}{Ưu điểm Pipeline}
+                \scriptsize
+                \begin{itemize}
+                    \item Nhiều lệnh \textbf{chồng chéo} cùng tồn tại trong CPU ở các tầng khác nhau.
+                    \item Thông lượng lý tưởng: hoàn thành \textbf{1 lệnh mỗi chu kỳ} (so với 5 chu kỳ ở Multi-cycle).
+                    \item Tần số clock cao hơn Single-cycle vì mỗi tầng chỉ chứa một phần logic nhỏ.
+                \end{itemize}
+            \end{block}
+        \end{column}
+
+        \begin{column}{0.48\textwidth}
+            \begin{alertblock}{Thách thức cần giải quyết}
+                \scriptsize
+                \begin{itemize}
+                    \item \textbf{Data Hazard:} Lệnh sau cần kết quả của lệnh trước chưa hoàn tất.
+                    \item \textbf{Control Hazard:} Branch/Jump làm sai đường thực thi.
+                    \item \textbf{Structural Hazard:} Nhiều core tranh chấp cùng tài nguyên bộ nhớ.
+                \end{itemize}
+            \end{alertblock}
+        \end{column}
+    \end{columns}
+\end{frame}
