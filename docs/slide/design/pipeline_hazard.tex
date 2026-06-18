@@ -1,47 +1,39 @@
 % =============================================================================
-% SLIDE 2: HAZARD DETECTION
+% SLIDE: HAZARD DETECTION & FORWARDING
 % =============================================================================
-\begin{frame}[fragile]{Hazard Detection}
+\begin{frame}{Hazard Detection\& Forwarding}
     \begin{itemize}
-        \item \textbf{Nhiệm vụ:} Phát hiện xung đột dữ liệu không thể cứu bằng Forwarding (Load-Use) và quản lý trạng thái đóng băng toàn bộ CPU khi Bus bộ nhớ bận (\texttt{mem\_wait}).
+        \item \textbf{Tư duy tích hợp:} Gom toàn bộ logic phát hiện Load-Use Stall, cứu dữ liệu (Forwarding) và quản lý bộ nhớ bận (\texttt{mem\_wait}) vào một bộ điều khiển tập trung để tối ưu tài nguyên.
     \end{itemize}
-    
-    \begin{block}{Mã nguồn Verilog - Phát hiện và Quản lý chốt chặn}
-\begin{lstlisting}
-// --- PASTE CODE LOGIC LOAD-USE STALL VA` QUAN LY' HOLD/CLEAR TAI DAY ---
 
-\end{lstlisting}
+    \begin{block}{Sơ đồ khối điều khiển trung tâm hệ thống - Hazard Controller}
+        \centering
+        \begin{tikzpicture}[
+            block/.style={draw, thick, fill=orange!10, draw=orange!80!black, minimum width=3.8cm, minimum height=2.4cm, rounded corners, font=\small\bfseries, align=center},
+            wire_in/.style={->, >=stealth, thick, red!70!black},
+            wire_out/.style={->, >=stealth, thick, green!50!black}
+        ]
+            % Hazard Block
+            \node[block] (hz) at (0, 0) {Hazard Controller\\[0.1cm]\tiny (\texttt{hazard\_controller.v})};
+            
+            % Inputs bên trái (Các chân giám sát xung đột)
+            \draw[wire_in] (-3.5, 0.6) -- node[above, font=\tiny\bfseries] {ex\_rs1 / ex\_rs2} (hz.170);
+            \draw[wire_in] (-3.5, 0.1) -- node[above, font=\tiny\bfseries] {mem\_rd / wb\_rd} (hz.180);
+            \draw[wire_in] (-3.5, -0.6) -- node[below, font=\tiny\bfseries] {mem\_wait / redirect} (hz.190);
+            
+            % Outputs bên phải (Tín hiệu điều khiển phản hồi)
+            \draw[->, >=stealth, double, double distance=1.0pt, thick, green!50!black] (hz.15) -- node[above, font=\tiny\bfseries] {forward\_a / b [1:0]} (3.5, 0.45);
+            \draw[wire_out] (hz.5) -- node[above, font=\tiny\bfseries, xshift=0.2cm] {if\_id\_hold / clear} (3.5, 0.15);
+            \draw[wire_out] (hz.-5) -- node[below, font=\tiny\bfseries, xshift=0.2cm] {id\_ex\_hold / clear} (3.5, -0.15);
+            \draw[wire_out] (hz.-15) -- node[below, font=\tiny\bfseries, xshift=0.1cm] {ex\_mem\_hold} (3.5, -0.45);
+        \end{tikzpicture}
     \end{block}
-    
-    \begin{itemize}
-        \item \textbf{Giải thuật:} Khi xảy ra xung đột, tầng \texttt{IF/ID} bị giữ nguyên trạng thái (\texttt{hold}), đồng thời chèn một bong bóng \texttt{NOP} bằng cách xóa tầng \texttt{ID/EX} (\texttt{clear}).
-    \end{itemize}
-\end{frame}
-
-% =============================================================================
-% SLIDE 3: FORWARDING LOGIC
-% =============================================================================
-\begin{frame}[fragile]{Forwarding}
-    \begin{itemize}
-        \item \textbf{Nhiệm vụ:} Tránh Stall bừa bãi bằng cách bơm trực tiếp kết quả từ tầng \texttt{EX/MEM} hoặc \texttt{MEM/WB} về đầu vào ALU nếu phát hiện lệnh sau đọc thanh ghi mà lệnh trước chuẩn bị ghi.
-    \end{itemize}
-
-    \begin{block}{Mã nguồn Verilog - Khối tổ hợp Forwarding chọn toán hạng ALU}
-\begin{lstlisting}
-// --- PASTE CODE LOGIC KIEM TRA DIEU KIEN FORWARD (CO' CHECK x0) TAI DAY ---
-
-\end{lstlisting}
-    \end{block}
-
-    \begin{alertblock}{Đặc điểm cốt lõi}
-        Bắt buộc phải kiểm tra điều kiện loại trừ thanh ghi đặc biệt \textbf{\texttt{x0}} (\texttt{rd\_addr != 5'd0}). Nếu lệnh trước ghi vào \texttt{x0}, mạch bỏ qua không forward để bảo toàn giá trị $0$ tuyệt đối của kiến trúc RISC-V.
-    \end{alertblock}
 \end{frame}
 
 % =============================================================================
 % SLIDE 4: RISC_CORE INTEGRATION
 % =============================================================================
-\begin{frame}[fragile]{risc\_core Integration}
+\begin{frame}[fragile]{RISC\_Core Integration}
     \begin{columns}[T]
         \begin{column}{0.45\textwidth}
             \textbf{Nguyên tắc đóng gói:}
@@ -65,7 +57,7 @@
 % =============================================================================
 % SLIDE 5: UNIT TESTING - PART 1
 % =============================================================================
-\begin{frame}{Unit Testing - Kiểm thử vách ngăn IF/ID và ID/EX}
+\begin{frame}{Pipeline Register Unit Testing - IF/ID và ID/EX}
     \begin{columns}[T]
         \begin{column}{0.5\textwidth}
             \begin{block}{1. Kết quả mô phỏng \texttt{pipe\_reg\_if\_id}}
@@ -88,7 +80,7 @@
 % =============================================================================
 % SLIDE 6: UNIT TESTING - PART 2
 % =============================================================================
-\begin{frame}{Unit Testing - Kiểm thử vách ngăn EX/MEM và MEM/WB}
+\begin{frame}{Pipeline Register Unit Testing EX/MEM và MEM/WB}
     \begin{columns}[T]
         \begin{column}{0.5\textwidth}
             \begin{block}{3. Kết quả mô phỏng \texttt{pipe\_reg\_ex\_mem}}

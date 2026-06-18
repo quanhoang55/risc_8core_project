@@ -1,4 +1,4 @@
-\frametitle{risc\_core Integration}
+\frametitle{RISC\_Core Integration}
 \begin{columns}[T]
         \begin{column}{0.45\textwidth}
             \textbf{Nguyên tắc đóng gói:}

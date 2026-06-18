@@ -15,7 +15,7 @@
 \headcommand {\beamer@subsectionentry {0}{1}{2}{5}{Kiến trúc Pipeline và Logic Điều khiển}}
 \headcommand {\slideentry {1}{2}{1}{5/5}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {5}{5}}
-\headcommand {\beamer@subsubsectionentry {0}{1}{2}{1}{6}{Thanh ghi đệm (Pipeline Registers) và Control Unit}}
+\headcommand {\beamer@subsubsectionentry {0}{1}{2}{1}{6}{Thanh ghi đệm Pipeline Registers và Control Unit}}
 \headcommand {\slideentry {1}{2}{2}{6/6}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {6}{6}}
 \headcommand {\slideentry {1}{2}{3}{7/7}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
@@ -28,8 +28,16 @@
 \headcommand {\beamer@framepages {10}{10}}
 \headcommand {\slideentry {1}{2}{7}{11/11}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {11}{11}}
-\headcommand {\beamer@partpages {1}{11}}
-\headcommand {\beamer@subsectionpages {5}{11}}
-\headcommand {\beamer@sectionpages {3}{11}}
-\headcommand {\beamer@documentpages {11}}
-\headcommand {\gdef \inserttotalframenumber {11}}
+\headcommand {\slideentry {1}{2}{8}{12/12}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
+\headcommand {\beamer@framepages {12}{12}}
+\headcommand {\slideentry {1}{2}{9}{13/13}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
+\headcommand {\beamer@framepages {13}{13}}
+\headcommand {\slideentry {1}{2}{10}{14/14}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
+\headcommand {\beamer@framepages {14}{14}}
+\headcommand {\slideentry {1}{2}{11}{15/15}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
+\headcommand {\beamer@framepages {15}{15}}
+\headcommand {\beamer@partpages {1}{15}}
+\headcommand {\beamer@subsectionpages {5}{15}}
+\headcommand {\beamer@sectionpages {3}{15}}
+\headcommand {\beamer@documentpages {15}}
+\headcommand {\gdef \inserttotalframenumber {15}}

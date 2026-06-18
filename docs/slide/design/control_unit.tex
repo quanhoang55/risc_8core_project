@@ -1,30 +1,227 @@
 \subsection{Kiến trúc Pipeline và Logic Điều khiển}
-\subsubsection{Thanh ghi đệm (Pipeline Registers) và Control Unit}
-% =============================================================================
-% SLIDE 1: TỔNG QUAN KIẾN TRÚC MODULAR
-% =============================================================================
-\begin{frame}{Pipeline Registers \& Control Unit}
-    \begin{block}{Tư duy thiết kế: Phân rã cấu trúc (Structural Separation)}
-        Tách biệt hoàn toàn giữa \textbf{Datapath} (Đường dữ liệu), \textbf{Control Unit} (Khối điều khiển tổ hợp), và \textbf{Pipeline Registers} (Vách ngăn đồng bộ).
-    \end{block}
+\subsubsection{Thanh ghi đệm Pipeline Registers và Control Unit}
 
-    \begin{columns}[T]
-        \begin{column}{0.5\textwidth}
-            \textbf{Control Unit (Thuần tổ hợp):}
-            \begin{itemize}
-                \item Giải mã mã lệnh 32-bit từ tầng IF.
-                \item Sinh tín hiệu điều khiển 1-bit ($reg\_write, mem\_read,\dots$).
-                \item \textit{[Bạn sẽ paste code Control Unit tại đây hoặc slide phụ]}
-            \end{itemize}
-        \end{column}
+% =============================================================================
+% SLIDE: CONTROL UNIT
+% =============================================================================
+\begin{frame}{Control Unit}
+    \begin{itemize}
+        \item \textbf{Nhiệm vụ:} Sử dụng Combinational Logic để giải mã các trường \texttt{Opcode}, \texttt{Funct3}, \texttt{Funct7} của \texttt{Instruction} và lập tức sinh các tín hiệu điều khiển cho hệ thống Datapath.
+    \end{itemize}
+
+    \begin{block}{Sơ đồ Input Output Control Unit}
+        \centering
+        \begin{tikzpicture}[
+            block/.style={draw, thick, fill=blue!10, draw=DeepBlue, minimum width=3.5cm, minimum height=2.4cm, rounded corners, font=\small\bfseries, align=center},
+            wire_in/.style={->, >=stealth, thick, red!70!black},
+            wire_out/.style={->, >=stealth, thick, green!50!black},
+            bus_out/.style={->, >=stealth, double, double distance=1.5pt, thick, DeepBlue}
+        ]
+            % Control Unit Block
+            \node[block] (cu) at (0, 0) {Control Unit\\[0.1cm]\tiny (\texttt{control\_unit.v})};
+            
+            % Input
+            \draw[->, >=stealth, double, double distance=1.5pt, thick, red!70!black] (-3.2, 0) -- node[above=0.05cm, font=\tiny\bfseries] {instruction[31:0]} (cu.west);
+            
+            % Outputs bên phải (Tín hiệu điều khiển Datapath)
+            \draw[wire_out] (cu.15) -- node[above, font=\tiny\bfseries, xshift=0.4cm] {reg\_write} (3.0, 0.45);
+            \draw[wire_out] (cu.5) -- node[above, font=\tiny\bfseries, xshift=0.4cm] {alu\_src} (3.0, 0.15);
+            \draw[wire_out] (cu.-5) -- node[below, font=\tiny\bfseries, xshift=0.4cm] {mem\_read} (3.0, -0.15);
+            \draw[wire_out] (cu.-15) -- node[below, font=\tiny\bfseries, xshift=0.4cm] {mem\_write} (3.0, -0.45);
+            
+            % Outputs hướng lên/xuống (Địa chỉ & Số Immediate)
+            \draw[bus_out] (cu.north) -- +(0, 0.6) node[above, font=\tiny\bfseries] {imm[31:0]};
+            \draw[->, >=stealth, double, double distance=1.0pt, thick, DeepBlue] (cu.south) -- +(0, -0.6) node[below, font=\tiny\bfseries] {rs1\_addr, rs2\_addr, rd\_addr [4:0]};
+        \end{tikzpicture}
+    \end{block}
+\end{frame}
+% =============================================================================
+% PIPELINE REGISTERS
+% =============================================================================
+\begin{frame}{Phân bố phần cứng trên 5 tầng Pipeline}
+    Hệ thống \textbf{Pipeline Registers} đóng vai trò là các vách ngăn đồng bộ, cô lập dữ liệu giữa các giai đoạn xử lý:
+    \vspace{0.3cm}
+    
+    \centering
+    \begin{tikzpicture}[
+        stage/.style={draw=DeepBlue, fill=DeepBlue!6, minimum width=1.8cm, minimum height=1.2cm, rounded corners=4pt, line width=1.2pt, font=\scriptsize, text width=1.75cm, align=center},
+        reg/.style={draw=AccentGreen!80!black, fill=AccentGreen!12, minimum width=0.4cm, minimum height=1.8cm, rounded corners=1.5pt, line width=1.2pt, font=\tiny\bfseries\color{DeepBlue!90!black}, align=center},
+        arrow/.style={->, >=stealth, line width=1.5pt, DeepBlue!85}
+    ]
+        % Stages & Registers
+        \node[stage] (if) at (0.9, 0) {\textbf{Fetch (IF)}\\[0.05cm]\tiny\color{black!70}\texttt{pc\_logic}\\[0.02cm]\tiny\color{black!70}\texttt{instr\_mem}};
+        \node[reg] (ifid) at (2.3, 0) {\makebox[0pt][c]{\rotatebox{90}{IF/ID}}};
         
-        \begin{column}{0.5\textwidth}
-            \textbf{Pipeline Registers (Chốt chặn Clock):}
-            \begin{itemize}
-                \item 4 khối đệm: \texttt{IF/ID}, \texttt{ID/EX}, \texttt{EX/MEM}, \texttt{MEM/WB}.
-                \item Đóng vai trò là vách ngăn phân chia 5 tầng xử lý.
-                \item Tích hợp chân \texttt{hold} (Stall) và \texttt{clear} (Flush).
-            \end{itemize}
-        \end{column}
-    \end{columns}
+        \node[stage] (id) at (3.7, 0) {\textbf{Decode (ID)}\\[0.05cm]\tiny\color{black!70}\texttt{control\_unit}\\[0.02cm]\tiny\color{black!70}\texttt{reg\_file}};
+        \node[reg] (idex) at (5.1, 0) {\makebox[0pt][c]{\rotatebox{90}{ID/EX}}};
+        
+        \node[stage] (ex) at (6.5, 0) {\textbf{Execute (EX)}\\[0.05cm]\tiny\color{black!70}\texttt{alu}};
+        \node[reg] (exmem) at (7.9, 0) {\makebox[0pt][c]{\rotatebox{90}{EX/MEM}}};
+        
+        \node[stage] (mem) at (9.3, 0) {\textbf{Memory (MEM)}\\[0.05cm]\tiny\color{black!70}Liên kết\\[0.02cm]\tiny\color{black!70}\texttt{data\_mem}};
+        \node[reg] (memwb) at (10.7, 0) {\makebox[0pt][c]{\rotatebox{90}{MEM/WB}}};
+        
+        \node[stage] (wb) at (12.1, 0) {\textbf{Writeback (WB)}\\[0.05cm]\tiny\color{black!70}Ghi tập\\[0.02cm]\tiny\color{black!70}thanh ghi};
+        
+        % Clock triangles at the bottom of pipeline registers
+        \draw[line width=1.2pt, AccentGreen!80!black] (2.2, -0.9) -- (2.3, -0.78) -- (2.4, -0.9);
+        \draw[line width=1.2pt, AccentGreen!80!black] (5.0, -0.9) -- (5.1, -0.78) -- (5.2, -0.9);
+        \draw[line width=1.2pt, AccentGreen!80!black] (7.8, -0.9) -- (7.9, -0.78) -- (8.0, -0.9);
+        \draw[line width=1.2pt, AccentGreen!80!black] (10.6, -0.9) -- (10.7, -0.78) -- (10.8, -0.9);
+        
+        % Connections
+        \draw[arrow] (if.east) -- (ifid.west);
+        \draw[arrow] (ifid.east) -- (id.west);
+        \draw[arrow] (id.east) -- (idex.west);
+        \draw[arrow] (idex.east) -- (ex.west);
+        \draw[arrow] (ex.east) -- (exmem.west);
+        \draw[arrow] (exmem.east) -- (mem.west);
+        \draw[arrow] (mem.east) -- (memwb.west);
+        \draw[arrow] (memwb.east) -- (wb.west);
+    \end{tikzpicture}
+    
+    \vspace{0.3cm}
+    \begin{block}{Nguyên lý điều khiển luồng trên các Thanh ghi đệm Pipeline}
+        \scriptsize
+        \begin{itemize}
+            \item \textbf{Clock Synchronization:} Dữ liệu/lệnh từ tầng trước chỉ được phép dịch chuyển sang tầng sau chính xác tại sườn lên của xung Clock (\texttt{posedge clk}).
+            \item \textbf{Pipeline register:} Giữ cố định trạng thái xử lý độc lập của 5 lệnh khác nhau cùng lúc, ngăn chặn hiện tượng lấn át hay trộn lẫn dữ liệu giữa các tầng Datapath.
+            \item \textbf{Pipeline Interlock:} Là nơi trực tiếp tiếp nhận các lệnh (\texttt{hold} để tạo \texttt{Stall}, hoặc \texttt{clear} để tạo \texttt{Flush/Bubble}) từ bộ điều khiển trung tâm.
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+% =============================================================================
+% PIPELINE REGISTERS - 4 SLIDES ĐỘC LẬP CHỨA INPUT / OUTPUT
+% =============================================================================
+
+% --- TẦNG 1: IF/ID ---
+\begin{frame}{PIPELINE REGISTERS: Fetch / Decode (IF/ID Register)}
+    \begin{itemize}
+        \item \textbf{Vai trò:} Chốt giữ \texttt{Instruction} 32-bit vừa đọc ra từ \texttt{Instruction Memory} và địa chỉ \texttt{PC} tương ứng để chuyển giao sang giai đoạn Decode.
+        \item \textbf{Cơ chế Hazard:} Nhận tín hiệu \texttt{hold} khi kích hoạt \texttt{Load-Use Stall} hoặc \texttt{Memory Stall} để đóng băng trạng thái; nhận tín hiệu \texttt{clear} để thực hiện \texttt{Flush} lệnh rác khi rẽ nhánh \texttt{Taken} sai.
+    \end{itemize}
+
+    \begin{block}{Sơ đồ cổng giao tiếp (Black Box) - \texttt{pipe\_reg\_if\_id.v}}
+        \centering
+        \begin{tikzpicture}[
+            block/.style={draw, thick, fill=blue!10, draw=DeepBlue, minimum width=3.2cm, minimum height=1.8cm, rounded corners, font=\small\bfseries, align=center},
+            bus/.style={->, >=stealth, double, double distance=1.5pt, thick, DeepBlue},
+            ctrl/.style={->, >=stealth, thick, red!70!black}
+        ]
+            \node[block] (reg) at (0, 0) {IF/ID Register};
+            
+            % Inputs (Trái)
+            \draw[bus] (-3.5, 0.3) -- node[above=0.01cm, font=\tiny\bfseries] {if\_pc[31:0]} (reg.160);
+            \draw[bus] (-3.5, -0.3) -- node[below=0.01cm, font=\tiny\bfseries] {if\_instr[31:0]} (reg.200);
+            
+            % Outputs (Phải)
+            \draw[bus] (reg.20) -- node[above=0.01cm, font=\tiny\bfseries] {id\_pc[31:0]} (3.5, 0.3);
+            \draw[bus] (reg.340) -- node[below=0.01cm, font=\tiny\bfseries] {id\_instr[31:0]} (3.5, -0.4);
+            
+            % Điều khiển (Dưới)
+            \draw[ctrl] (-0.8, -1.3) -- node[right, font=\tiny\bfseries] {hold} (-0.8, -0.9);
+            \draw[ctrl] (0.2, -1.3) -- node[right, font=\tiny\bfseries] {clear} (0.2, -0.9);
+            \draw[->, >=stealth, thick, black] (1.1, -1.3) -- node[right, font=\tiny\bfseries] {clk} (1.1, -0.9);
+        \end{tikzpicture}
+    \end{block}
+\end{frame}
+
+% --- TẦNG 2: ID/EX ---
+\begin{frame}{PIPELINE REGISTERS Decode / Execute (ID/EX Register)}
+    \begin{itemize}
+        \item \textbf{Vai trò:} Tiếp nhận và chuyển tiếp toàn bộ các tín hiệu điều khiển từ \texttt{Control Unit}, giá trị các toán hạng đọc từ \texttt{Register File} (\texttt{rs1\_data}, \texttt{rs2\_data}) và số \texttt{Immediate} đã mở rộng sang giai đoạn \texttt{Execute} cho \texttt{ALU}.
+        \item \textbf{Cơ chế Hazard:} Nhận tín hiệu \texttt{clear = 1} để chủ động chèn một \texttt{Bubble} (\texttt{NOP}) vào tầng \texttt{Execute} khi xảy ra xung đột \texttt{Load-Use}.
+    \end{itemize}
+
+    \begin{block}{Sơ đồ cổng giao tiếp (Black Box) - \texttt{pipe\_reg\_id\_ex.v}}
+        \centering
+        \begin{tikzpicture}[
+            block/.style={draw, thick, fill=blue!10, draw=DeepBlue, minimum width=3.2cm, minimum height=2.2cm, rounded corners, font=\small\bfseries, align=center},
+            bus/.style={->, >=stealth, double, double distance=1.5pt, thick, DeepBlue},
+            ctrl/.style={->, >=stealth, thick, red!70!black},
+            w_in/.style={->, >=stealth, thick, DeepBlue},
+            w_out/.style={->, >=stealth, thick, green!50!black}
+        ]
+            \node[block] (reg) at (0, 0) {ID/EX Register};
+            
+            % Inputs (Trái)
+            \draw[bus] (-3.8, 0.6) -- node[above, font=\tiny\bfseries] {id\_rs1\_data / rs2\_data} (reg.160);
+            \draw[bus] (-3.8, 0.1) -- node[above, font=\tiny\bfseries] {id\_imm[31:0]} (reg.180);
+            \draw[w_in] (-3.8, -0.5) -- node[below, font=\tiny\bfseries] {id\_ctrl\_signals (reg\_write, alu\_op,\dots)} (reg.200);
+            
+            % Outputs (Phải)
+            \draw[bus] (reg.20) -- node[above, font=\tiny\bfseries] {ex\_rs1\_data / rs2\_data} (3.8, 0.6);
+            \draw[bus] (reg.0) -- node[above, font=\tiny\bfseries] {ex\_imm[31:0]} (3.8, 0.1);
+            \draw[w_out] (reg.340) -- node[below, font=\tiny\bfseries] {ex\_ctrl\_signals} (3.8, -0.5);
+            
+            % Điều khiển (Dưới)
+            \draw[ctrl] (-0.6, -1.5) -- node[right, font=\tiny\bfseries] {hold} (-0.6, -1.1);
+            \draw[ctrl] (0.3, -1.5) -- node[right, font=\tiny\bfseries] {clear} (0.3, -1.1);
+        \end{tikzpicture}
+    \end{block}
+\end{frame}
+
+% --- TẦNG 3: EX/MEM ---
+\begin{frame}{PIPELINE REGISTERS Execute / Memory (EX/MEM Register)}
+    \begin{itemize}
+        \item \textbf{Vai trò:} Chốt giữ kết quả tính toán từ đầu ra của \texttt{ALU}, dữ liệu cần ghi vào \texttt{Data Memory} (\texttt{rs2\_data}) của lệnh \texttt{Store}, và địa chỉ thanh ghi đích \texttt{rd}.
+        \item \textbf{Cơ chế Hazard:} Nhận tín hiệu \texttt{hold} từ mạch \texttt{Memory Stall} (\texttt{mem\_wait}) nhằm giữ nguyên thông tin khi \texttt{Shared Bus} đang bận phân xử quyền truy cập bộ nhớ đa nhân.
+    \end{itemize}
+
+    \begin{block}{Sơ đồ cổng giao tiếp (Black Box) - \texttt{pipe\_reg\_ex\_mem.v}}
+        \centering
+        \begin{tikzpicture}[
+            block/.style={draw, thick, fill=blue!10, draw=DeepBlue, minimum width=3.2cm, minimum height=2.0cm, rounded corners, font=\small\bfseries, align=center},
+            bus/.style={->, >=stealth, double, double distance=1.5pt, thick, DeepBlue},
+            ctrl/.style={->, >=stealth, thick, red!70!black},
+            w_in/.style={->, >=stealth, thick, DeepBlue},
+            w_out/.style={->, >=stealth, thick, green!50!black}
+        ]
+            \node[block] (reg) at (0, 0) {EX/MEM Register};
+            
+            % Inputs (Trái)
+            \draw[bus] (-3.8, 0.4) -- node[above, font=\tiny\bfseries] {ex\_alu\_result[31:0]} (reg.160);
+            \draw[bus] (-3.8, -0.4) -- node[below, font=\tiny\bfseries] {ex\_store\_data[31:0]} (reg.200);
+            
+            % Outputs (Phải)
+            \draw[bus] (reg.20) -- node[above, font=\tiny\bfseries] {mem\_alu\_result[31:0]} (3.8, 0.4);
+            \draw[bus] (reg.340) -- node[below, font=\tiny\bfseries] {mem\_store\_data[31:0]} (3.8, -0.4);
+            
+            % Điều khiển (Dưới)
+            \draw[ctrl] (-0.5, -1.4) -- node[right, font=\tiny\bfseries] {hold} (-0.5, -1.0);
+            \draw[ctrl] (0.5, -1.4) -- node[right, font=\tiny\bfseries] {clear} (0.5, -1.0);
+        \end{tikzpicture}
+    \end{block}
+\end{frame}
+
+% --- TẦNG 4: MEM/WB ---
+\begin{frame}{PIPELINE REGISTERS Memory / Writeback (MEM/WB Register)}
+    \begin{itemize}
+        \item \textbf{Vai trò:} Chốt giữ dữ liệu đọc lên từ \texttt{Data Memory} (\texttt{rdata}) hoặc kết quả trực tiếp từ \texttt{ALU} để sẵn sàng đưa về cổng ghi của \texttt{Register File}.
+        \item \textbf{Cơ chế Hazard (Đã vá lỗi):} Loại bỏ hoàn toàn chân \texttt{clear} độc hại, chuyển sang sử dụng chân \texttt{hold} đồng bộ. Khi gặp \texttt{Memory Stall}, dữ liệu tầng này đứng im để bảo toàn dữ liệu, tránh lỗi mất thông tin trên \texttt{Pipeline}.
+    \end{itemize}
+
+    \begin{block}{Sơ đồ cổng giao tiếp (Black Box) - \texttt{pipe\_reg\_mem\_wb.v}}
+        \centering
+        \begin{tikzpicture}[
+            block/.style={draw, thick, fill=blue!10, draw=DeepBlue, minimum width=3.2cm, minimum height=2.0cm, rounded corners, font=\small\bfseries, align=center},
+            bus/.style={->, >=stealth, double, double distance=1.5pt, thick, DeepBlue},
+            ctrl/.style={->, >=stealth, thick, red!70!black}
+        ]
+            \node[block] (reg) at (0, 0) {MEM/WB Register};
+            
+            % Inputs (Trái)
+            \draw[bus] (-3.8, 0.4) -- node[above, font=\tiny\bfseries] {mem\_alu\_out[31:0]} (reg.160);
+            \draw[bus] (-3.8, -0.4) -- node[below, font=\tiny\bfseries] {mem\_rdata[31:0]} (reg.200);
+            
+            % Outputs (Phải)
+            \draw[bus] (reg.20) -- node[above, font=\tiny\bfseries] {wb\_alu\_out[31:0]} (3.8, 0.4);
+            \draw[bus] (reg.340) -- node[below, font=\tiny\bfseries] {wb\_rdata[31:0]} (3.8, -0.4);
+            
+            % Điều khiển (Dưới)
+            \draw[ctrl] (-0.5, -1.4) -- node[right, font=\tiny\bfseries] {hold} (-0.5, -1.0);
+            \draw[ctrl] (0.5, -1.4) -- node[right, font=\tiny\bfseries] {clear~(fixed~0)} (0.5, -1.0);
+        \end{tikzpicture}
+    \end{block}
 \end{frame}
