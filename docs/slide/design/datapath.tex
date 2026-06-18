@@ -291,7 +291,7 @@ endmodule
     \begin{columns}
         \begin{column}{0.55\textwidth}
             \begin{block}{Console Output (\$monitor)}
-                \begin{lstlisting}[basicstyle=\fontsize{7.5pt}{9.0pt}\selectfont\ttfamily, numbers=none]
+                \begin{lstlisting}[basicstyle=\fontsize{6.5pt}{7.5pt}\selectfont\ttfamily, numbers=none]
 Time=0 | PC=         0 | stall=0 | branch=0 | jump=0
 Time=15000 | PC=         4 | stall=0 | branch=0 | jump=0
 Time=25000 | PC=         8 | stall=0 | branch=0 | jump=0
@@ -312,10 +312,10 @@ tb/pc_logic_tb.v:63: $finish called at 80000 (1ps)
             \begin{block}{Phân tích kịch bản kiểm thử}
                 \scriptsize
                 \begin{itemize}
-                    \item \textbf{0ns -- 30ns (Tăng tuần tự):} PC tăng tuần tự +4 sau mỗi chu kỳ clock (0 $\rightarrow$ 4 $\rightarrow$ 8).
-                    \item \textbf{30ns -- 40ns (Đóng băng):} Tín hiệu \texttt{stall=1}, PC giữ nguyên giá trị bằng 8.
-                    \item \textbf{40ns -- 50ns (Rẽ nhánh):} Tín hiệu \texttt{branch\_taken=1}, PC cập nhật địa chỉ nhánh bằng 100.
-                    \item \textbf{50ns -- 60ns (Lệnh nhảy):} Tín hiệu \texttt{jump=1}, PC cập nhật địa chỉ nhảy bằng 200.
+                    \item \textbf{0ns -- 30ns (Tăng tuần tự):} PC tăng +4 mỗi chu kỳ (0 $\rightarrow$ 4 $\rightarrow$ 8).
+                    \item \textbf{30ns -- 40ns (Đóng băng):} \texttt{stall=1}, PC giữ nguyên giá trị bằng 8.
+                    \item \textbf{40ns -- 50ns (Rẽ nhánh):} \texttt{branch=1}, PC nhảy tới 100 (\texttt{0x64}).
+                    \item \textbf{50ns -- 60ns (Lệnh nhảy):} \texttt{jump=1}, PC nhảy tới 200 (\texttt{0xC8}).
                 \end{itemize}
             \end{block}
         \end{column}

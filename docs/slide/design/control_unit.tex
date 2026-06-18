@@ -102,7 +102,7 @@
         \item \textbf{Cơ chế Hazard:} Nhận tín hiệu \texttt{hold} khi kích hoạt \texttt{Load-Use Stall} hoặc \texttt{Memory Stall} để đóng băng trạng thái; nhận tín hiệu \texttt{clear} để thực hiện \texttt{Flush} lệnh rác khi rẽ nhánh \texttt{Taken} sai.
     \end{itemize}
 
-    \begin{block}{Sơ đồ Input Output - IF/ID Register}
+    \begin{block}{Sơ đồ Input Output- \texttt{if\_id.v}}
         \centering
         \begin{tikzpicture}[
             block/.style={draw, thick, fill=blue!10, draw=DeepBlue, minimum width=3.2cm, minimum height=1.8cm, rounded corners, font=\small\bfseries, align=center},
@@ -128,7 +128,7 @@
 \end{frame}
 
 \begin{frame}{Pipeline Registers Unit Testing - IF/ID}
-    \begin{block}{1. Kết quả Simulation IF/ID}
+    \begin{block}{1. Kết quả Simulation \texttt{if\_id}}
         \centering
         \includegraphics[width=0.9\textwidth]{design/test/if_id.png}
     \end{block}
@@ -142,7 +142,7 @@
         \item \textbf{Cơ chế Hazard:} Nhận tín hiệu \texttt{clear = 1} để chủ động chèn một \texttt{Bubble} (\texttt{NOP}) vào tầng \texttt{Execute} khi xảy ra xung đột \texttt{Load-Use}.
     \end{itemize}
 
-    \begin{block}{Sơ đồ Input Output - ID/EX Register}
+    \begin{block}{Sơ đồ Input Output - \texttt{id\_ex.v}}
         \centering
         \begin{tikzpicture}[
             block/.style={draw, thick, fill=blue!10, draw=DeepBlue, minimum width=3.2cm, minimum height=2.2cm, rounded corners, font=\small\bfseries, align=center},
@@ -171,7 +171,7 @@
 \end{frame}
 
 \begin{frame}
-    \begin{block}{2. Kết quả Simulation ID/EX}
+    \begin{block}{2. Kết quả Simulation \texttt{id\_ex}}
         \centering
         \begin{columns}
             \begin{column}{0.5\textwidth}
@@ -193,7 +193,7 @@
         \item \textbf{Cơ chế Hazard:} Nhận tín hiệu \texttt{hold} từ mạch \texttt{Memory Stall} (\texttt{mem\_wait}) nhằm giữ nguyên thông tin khi \texttt{Shared Bus} đang bận phân xử quyền truy cập bộ nhớ đa nhân.
     \end{itemize}
 
-    \begin{block}{Sơ đồ Input Output - EX/MEM Register}
+    \begin{block}{Sơ đồ Input Output - \texttt{ex\_mem.v}}
         \centering
         \begin{tikzpicture}[
             block/.style={draw, thick, fill=blue!10, draw=DeepBlue, minimum width=3.2cm, minimum height=2.0cm, rounded corners, font=\small\bfseries, align=center},
@@ -218,7 +218,7 @@
 \end{frame}
 
 \begin{frame}{Pipeline Registers Unit Testing - EX/MEM}
-    \begin{block}{3. Kết quả Simulation EX/MEM}
+    \begin{block}{3. Kết quả Simulation \texttt{ex\_mem}}
         \centering
         \includegraphics[width=0.9\textwidth]{design/test/ex_mem.png}
     \end{block}
@@ -232,7 +232,7 @@
         \item \textbf{Cơ chế Hazard (Đã vá lỗi):} Loại bỏ hoàn toàn chân \texttt{clear} độc hại, chuyển sang sử dụng chân \texttt{hold} đồng bộ. Khi gặp \texttt{Memory Stall}, dữ liệu tầng này đứng im để bảo toàn dữ liệu, tránh lỗi mất thông tin trên \texttt{Pipeline}.
     \end{itemize}
 
-    \begin{block}{Sơ đồ Input Output - MEM/WB Register}
+    \begin{block}{Sơ đồ Input Output - \texttt{mem\_wb.v}}
         \centering
         \begin{tikzpicture}[
             block/.style={draw, thick, fill=blue!10, draw=DeepBlue, minimum width=3.2cm, minimum height=2.0cm, rounded corners, font=\small\bfseries, align=center},
@@ -257,7 +257,7 @@
 \end{frame}
 
 \begin{frame}{Pipeline Registers Unit Testing - MEM\\WB}
-    \begin{block}{4. Kết quả Simulation MEM/WB}
+    \begin{block}{4. Kết quả Simulation \texttt{mem\_wb}}
         \centering
         \includegraphics[width=0.9\textwidth]{design/test/mem_wb.png}
     \end{block}
