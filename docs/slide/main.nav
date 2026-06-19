@@ -88,9 +88,9 @@
 \headcommand {\beamer@framepages {31}{31}}
 \headcommand {\slideentry {3}{2}{14}{32/32}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {32}{32}}
-\headcommand {\beamer@subsubsectionentry {0}{3}{2}{2}{33}{Bộ phân xử và kết nối đa nhân (Interconnect)}}
 \headcommand {\slideentry {3}{2}{15}{33/33}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {33}{33}}
+\headcommand {\beamer@subsubsectionentry {0}{3}{2}{2}{34}{Bộ phân xử và kết nối đa nhân (Interconnect)}}
 \headcommand {\slideentry {3}{2}{16}{34/34}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {34}{34}}
 \headcommand {\slideentry {3}{2}{17}{35/35}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
@@ -103,8 +103,10 @@
 \headcommand {\beamer@framepages {38}{38}}
 \headcommand {\slideentry {3}{2}{21}{39/39}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {39}{39}}
-\headcommand {\beamer@partpages {1}{39}}
-\headcommand {\beamer@subsectionpages {19}{39}}
-\headcommand {\beamer@sectionpages {17}{39}}
-\headcommand {\beamer@documentpages {39}}
-\headcommand {\gdef \inserttotalframenumber {39}}
+\headcommand {\slideentry {3}{2}{22}{40/40}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
+\headcommand {\beamer@framepages {40}{40}}
+\headcommand {\beamer@partpages {1}{40}}
+\headcommand {\beamer@subsectionpages {19}{40}}
+\headcommand {\beamer@sectionpages {17}{40}}
+\headcommand {\beamer@documentpages {40}}
+\headcommand {\gdef \inserttotalframenumber {40}}

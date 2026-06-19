@@ -35,6 +35,22 @@
         \end{tikzpicture}
     \end{block}
 \end{frame}
+
+\begin{frame}{Unit Test - Control Unit}
+
+\begin{itemize}
+    \item Nạp các mã lệnh RISC-V thực tế dưới dạng 32-bit instruction
+    \item Kiểm tra quá trình giải mã opcode, funct3 và funct7
+    \item Quan sát các tín hiệu điều khiển được sinh ra bởi Control Unit
+    \item Xác minh các trường rs1, rs2, rd và immediate được tách chính xác
+    \item Bao phủ nhiều nhóm lệnh: Arithmetic, Load/Store, Branch, Jump và Atomic
+\end{itemize}
+
+\begin{center}
+\includegraphics[width=0.9\linewidth]{design/test/control_unit.png}
+\end{center}
+
+\end{frame}
 % =============================================================================
 % PIPELINE REGISTERS
 % =============================================================================
@@ -258,7 +274,7 @@
     \end{block}
 \end{frame}
 
-\begin{frame}{Pipeline Registers Unit Testing - MEM\\WB}
+\begin{frame}{Pipeline Registers Unit Testing - MEM\_WB}
     \begin{block}{4. Kết quả Simulation \texttt{mem\_wb}}
         \centering
         \includegraphics[width=0.9\textwidth]{design/test/mem_wb.png}
