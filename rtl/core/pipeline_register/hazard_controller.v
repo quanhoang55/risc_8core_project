@@ -34,7 +34,7 @@ module hazard_controller (
 );
 
     // =========================================================================
-    // 1. Mạch Forwarding (Đã dùng always @* của Verilog tiêu chuẩn)
+    // 1. Mạch Forwarding
     // =========================================================================
     always @* begin
         // Mặc định dùng dữ liệu gốc từ Register File
