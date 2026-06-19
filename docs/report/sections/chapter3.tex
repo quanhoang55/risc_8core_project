@@ -1,6 +1,6 @@
 \chapter{Kết Quả Mô Phỏng Và Kiểm Chứng Chức Năng}
 
-Để xác minh tính đúng đắn và hiệu năng của hệ thống vi xử lý đơn nhân pipeline và đa lõi 8-Core chia sẻ RAM, các kịch bản kiểm thử (Testbench) đã được xây dựng và thực thi trên môi trường mô phỏng bằng công cụ \textbf{Icarus Verilog} kết hợp với phần mềm hiển thị dạng sóng \textbf{GTKWave}.
+Để xác minh tính đúng đắn và hiệu năng của hệ thống vi xử lý đơn nhân pipeline và đa lõi 8-Core chia sẻ RAM, các kịch bản kiểm thử (Testbench) đã được xây dựng và thực thi trên môi trường mô phỏng bằng công cụ \textbf{Icarus Verilog} \cite{icarus} kết hợp với phần mềm hiển thị dạng sóng \textbf{GTKWave} \cite{gtkwave}.
 
 \section{Kết quả kiểm chứng đơn lõi (Single-Core Verification)}
 Mục tiêu của kịch bản này là xác minh khả năng thực thi đúng đắn tập chỉ thị RV32I của lõi đơn nhân pipeline 5 tầng (\texttt{risc\_core.v}) cùng với các cơ chế gỡ lỗi xung đột (stalls và flushes).
@@ -85,6 +85,54 @@ TONG KET: 10 PASSED, 0 FAILED
 
 \section{Thảo luận và phân tích hiệu năng hệ thống}
 Kết quả thống kê thực nghiệm từ mô phỏng đa nhân mang lại những nhận định giá trị về mặt kiến trúc máy tính:
+
+\subsection{Các chỉ số hiệu năng đo được từ \texttt{system\_tb.v}}
+Bảng \ref{tab:perf_summary} tổng hợp các chỉ số đo trực tiếp từ testbench hệ thống trong 500 chu kỳ mô phỏng. Các giá trị CPI và IPC dưới đây được hiểu là chỉ số thông lượng tổng hợp của workload kiểm thử hiện tại, không phải benchmark hiệu năng chuẩn. Do chương trình thử nghiệm có vòng lặp \texttt{halt} và chưa có workload song song có kích thước tăng theo số lõi, các số này chỉ dùng để chứng minh hệ thống có retire instruction, có tranh chấp bus và không deadlock.
+
+\begin{table}[H]
+\centering
+\small
+\setlength{\tabcolsep}{5pt}
+\begin{tabularx}{\textwidth}{X r}
+\toprule
+\textbf{Chỉ số} & \textbf{Giá trị đo được} \\
+\midrule
+Tổng số chu kỳ mô phỏng & 500 \\
+Retired instruction từng core & 163, 163, 163, 162, 162, 162, 161, 161 \\
+Tổng retired instruction & 1297 \\
+CPI tổng hợp toàn hệ thống & $500 / 1297 \approx 0.385$ \\
+IPC tổng hợp toàn hệ thống & $1297 / 500 \approx 2.594$ \\
+Grant bus từng core & 3, 3, 3, 3, 3, 3, 4, 4 \\
+Tổng số grant bus & 26 \\
+Bus utilization theo grant pulse & $26 / 500 = 5.2\%$ \\
+Tổng số chu kỳ chờ bus/memory stall & 132 \\
+Trung bình memory stall mỗi core & $132 / 8 = 16.5$ \\
+\bottomrule
+\end{tabularx}
+\caption{Tổng hợp chỉ số hiệu năng đo được từ \texttt{system\_tb.v}}
+\label{tab:perf_summary}
+\end{table}
+
+\subsection{So sánh theo số lượng core}
+Bảng \ref{tab:core_scaling} ghi rõ trạng thái dữ liệu hiện có. Phiên bản báo cáo này chỉ có số liệu đầy đủ cho cấu hình 8 core từ \texttt{system\_tb.v}; các cấu hình 1, 2 và 4 core chưa có testbench hoặc workload scale tương ứng trong repo hiện tại. Vì vậy chưa thể kết luận speedup và parallel efficiency một cách nghiêm túc.
+
+\begin{table}[H]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\textwidth}{c X X X}
+\toprule
+\textbf{Số core} & \textbf{Trạng thái dữ liệu} & \textbf{Speedup} & \textbf{Parallel efficiency} \\
+\midrule
+1 & Chưa có baseline tương đương cho workload đa lõi hiện tại & Chưa kết luận & Chưa kết luận \\
+2 & Chưa có testbench riêng hoặc tham số hóa số core & Chưa kết luận & Chưa kết luận \\
+4 & Chưa có testbench riêng hoặc tham số hóa số core & Chưa kết luận & Chưa kết luận \\
+8 & Có số liệu: 500 cycle, 1297 retired, IPC $\approx 2.594$ & Chưa kết luận do thiếu baseline & Chưa kết luận do thiếu baseline \\
+\bottomrule
+\end{tabularx}
+\caption{Trạng thái so sánh hiệu năng theo số lượng core}
+\label{tab:core_scaling}
+\end{table}
 
 \begin{enumerate}
     \item \textbf{Độ tin cậy của việc đồng bộ hóa dữ liệu:} 

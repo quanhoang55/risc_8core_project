@@ -653,6 +653,7 @@ Giá trị chi tiết của các tín hiệu điều khiển tương ứng với
 \end{table}
 
 \section{Cơ chế xử lý xung đột trong Pipeline}
+Các cơ chế forwarding, stall và flush là những kỹ thuật cơ bản trong thiết kế pipeline nhằm duy trì tính đúng đắn khi các lệnh phụ thuộc dữ liệu hoặc thay đổi luồng điều khiển xuất hiện liên tiếp \cite{patterson,pipeline_hazard}.
 \begin{itemize}
     \item \textbf{Data Hazard:} Giải quyết bằng cách chèn các mạch \textbf{Forwarding} (bơm tắt kết quả từ tầng EX/MEM và MEM/WB trực tiếp về đầu vào ALU tầng EX). Đối với xung đột \textbf{Load-use hazard}, bộ xử lý chèn 1 chu kỳ \textbf{Stall} (hoãn PC và xóa tín hiệu tầng ID/EX).
     \item \textbf{Control Hazard:} Khi phát hiện branch/jump đi sai hướng, toàn bộ các lệnh đang được nạp dở ở tầng IF/ID và ID/EX sẽ bị xóa (\textbf{Flush}) bằng cách đặt cờ hiệu valid của tầng đệm về 0, chuyển lệnh thành chỉ thị rỗng NOP.
@@ -662,7 +663,7 @@ Giá trị chi tiết của các tín hiệu điều khiển tương ứng với
 Trong hệ thống đa nhân chia sẻ bộ nhớ RAM dùng chung, bộ phân xử (Arbiter) và bộ điều khiển Bus (Bus Controller) đóng vai trò trung tâm để điều phối và quản lý việc truy cập bus bộ nhớ một cách hợp lệ, tránh xung đột dữ liệu.
 
 \subsection{Thiết kế Bộ phân xử Round-Robin (\texttt{arbiter.v})}
-Bộ phân xử sử dụng thuật toán xoay vòng Round-Robin để đảm bảo tính công bằng và tránh tình trạng đói bus (starvation) của các lõi. Nguyên lý hoạt động như sau:
+Bộ phân xử sử dụng thuật toán xoay vòng Round-Robin để đảm bảo tính công bằng và tránh tình trạng đói bus (starvation) của các lõi \cite{round_robin}. Nguyên lý hoạt động như sau:
 \begin{itemize}
     \item Con trỏ ưu tiên \texttt{priority\_ptr} (3-bit) chỉ ra core có mức ưu tiên cao nhất trong chu kỳ hiện tại.
     \item Khi có nhiều core gửi yêu cầu truy cập cùng lúc (\texttt{request}), bộ phân xử sẽ quét xoay vòng từ vị trí con trỏ ưu tiên để tìm core đầu tiên có yêu cầu hợp lệ.
@@ -738,6 +739,15 @@ Bộ điều khiển bus đóng vai trò như một bộ định tuyến dữ li
     \item Dữ liệu đọc từ RAM (\texttt{dm\_rdata}) được phản hồi ngược lại cho chính xác core đang nắm giữ quyền truy cập.
     \item Hỗ trợ giao dịch nguyên tử: tích hợp các bộ chốt reservation cho lệnh \texttt{LR.W} và \texttt{SC.W} để hỗ trợ các phép toán đồng bộ hóa phần mềm (như spinlock), tránh xung đột cập nhật dữ liệu.
 \end{itemize}
+
+\section{Đặc tả giao thức bus và memory map}
+Giao thức bus của hệ thống được thiết kế đơn giản để phù hợp với phạm vi mô phỏng RTL của đồ án. Core phát sinh yêu cầu bộ nhớ khi tầng MEM gặp các lệnh \texttt{LW}, \texttt{SW}, \texttt{LR.W}, \texttt{SC.W} hoặc nhóm lệnh \texttt{AMO}. Khi đó tín hiệu \texttt{mem\_req} của core tương ứng được kéo lên mức 1 và được đưa trực tiếp vào bus qua ánh xạ \texttt{bus\_request = core\_mem\_req}. Bộ phân xử Round-Robin nhận vector request 8 bit, chọn một core thắng quyền truy cập, rồi phát \texttt{grant\_valid} và \texttt{grant\_id} trong một chu kỳ. Sau đó \texttt{bus\_ctrl} dùng \texttt{grant\_id} để chọn đúng địa chỉ, dữ liệu ghi và loại giao dịch của core được cấp quyền.
+
+Một request phải được giữ ổn định cho đến khi core nhận phản hồi hoàn tất từ \texttt{mem\_ready}/\texttt{core\_ready}. Trong các testbench mức interconnect, request được giữ qua nhiều cạnh clock và chỉ xóa sau khi dữ liệu hoặc kết quả giao dịch đã ổn định. Với giao dịch đọc thường và \texttt{LR.W}, \texttt{data\_mem} trả dữ liệu theo đường đọc bất đồng bộ nên kết quả có thể hoàn tất trong cùng grant-cycle. Với giao dịch ghi thường và \texttt{SC.W} thành công, \texttt{bus\_ctrl} kéo \texttt{dm\_we = 1} và dữ liệu được ghi vào RAM tại cạnh lên của clock. Với \texttt{AMO}, bộ điều khiển dùng nhiều pha hơn: nhận grant, đọc giá trị cũ, tính giá trị mới, ghi lại RAM và trả giá trị cũ cho core. Cách tổ chức LR/SC và AMO bám theo ý tưởng atomic memory operation của RISC-V A-extension \cite{riscv_unprivileged,riscv_atomic}.
+
+Bộ nhớ dữ liệu dùng chung là \texttt{data\_mem} gồm 1024 word, mỗi word 32 bit, tổng dung lượng 4 KB. Địa chỉ từ core là byte address, nhưng RAM chọn word bằng \texttt{addr[11:2]}, do đó hai bit thấp \texttt{addr[1:0]} bị bỏ qua. Vì vậy chương trình nên dùng địa chỉ word-aligned; RTL hiện tại chưa sinh lỗi khi địa chỉ không căn hàng mà sẽ ánh xạ về word chứa địa chỉ đó. Tương tự, hệ thống chưa có bus error hoặc exception khi truy cập vượt quá 4 KB; do chỉ lấy \texttt{addr[11:2]}, các địa chỉ ngoài vùng 4 KB có thể bị alias/wrap vào vùng RAM hiện có.
+
+Cấu trúc reservation cho LR/SC nằm trong \texttt{bus\_ctrl} với hai mảng \texttt{reservation\_valid[0:7]} và \texttt{reservation\_addr[0:7]}. Lệnh \texttt{LR.W} đọc dữ liệu và đặt reservation cho core tại địa chỉ đang truy cập. Lệnh \texttt{SC.W} thành công khi reservation của chính core còn hợp lệ và địa chỉ khớp; khi đó \texttt{core\_sc\_result = 0}, RAM được ghi dữ liệu mới và reservation bị xóa. Nếu reservation không còn hợp lệ hoặc địa chỉ không khớp, \texttt{SC.W} thất bại, \texttt{core\_sc\_result = 1} và RAM không bị ghi bởi giao dịch đó. Store hoặc AMO từ core khác vào cùng địa chỉ sẽ invalidate reservation tương ứng, giúp mô phỏng hành vi đồng bộ cơ bản trong hệ thống shared-memory multicore.
 
 \section{Tích hợp toàn hệ thống đa lõi 8-Core (\texttt{top\_8core.v})}
 Khối tích hợp mức cao nhất (\texttt{top\_8core.v}) thực hiện liên kết 8 lõi CPU đơn nhân với các khối kết nối Interconnect và bộ nhớ dùng chung. Các lõi được sinh ra tự động thông qua khối lệnh \texttt{generate} trong Verilog để đảm bảo tính modular và dễ mở rộng.
