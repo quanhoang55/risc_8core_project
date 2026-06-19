@@ -163,7 +163,7 @@ module control_unit (
             // =================================================================
             OP_I_TYPE: begin
                 reg_write = 1'b1;
-                alu_src   = 1'b1;  // Toán hạng B = immediate
+                alu_src   = 1'b1;
 
                 case (funct3)
                     3'b000: alu_control = ALU_ADD;  // ADDI
