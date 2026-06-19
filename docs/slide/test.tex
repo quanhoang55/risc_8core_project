@@ -17,7 +17,7 @@
             \midrule
             \textbf{1. Single Core} & Nạp file Hex mẫu. Xem \texttt{PC} tăng tiến và các toán hạng ALU khớp. & Hoàn thành \\
             \textbf{2. Pipeline Hazard} & Gây lỗi đọc-ghi liên tiếp. Kiểm tra tín hiệu \texttt{ForwardA/B} bật lên. & Hoàn thành \\
-            \textbf{3. Multi-Core} & Cho 8 Core cùng chạy, theo dõi tín hiệu phân phối \texttt{grant} của Arbiter. & Đang triển khai \\
+            \textbf{3. Multi-Core} & Cho 8 Core cùng chạy, theo dõi tín hiệu phân phối \texttt{grant} của Arbiter. & Hoàn thành \\
             \bottomrule
         \end{tabular}
     \end{table}
@@ -26,4 +26,127 @@
     \begin{block}{Minh chứng Thuyết trình (Bằng chứng trực quan)}
         Trong báo cáo chi tiết, chúng em sử dụng ảnh chụp Waveform từ công cụ mô phỏng để giải thích rõ ràng các pha \textbf{Cache Miss / Stall} và cách hệ thống tự động sửa sai trên dòng xung nhịp thực tế.
     \end{block}
+\end{frame}
+
+% ==========================================
+% SLIDE: KIỂM THỬ LÕI ĐƠN (SINGLE-CORE)
+% ==========================================
+\subsection{Kiểm thử Lõi đơn \& Đa nhân}
+\begin{frame}[fragile]{Kết Quả Kiểm Thử Lõi Đơn (Single-Core)}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \textbf{Kịch bản kiểm thử:}
+            \begin{itemize}
+                \item Nạp file chương trình chứa các lệnh tính toán cơ bản và rẽ nhánh.
+                \item Kiểm tra tính chính xác của Register File và Memory.
+                \item Giám sát các chỉ số tối ưu hóa Pipeline.
+            \end{itemize}
+            \begin{block}{Bằng chứng Pipeline hoạt động}
+                \scriptsize
+                \begin{itemize}
+                    \item \texttt{load\_use\_stall = 1}: Có stall khi đọc dữ liệu ngay sau lệnh tải bộ nhớ.
+                    \item \texttt{flush = 62}: Pipeline giải phóng lệnh thừa khi rẽ nhánh/nhảy.
+                    \item \texttt{retired = 67}: 67 lệnh hoàn thành chu kỳ ghi kết quả thành công.
+                \end{itemize}
+            \end{block}
+        \end{column}
+        
+        \begin{column}{0.5\textwidth}
+            \begin{block}{Kết quả chạy Testbench (\texttt{core\_tb.v})}
+                \fontsize{6pt}{7pt}\selectfont
+                \begin{verbatim}
+=======================================
+           CORE TEST RESULTS           
+=======================================
+x1 (expect 10) = 10 -> PASSED
+x2 (expect 20) = 20 -> PASSED
+x3 (expect 30) = 30 -> PASSED
+x4 (expect 30) = 30 -> PASSED
+x5 (expect 1)  = 1  -> PASSED
+mem[0] (expect 30) = 30 -> PASSED
+
+PIPELINE EVIDENCE:
+retired=67 mem_stall=4 load_use_stall=1 flush=62
+
+SUMMARY: 7 PASSED, 0 FAILED
+=======================================
+                \end{verbatim}
+            \end{block}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% ==========================================
+% SLIDE: KIỂM THỬ TOÀN HỆ THỐNG (8-CORE)
+% ==========================================
+\begin{frame}[fragile]{Kết Quả Kiểm Thử Hệ Thống 8-Core}
+    \begin{columns}[T]
+        \begin{column}{0.45\textwidth}
+            \textbf{Đánh giá Hiệu năng Hệ thống:}
+            \begin{itemize}
+                \item 8 core chạy song song, ghi/đọc RAM dùng chung không bị deadlock.
+                \item Tín hiệu cấp phát bus của Arbiter công bằng cho tất cả các nhân.
+            \end{itemize}
+            
+            \begin{block}{Chỉ số Giám sát Bus \& Pipeline}
+                \scriptsize
+                \begin{itemize}
+                    \item Cả 8 core đều có chỉ số \texttt{grant > 0} (được cấp bus) và \texttt{retired > 0} (hoàn thành lệnh).
+                    \item \texttt{mem\_stall} xuất hiện hợp lý thể hiện độ trễ xếp hàng khi tranh chấp tài nguyên bộ nhớ.
+                \end{itemize}
+            \end{block}
+        \end{column}
+        
+        \begin{column}{0.55\textwidth}
+            \begin{block}{Kết quả chạy Testbench Hệ thống (\texttt{system\_tb.v})}
+                \fontsize{5pt}{6pt}\selectfont
+                \begin{verbatim}
+============================================================
+                  SYSTEM TEST SUMMARIES
+============================================================
+Core 0: retired=16 mem_stall=27 load_use_stall=0 flush=3 grant=4
+Core 1: retired=16 mem_stall=29 load_use_stall=0 flush=3 grant=4
+Core 2: retired=16 mem_stall=31 load_use_stall=0 flush=3 grant=4
+Core 3: retired=16 mem_stall=33 load_use_stall=0 flush=3 grant=4
+Core 4: retired=16 mem_stall=35 load_use_stall=0 flush=3 grant=4
+Core 5: retired=16 mem_stall=37 load_use_stall=0 flush=3 grant=4
+Core 6: retired=16 mem_stall=39 load_use_stall=0 flush=3 grant=4
+Core 7: retired=16 mem_stall=41 load_use_stall=0 flush=3 grant=4
+
+TONG KET: 10 PASSED, 0 FAILED
+============================================================
+                \end{verbatim}
+            \end{block}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% ==========================================
+% SLIDE: GIẢN ĐỒ SÓNG (WAVEFORMS)
+% ==========================================
+\subsection{Phân tích Waveform}
+\begin{frame}{Minh Chứng Waveform Mô Phỏng}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{block}{Kiểm thử khối ALU đơn nhân (\texttt{alu\_test.png})}
+                \centering
+                \includegraphics[width=0.95\textwidth]{design/test/alu_test.png}
+            \end{block}
+            \scriptsize
+            \begin{itemize}
+                \item Waveform xác nhận các phép toán cộng, trừ, logic AND/OR hoạt động chính xác tương ứng với các mã opcode từ Control Unit.
+            \end{itemize}
+        \end{column}
+        
+        \begin{column}{0.5\textwidth}
+            \begin{block}{Kiểm thử Logic PC (\texttt{pc\_test.png})}
+                \centering
+                \includegraphics[width=0.95\textwidth]{design/test/pc_test.png}
+            \end{block}
+            \scriptsize
+            \begin{itemize}
+                \item Tín hiệu Program Counter tăng tiến tuần tự và rẽ nhánh chính xác khi phát hiện các điều kiện nhảy.
+            \end{itemize}
+        \end{column}
+    \end{columns}
 \end{frame}

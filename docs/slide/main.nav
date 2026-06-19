@@ -91,19 +91,12 @@
 \headcommand {\beamer@framepages {31}{31}}
 \headcommand {\slideentry {3}{2}{13}{32/32}{Các khối xử lý logic chức năng}{0}}
 \headcommand {\beamer@framepages {32}{32}}
-<<<<<<< HEAD
-\headcommand {\slideentry {3}{2}{15}{33/33}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
-\headcommand {\beamer@framepages {33}{33}}
-\headcommand {\beamer@subsubsectionentry {0}{3}{2}{2}{34}{Bộ phân xử và kết nối đa nhân (Interconnect)}}
-\headcommand {\slideentry {3}{2}{16}{34/34}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
-=======
 \headcommand {\beamer@subsubsectionentry {0}{3}{2}{5}{33}{Bộ nhớ dữ liệu (Data Memory)}}
 \headcommand {\slideentry {3}{2}{14}{33/33}{Các khối xử lý logic chức năng}{0}}
 \headcommand {\beamer@framepages {33}{33}}
 \headcommand {\beamer@subsectionpages {20}{33}}
 \headcommand {\beamer@subsectionentry {0}{3}{3}{34}{Kiến trúc Pipeline và Logic Điều khiển}}
 \headcommand {\slideentry {3}{3}{1}{34/34}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
->>>>>>> 9d49b563b63ea37b87faa3d991e32949db22358e
 \headcommand {\beamer@framepages {34}{34}}
 \headcommand {\beamer@subsubsectionentry {0}{3}{3}{1}{35}{Thanh ghi đệm Pipeline Registers và Control Unit}}
 \headcommand {\slideentry {3}{3}{2}{35/35}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
@@ -116,15 +109,6 @@
 \headcommand {\beamer@framepages {38}{38}}
 \headcommand {\slideentry {3}{3}{6}{39/39}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {39}{39}}
-<<<<<<< HEAD
-\headcommand {\slideentry {3}{2}{22}{40/40}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
-\headcommand {\beamer@framepages {40}{40}}
-\headcommand {\beamer@partpages {1}{40}}
-\headcommand {\beamer@subsectionpages {19}{40}}
-\headcommand {\beamer@sectionpages {17}{40}}
-\headcommand {\beamer@documentpages {40}}
-\headcommand {\gdef \inserttotalframenumber {40}}
-=======
 \headcommand {\slideentry {3}{3}{7}{40/40}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {40}{40}}
 \headcommand {\slideentry {3}{3}{8}{41/41}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
@@ -141,9 +125,9 @@
 \headcommand {\beamer@framepages {46}{46}}
 \headcommand {\slideentry {3}{3}{14}{47/47}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {47}{47}}
-\headcommand {\beamer@subsubsectionentry {0}{3}{3}{2}{48}{Bộ phân xử và kết nối đa nhân (Interconnect)}}
 \headcommand {\slideentry {3}{3}{15}{48/48}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {48}{48}}
+\headcommand {\beamer@subsubsectionentry {0}{3}{3}{2}{49}{Bộ phân xử và kết nối đa nhân (Interconnect)}}
 \headcommand {\slideentry {3}{3}{16}{49/49}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {49}{49}}
 \headcommand {\slideentry {3}{3}{17}{50/50}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
@@ -156,9 +140,33 @@
 \headcommand {\beamer@framepages {53}{53}}
 \headcommand {\slideentry {3}{3}{21}{54/54}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {54}{54}}
-\headcommand {\beamer@partpages {1}{54}}
-\headcommand {\beamer@subsectionpages {34}{54}}
-\headcommand {\beamer@sectionpages {17}{54}}
-\headcommand {\beamer@documentpages {54}}
-\headcommand {\gdef \inserttotalframenumber {54}}
->>>>>>> 9d49b563b63ea37b87faa3d991e32949db22358e
+\headcommand {\slideentry {3}{3}{22}{55/55}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
+\headcommand {\beamer@framepages {55}{55}}
+\headcommand {\beamer@sectionpages {17}{55}}
+\headcommand {\beamer@subsectionpages {34}{55}}
+\headcommand {\sectionentry {4}{Chiến Lược Kiểm Thử (Testing)}{56}{Chiến Lược Kiểm Thử (Testing)}{0}}
+\headcommand {\beamer@subsectionpages {56}{55}}
+\headcommand {\beamer@subsectionentry {0}{4}{1}{56}{Kế hoạch \& Trạng thái kiểm thử}}
+\headcommand {\slideentry {4}{1}{1}{56/56}{Kế hoạch \& Trạng thái kiểm thử}{0}}
+\headcommand {\beamer@framepages {56}{56}}
+\headcommand {\slideentry {4}{1}{2}{57/57}{Kế hoạch \& Trạng thái kiểm thử}{0}}
+\headcommand {\beamer@framepages {57}{57}}
+\headcommand {\beamer@subsectionpages {56}{57}}
+\headcommand {\beamer@subsectionentry {0}{4}{2}{58}{Kiểm thử Lõi đơn \& Đa nhân}}
+\headcommand {\slideentry {4}{2}{1}{58/58}{Kiểm thử Lõi đơn \& Đa nhân}{0}}
+\headcommand {\beamer@framepages {58}{58}}
+\headcommand {\slideentry {4}{2}{2}{59/59}{Kiểm thử Lõi đơn \& Đa nhân}{0}}
+\headcommand {\beamer@framepages {59}{59}}
+\headcommand {\slideentry {4}{2}{3}{60/60}{Kiểm thử Lõi đơn \& Đa nhân}{0}}
+\headcommand {\beamer@framepages {60}{60}}
+\headcommand {\beamer@subsectionpages {58}{60}}
+\headcommand {\beamer@subsectionentry {0}{4}{3}{61}{Phân tích Waveform}}
+\headcommand {\slideentry {4}{3}{1}{61/61}{Phân tích Waveform}{0}}
+\headcommand {\beamer@framepages {61}{61}}
+\headcommand {\slideentry {4}{3}{2}{62/62}{Phân tích Waveform}{0}}
+\headcommand {\beamer@framepages {62}{62}}
+\headcommand {\beamer@partpages {1}{62}}
+\headcommand {\beamer@subsectionpages {61}{62}}
+\headcommand {\beamer@sectionpages {56}{62}}
+\headcommand {\beamer@documentpages {62}}
+\headcommand {\gdef \inserttotalframenumber {62}}
