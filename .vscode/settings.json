@@ -1,0 +1,14 @@
+{
+  "latex-workshop.formatting.latex": "latexindent",
+  "files.exclude": {
+    "**/*.aux": true,
+    "**/*.fls": true,
+    "**/*.log": true,
+    "**/*.fdb_latexmk": true,
+    "**/*.synctex.gz": true,
+    "**/*.toc": true,
+    "**/*.nav": true,
+    "**/*.snm": true,
+    "**/*.out": true
+  }
+}

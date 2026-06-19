@@ -9,7 +9,60 @@
 \section{Hướng phát triển đề tài}
 \begin{enumerate}
     \item Thiết kế bộ nhớ đệm L1 Cache riêng cho từng core.
-    \item Hiện thực hóa bộ điều khiển tính nhất quán bộ nhớ đệm (Cache Coherence Controller) theo giao thức MESI hoặc Snooping.
+    \item Hiện thực hóa bộ điều khiển tính nhất quán bộ nhớ đệm (Cache Coherence Controller) theo giao thức MESI hoặc Snooping \cite{mesi_coherence}.
     \item Nâng cấp lõi CPU lên kiến trúc RV32IM hoàn chỉnh.
 \end{enumerate}
 
+\section{Khả năng tái lập}
+Để người đọc có thể tái lập kết quả mô phỏng, báo cáo sử dụng trạng thái mã nguồn tại commit \texttt{e7889c8}. Môi trường chạy hiện tại là Windows với PowerShell. Các phiên bản công cụ có thể kiểm tra bằng các lệnh:
+
+\begin{lstlisting}[language=bash, caption={Kiểm tra phiên bản công cụ mô phỏng}]
+iverilog -V
+vvp -V
+gtkwave --version
+\end{lstlisting}
+
+Cấu trúc thư mục chính của dự án gồm:
+\begin{itemize}
+    \item \texttt{rtl/core}: các module lõi CPU, ALU, control unit, PC logic, register file và pipeline register.
+    \item \texttt{rtl/interconnect}: bộ phân xử \texttt{arbiter.v} và bộ điều khiển bus \texttt{bus\_ctrl.v}.
+    \item \texttt{rtl/memory}: bộ nhớ lệnh và bộ nhớ dữ liệu dùng chung.
+    \item \texttt{tb}: các testbench và file waveform sinh ra khi mô phỏng.
+    \item \texttt{software}: chương trình assembly và file machine code \texttt{.hex}.
+    \item \texttt{scripts}: script hỗ trợ biên dịch/chạy mô phỏng.
+    \item \texttt{docs}: tài liệu báo cáo, slide và bằng chứng mô phỏng.
+\end{itemize}
+
+Các lệnh biên dịch và chạy mô phỏng chính:
+
+\begin{lstlisting}[language=bash, caption={Chạy test lõi đơn}]
+iverilog -g2012 -o tb/core_test.vvp \
+  -I rtl/core -I rtl/interconnect -I rtl/memory \
+  rtl/core/alu.v rtl/core/control_unit.v rtl/core/pc_logic.v \
+  rtl/core/reg_file.v rtl/core/risc_core.v \
+  rtl/memory/data_mem.v rtl/memory/instr_mem.v \
+  tb/core_tb.v
+vvp tb/core_test.vvp
+\end{lstlisting}
+
+\begin{lstlisting}[language=bash, caption={Chạy test hệ thống 8 core}]
+iverilog -g2012 -o tb/system_test.vvp \
+  -I rtl/core -I rtl/interconnect -I rtl/memory \
+  rtl/core/alu.v rtl/core/control_unit.v rtl/core/pc_logic.v \
+  rtl/core/reg_file.v rtl/core/risc_core.v \
+  rtl/memory/data_mem.v rtl/memory/instr_mem.v \
+  rtl/interconnect/arbiter.v rtl/interconnect/bus_ctrl.v \
+  rtl/top_8core.v tb/system_tb.v
+vvp tb/system_test.vvp
+\end{lstlisting}
+
+\begin{lstlisting}[language=bash, caption={Chạy test interconnect}]
+iverilog -g2012 -o interconnect_test.vvp \
+  rtl/interconnect/arbiter.v rtl/interconnect/bus_ctrl.v \
+  rtl/memory/data_mem.v tb/interconnect_tb.v
+vvp interconnect_test.vvp
+\end{lstlisting}
+
+Output kỳ vọng lần lượt là \texttt{SUMMARY: 7 PASSED, 0 FAILED} với \texttt{core\_tb}, \texttt{TONG KET: 10 PASSED, 0 FAILED} với \texttt{system\_tb}, và \texttt{SUMMARY: 10 PASSED, 0 FAILED} với \texttt{interconnect\_tb}. Các file \texttt{.vcd} sinh ra có thể mở bằng GTKWave để quan sát tín hiệu pipeline, bus grant, request, ready và dữ liệu bộ nhớ.
+
+Các file \texttt{.hex} hiện được lưu sẵn cùng mã nguồn assembly trong thư mục \texttt{software}. Repo hiện chưa có assembler tự động từ \texttt{.asm} sang \texttt{.hex}; khi thay đổi chương trình assembly, cần tự chuyển sang machine code đúng định dạng \texttt{\$readmemh} rồi cập nhật file \texttt{.hex} tương ứng.

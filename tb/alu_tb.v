@@ -22,6 +22,9 @@ module alu_tb();
     localparam AND  = 4'b0000;
     localparam OR   = 4'b0001;
     localparam ADD  = 4'b0010;
+    localparam SLL  = 4'b0011;
+    localparam XOR  = 4'b0100;
+    localparam SRL  = 4'b0101;
     localparam SUB  = 4'b0110;
     localparam SLT  = 4'b0111;
 
@@ -58,6 +61,26 @@ module alu_tb();
         a = -32'd10; b = 32'd5; alu_control = SLT;
         #10;
         $display("%9d | 0x%08h (%11d) | 0x%08h (%11d) |   SLT    | 0x%08h (%11d) |  %b  ", $time, a, $signed(a), b, $signed(b), result, $signed(result), zero);
+
+        // Test Case 6: Phép toán logic OR
+        a = 32'hF0F0_FFFF; b = 32'h0F0F_0000; alu_control = OR;
+        #10;
+        $display("%9d | 0x%08h (%11d) | 0x%08h (%11d) |    OR    | 0x%08h (%11d) |  %b  ", $time, a, $signed(a), b, $signed(b), result, $signed(result), zero);
+
+        // Test Case 7: Phép toán logic XOR
+        a = 32'hF0F0_FFFF; b = 32'hFFFF_0000; alu_control = XOR;
+        #10;
+        $display("%9d | 0x%08h (%11d) | 0x%08h (%11d) |   XOR    | 0x%08h (%11d) |  %b  ", $time, a, $signed(a), b, $signed(b), result, $signed(result), zero);
+
+        // Test Case 8: Dịch trái logic (SLL) - dịch 4 bit
+        a = 32'h0000_000F; b = 32'd4; alu_control = SLL;
+        #10;
+        $display("%9d | 0x%08h (%11d) | 0x%08h (%11d) |   SLL    | 0x%08h (%11d) |  %b  ", $time, a, $signed(a), b, $signed(b), result, $signed(result), zero);
+
+        // Test Case 9: Dịch phải logic (SRL) - dịch 4 bit
+        a = 32'hF000_0000; b = 32'd4; alu_control = SRL;
+        #10;
+        $display("%9d | 0x%08h (%11d) | 0x%08h (%11d) |   SRL    | 0x%08h (%11d) |  %b  ", $time, a, $signed(a), b, $signed(b), result, $signed(result), zero);
 
         $display("----------|----------------------------------|----------------------------------|----------|----------------------------------|------");
         $display("Kiem tra ket thuc.");

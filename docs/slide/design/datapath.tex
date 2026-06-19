@@ -287,11 +287,11 @@ endmodule
         \end{column}
     \end{columns}
 \end{frame}
-\begin{frame}[fragile]{PC Logic: Kết quả mô phỏng \& Giản đồ sóng}
-    \begin{columns}[t]
-        \begin{column}{0.48\textwidth}
+\begin{frame}[fragile]{PC Logic: Kết Quả Mô Phỏng Console}
+    \begin{columns}
+        \begin{column}{0.55\textwidth}
             \begin{block}{Console Output (\$monitor)}
-                \begin{lstlisting}[basicstyle=\fontsize{5.5pt}{6.5pt}\selectfont\ttfamily]
+                \begin{lstlisting}[basicstyle=\fontsize{6.5pt}{7.5pt}\selectfont\ttfamily, numbers=none]
 Time=0 | PC=         0 | stall=0 | branch=0 | jump=0
 Time=15000 | PC=         4 | stall=0 | branch=0 | jump=0
 Time=25000 | PC=         8 | stall=0 | branch=0 | jump=0
@@ -308,21 +308,36 @@ tb/pc_logic_tb.v:63: $finish called at 80000 (1ps)
             \end{block}
         \end{column}
         
-        \begin{column}{0.48\textwidth}
-            \begin{block}{Giản đồ sóng (Waveform)}
-                \centering
-                \vspace{0.1cm}
-                \includegraphics[width=\textwidth]{pc_logic_wave.png}
-                \vspace{0.2cm}
+        \begin{column}{0.41\textwidth}
+            \begin{block}{Phân tích kịch bản kiểm thử}
                 \scriptsize
                 \begin{itemize}
-                    \item \textbf{Stall (30-40ns):} PC giữ nguyên giá trị cũ (= 8).
-                    \item \textbf{Branch (40-50ns):} PC nhảy tới `0x64` (= 100).
-                    \item \textbf{Jump (50-60ns):} PC nhảy tới `0xC8` (= 200).
+                    \item \textbf{0ns -- 30ns (Tăng tuần tự):} PC tăng +4 mỗi chu kỳ (0 $\rightarrow$ 4 $\rightarrow$ 8).
+                    \item \textbf{30ns -- 40ns (Đóng băng):} \texttt{stall=1}, PC giữ nguyên giá trị bằng 8.
+                    \item \textbf{40ns -- 50ns (Rẽ nhánh):} \texttt{branch=1}, PC nhảy tới 100 (\texttt{0x64}).
+                    \item \textbf{50ns -- 60ns (Lệnh nhảy):} \texttt{jump=1}, PC nhảy tới 200 (\texttt{0xC8}).
                 \end{itemize}
             \end{block}
         \end{column}
     \end{columns}
+\end{frame}
+
+\begin{frame}{PC Logic: Giản Đồ Sóng Mô Phỏng (GTKWave)}
+    \begin{block}{Giản đồ sóng chi tiết}
+        \centering
+        \vspace{0.05cm}
+        \includegraphics[width=0.98\textwidth]{design/test/pc_test.png}
+        \vspace{0.05cm}
+    \end{block}
+    \vspace{0.1cm}
+    \begin{block}{Nhận xét kết quả trên dạng sóng}
+        \scriptsize
+        \begin{itemize}
+            \item \textbf{Thời điểm 30ns (Stall):} Khi \texttt{stall} lên 1, giá trị PC được chốt giữ nguyên ở mức 8 tại sườn lên clock tiếp theo.
+            \item \textbf{Thời điểm 40ns (Branch):} Địa chỉ rẽ nhánh \texttt{branch\_target} = \texttt{0x00000064} (100) được nạp thành công vào PC.
+            \item \textbf{Thời điểm 50ns (Jump):} Địa chỉ nhảy \texttt{jump\_target} = \texttt{0x000000C8} (200) được cập nhật thành công vào PC.
+        \end{itemize}
+    \end{block}
 \end{frame}
 \subsubsection{Khối Tập thanh ghi (Register File)}
 \begin{frame}[fragile]{Khối Tập Thanh Ghi (\texttt{reg\_file.v})}
@@ -483,11 +498,14 @@ module alu_tb();
         .result(result), .zero(zero)
     );
 
-    localparam AND = 4'b0000;
-    localparam OR  = 4'b0001;
-    localparam ADD = 4'b0010;
-    localparam SUB = 4'b0110;
-    localparam SLT = 4'b0111;
+    localparam AND  = 4'b0000;
+    localparam OR   = 4'b0001;
+    localparam ADD  = 4'b0010;
+    localparam SLL  = 4'b0011;
+    localparam XOR  = 4'b0100;
+    localparam SRL  = 4'b0101;
+    localparam SUB  = 4'b0110;
+    localparam SLT  = 4'b0111;
                 \end{lstlisting}
             \end{block}
         \end{column}
@@ -498,20 +516,20 @@ module alu_tb();
     initial begin
         $dumpfile("tb/alu_tb.vcd");
         $dumpvars(0, alu_tb);
-
-        // Case 1: Phep cong (ADD)
-        a = 32'd10; b = 32'd20; alu_control = ADD; #10;
-        
-        // Case 2: Phep tru (SUB) -> zero = 1
-        a = 32'd50; b = 32'd50; alu_control = SUB; #10;
-        
-        // Case 3: Phep logic AND
+        // Cases: ADD, SUB, AND, SLT (pos/neg)
+        a = 10; b = 20; alu_control = ADD; #10;
+        a = 50; b = 50; alu_control = SUB; #10;
         a = 32'hAAAA_AAAA; b = 32'h5555_5555; 
         alu_control = AND; #10;
-        
-        // Case 4: So sanh nho hon SLT (co dau)
-        a = -32'd10; b = 32'd5; alu_control = SLT; #10;
-        
+        a = 15; b = 25; alu_control = SLT; #10;
+        a = -10; b = 5; alu_control = SLT; #10;
+        // Cases: OR, XOR, SLL, SRL
+        a = 32'hF0F0_FFFF; b = 32'h0F0F_0000; 
+        alu_control = OR; #10;
+        a = 32'hF0F0_FFFF; b = 32'hFFFF_0000; 
+        alu_control = XOR; #10;
+        a = 32'h0000_000F; b = 4; alu_control = SLL; #10;
+        a = 32'hF000_0000; b = 4; alu_control = SRL; #10;
         $finish;
     end
                 \end{lstlisting}
@@ -521,11 +539,11 @@ module alu_tb();
 \end{frame}
 
 \begin{frame}[fragile]{ALU: Kết quả mô phỏng Console}
-    Mô phỏng thực thi chính xác các phép tính và kiểm chứng cờ rẽ nhánh:
-    \vspace{0.2cm}
+    Mô phỏng thực thi chính xác toàn bộ 9 kịch bản kiểm thử trên Console:
+    \vspace{0.1cm}
     
     \begin{block}{Kết quả xuất ra màn hình (Console Output)}
-        \begin{lstlisting}[basicstyle=\fontsize{6.0pt}{7.0pt}\selectfont\ttfamily]
+        \begin{lstlisting}[basicstyle=\fontsize{5.5pt}{6.5pt}\selectfont\ttfamily]
 Time |     A (Hex) [Dec]     |     B (Hex) [Dec]     | Control |   Result [Dec]    | Zero
 -----|-----------------------|-----------------------|---------|-------------------|-----
   10 | 0x0000000a (  10)     | 0x00000014 (  20)     |   ADD   | 0x0000001e (  30) |  0
@@ -533,18 +551,23 @@ Time |     A (Hex) [Dec]     |     B (Hex) [Dec]     | Control |   Result [Dec] 
   30 | 0xaaaaaaaa (-1.43G)   | 0x55555555 ( 1.43G)   |   AND   | 0x00000000 (   0) |  1
   40 | 0x0000000f (  15)     | 0x00000019 (  25)     |   SLT   | 0x00000001 (   1) |  0
   50 | 0xfffffff6 ( -10)     | 0x00000005 (   5)     |   SLT   | 0x00000001 (   1) |  0
+  60 | 0xf0f0ffff (-252M)    | 0x0f0f0000 ( 252M)    |   OR    | 0xffffffff (  -1) |  0
+  70 | 0xf0f0ffff (-252M)    | 0xffff0000 ( -65K)    |   XOR   | 0x0f0fffff ( 252M)|  0
+  80 | 0x0000000f (  15)     | 0x00000004 (   4)     |   SLL   | 0x000000f0 ( 240) |  0
+  90 | 0xf0000000 (-268M)    | 0x00000004 (   4)     |   SRL   | 0x0f000000 ( 251M)|  0
 -----|-----------------------|-----------------------|---------|-------------------|-----
 Kiem tra ket thuc.
         \end{lstlisting}
     \end{block}
     
-    \vspace{0.1cm}
+    \vspace{-0.05cm}
     \scriptsize
     \textbf{Nhận xét kết quả:}
     \begin{itemize}
-        \item \textbf{Tính toán chính xác:} Phép `ADD` (10 + 20 = 30) và phép `SUB` (50 - 50 = 0) cho kết quả khớp lý thuyết.
-        \item \textbf{Cờ Zero:} Tự động kích hoạt lên `1` khi kết quả của phép `SUB` và `AND` bằng 0.
-        \item \textbf{Phép toán có dấu SLT:} So sánh $-10$ và $5$ cho kết quả đúng bằng `1` (SLT thực hiện so sánh có dấu \texttt{\$signed}).
+        \item \textbf{Phép toán số học \& logic:} Cộng (`ADD`), trừ (`SUB`), `AND`, `OR`, `XOR` cho kết quả chính xác 100\%.
+        \item \textbf{So sánh có dấu SLT:} Kiểm chứng đúng cho cả số dương và số âm ($-10 < 5$ ra kết quả bằng `1`).
+        \item \textbf{Dịch chuyển bit SLL/SRL:} Dịch chuyển đúng số bit được yêu cầu (ví dụ: dịch trái `0xF` đi 4 bit ra `0xF0`).
+        \item \textbf{Cờ Zero:} Tự động phản hồi lên `1` khi kết quả tính toán bằng 0 (như ở phép `SUB` và `AND`).
     \end{itemize}
 \end{frame}
 
@@ -552,7 +575,7 @@ Kiem tra ket thuc.
     \begin{block}{Giản đồ sóng chi tiết thu được từ bộ mô phỏng}
         \centering
         \vspace{0.05cm}
-        \includegraphics[width=0.95\textwidth]{alu_wave.png}
+        \includegraphics[width=0.95\textwidth]{design/test/alu_test.png}
         \vspace{0.05cm}
     \end{block}
     \vspace{0.15cm}
@@ -563,7 +586,7 @@ Kiem tra ket thuc.
             \scriptsize
             \begin{itemize}
                 \item \texttt{a[31:0]}, \texttt{b[31:0]}: Toán hạng ngõ vào (dạng Hex).
-                \item \texttt{alu\_control[3:0]}: Mã phép toán điều khiển (\texttt{2}=ADD, \texttt{6}=SUB, \texttt{0}=AND, \texttt{7}=SLT).
+                \item \texttt{alu\_control[3:0]}: Mã lệnh điều khiển (\texttt{2}=ADD, \texttt{6}=SUB, \texttt{0}=AND, \texttt{7}=SLT, \texttt{1}=OR, \texttt{4}=XOR, \texttt{3}=SLL, \texttt{5}=SRL).
             \end{itemize}
         \end{column}
         
@@ -579,33 +602,6 @@ Kiem tra ket thuc.
     \end{columns}
 \end{frame}
 
-\begin{frame}{ALU: Phân Tích Chi Tiết Sóng Mô Phỏng}
-    \begin{columns}
-        \begin{column}{0.58\textwidth}
-            \begin{block}{Phân tích 5 Test Case thực thi}
-                \scriptsize
-                \begin{itemize}
-                    \item \textbf{0ns - 10ns (ADD):} $10 + 20 = 30$ (\texttt{0x1E}). Kết quả khác 0 $\rightarrow$ cờ \texttt{zero = 0}.
-                    \item \textbf{10ns - 20ns (SUB):} $50 - 50 = 0$. Kết quả bằng 0 $\rightarrow$ cờ \texttt{zero = 1} kéo lên mức cao.
-                    \item \textbf{20ns - 30ns (AND):} \texttt{0xAAAAAAAA} AND \texttt{0x55555555} = $0$. Cờ \texttt{zero} tiếp tục giữ ở mức cao.
-                    \item \textbf{30ns - 40ns (SLT - Số dương):} So sánh $15 < 25$ (Đúng $\rightarrow$ \texttt{result = 1}). Cờ \texttt{zero = 0}.
-                    \item \textbf{40ns - 50ns (SLT - Số âm):} So sánh có dấu $-10$ (\texttt{0xFFFFFFF6}) $< 5$ (Đúng $\rightarrow$ \texttt{result = 1}).
-                \end{itemize}
-            \end{block}
-        \end{column}
-        
-        \begin{column}{0.38\textwidth}
-            \begin{block}{Nhận xét kỹ thuật}
-                \scriptsize
-                \begin{itemize}
-                    \item Phép so sánh \texttt{SLT} hoạt động chính xác với số âm (\texttt{\$signed}) nhờ biểu diễn bù 2, không bị nhầm lẫn với số không dấu.
-                    \item Cờ \texttt{zero} phản hồi tức thời theo giá trị của \texttt{result}.
-                    \item Thiết kế ALU hoạt động đúng chức năng của tập lệnh RV32I.
-                \end{itemize}
-            \end{block}
-        \end{column}
-    \end{columns}
-\end{frame}
 
 \subsubsection{Bộ nhớ dữ liệu (Data Memory)}
 \begin{frame}[fragile]{Bộ Nhớ Dữ Liệu Dùng Chung (\texttt{data\_mem.v})}
@@ -618,19 +614,22 @@ Kiem tra ket thuc.
             \begin{tikzpicture}[
                 block/.style={draw, thick, fill=blue!10, draw=DeepBlue, minimum width=3.0cm, minimum height=2.4cm, rounded corners, font=\scriptsize\bfseries, align=center},
                 bus/.style={->, >=stealth, double, double distance=1.5pt, thick, DeepBlue},
-                wire/.style={->, >=stealth, thick, DeepBlue}
+                ctrl/.style={->, >=stealth, thick, red!70!black}
             ]
                 % Main Block
                 \node[block] (mem) at (0, 0) {Shared RAM 4KB\\[0.1cm]\tiny (\texttt{data\_mem.v})};
                 
-                % Inputs (Left side)
-                \draw[wire] (-2.2, 0.9) -- node[above, font=\tiny\bfseries] {clk} ([yshift=0.9cm]mem.west);
-                \draw[wire] (-2.2, 0.5) -- node[above, font=\tiny\bfseries] {reset} ([yshift=0.5cm]mem.west);
-                \draw[bus] (-2.2, 0.1) -- node[above=0.01cm, font=\tiny\bfseries] {addr[31:0]} ([yshift=0.1cm]mem.west);
-                \draw[bus] (-2.2, -0.4) -- node[above=0.01cm, font=\tiny\bfseries] {wdata[31:0]} ([yshift=-0.4cm]mem.west);
-                \draw[wire] (-2.2, -0.9) -- node[above, font=\tiny\bfseries] {we} ([yshift=-0.9cm]mem.west);
+                % Control Inputs (Left side - Red lines)
+                \draw[ctrl] (-2.2, 0.9) -- node[above, font=\tiny\bfseries] {clk} ([yshift=0.9cm]mem.west);
+                \draw[ctrl] (-2.2, 0.6) -- node[above, font=\tiny\bfseries] {reset} ([yshift=0.6cm]mem.west);
+                \draw[ctrl] (-2.2, 0.3) -- node[above, font=\tiny\bfseries] {we} ([yshift=0.3cm]mem.west);
+                \draw[ctrl] (-2.2, 0.0) -- node[above, font=\tiny\bfseries] {re} ([yshift=0.0cm]mem.west);
                 
-                % Outputs (Right side)
+                % Data/Address Inputs (Left side - Double Blue lines)
+                \draw[bus] (-2.2, -0.4) -- node[above=0.01cm, font=\tiny\bfseries] {addr[31:0]} ([yshift=-0.4cm]mem.west);
+                \draw[bus] (-2.2, -0.8) -- node[above=0.01cm, font=\tiny\bfseries] {wdata[31:0]} ([yshift=-0.8cm]mem.west);
+                
+                % Data Outputs (Right side - Double Blue line)
                 \draw[bus] (mem.east) -- node[above=0.01cm, font=\tiny\bfseries] {rdata[31:0]} (2.2, 0);
             \end{tikzpicture}
             

@@ -65,9 +65,7 @@
   \begin{frame}{Nội Dung Báo Cáo}
     \tableofcontents[
       currentsection,
-      currentsubsection,
-      subsectionstyle=show/shaded/hide,
-      subsubsectionstyle=hide
+      subsectionstyle=show/shaded/hide
     ]
   \end{frame}
 }
@@ -79,14 +77,14 @@
 % ==========================================
 {\setbeamercolor{background canvas}{bg=LightGray}
 \begin{frame}[plain]
-    \titlepage
+  \titlepage
 \end{frame}}
 
 % ==========================================
 % SLIDE 2: MỤC LỤC
 % ==========================================
 \begin{frame}{Nội Dung Báo Cáo}
-    \tableofcontents[subsubsectionstyle=hide]
+  \tableofcontents[subsubsectionstyle=hide]
 \end{frame}
 
 \input{introduction.tex}
@@ -99,47 +97,47 @@
 
 \subsection{Cấu trúc tổng thể}
 \begin{frame}{Cấu Trúc Tổng Thể Hệ Thống 8-Core}
-    \centering
-    \begin{tikzpicture}[
-        node distance=0.8cm and 1.2cm,
-        core/.style={draw, fill=blue!10, minimum width=2.2cm, minimum height=0.6cm, font=\scriptsize\bfseries, align=center},
-        bus/.style={draw, fill=orange!15, minimum width=3.2cm, minimum height=1.0cm, font=\scriptsize\bfseries, align=center},
-        arb/.style={draw, fill=green!15, minimum width=3.2cm, minimum height=0.8cm, font=\scriptsize\bfseries, align=center},
-        mem/.style={draw, fill=yellow!15, minimum width=3.2cm, minimum height=1.0cm, font=\scriptsize\bfseries, align=center}
+  \centering
+  \begin{tikzpicture}[
+      node distance=0.8cm and 1.2cm,
+      core/.style={draw, fill=blue!10, minimum width=2.2cm, minimum height=0.6cm, font=\scriptsize\bfseries, align=center},
+      bus/.style={draw, fill=orange!15, minimum width=3.2cm, minimum height=1.0cm, font=\scriptsize\bfseries, align=center},
+      arb/.style={draw, fill=green!15, minimum width=3.2cm, minimum height=0.8cm, font=\scriptsize\bfseries, align=center},
+      mem/.style={draw, fill=yellow!15, minimum width=3.2cm, minimum height=1.0cm, font=\scriptsize\bfseries, align=center}
     ]
-        % Cores
-        \node[core] (c0) at (0, 1.2) {Core 0 (risc\_core)};
-        \node[core] (c1) at (0, 0.4) {Core 1 (risc\_core)};
-        \node[font=\bfseries] (cdot) at (0, -0.3) {\vdots};
-        \node[core] (c7) at (0, -1.0) {Core 7 (risc\_core)};
-        
-        % Bus Controller
-        \node[bus] (busctrl) at (4.8, 0.1) {Bộ Điều Khiển Bus\\(\texttt{bus\_ctrl.v})};
-        
-        % Arbiter
-        \node[arb] (arbiter) at (4.8, -1.4) {Arbiter (Round-Robin)\\(\texttt{arbiter.v})};
-        
-        % Shared Memory
-        \node[mem] (sharedmem) at (9.6, 0.1) {Bộ nhớ dùng chung\\(Shared RAM 4KB)\\(\texttt{data\_mem.v})};
-        
-        % Connections (Đã sửa lỗi cú pháp neo điểm cho tương thích babel tiếng Việt)
-        \draw[<->, >=stealth, thick, DeepBlue] (c0.east) -- (2.3, 1.2) -- (2.3, 0.5) -- (busctrl.west);
-        \draw[<->, >=stealth, thick, DeepBlue] (c1.east) -- (busctrl.west);
-        \draw[<->, >=stealth, thick, DeepBlue] (c7.east) -- (2.3, -1.0) -- (2.3, -0.3) -- (busctrl.west);
-        
-        \draw[<->, >=stealth, thick, red!70!black] (arbiter) -- node[right, font=\tiny\bfseries] {req / grant} (busctrl);
-        \draw[<->, >=stealth, thick, green!60!black] (busctrl) -- node[above, font=\tiny\bfseries] {Shared Bus} (sharedmem);
-    \end{tikzpicture}
-    
-    \vspace{0.2cm}
-    \scriptsize
-    Hệ thống kết nối đa nhân: \textbf{8 lõi CPU} hoạt động song song độc lập, thực hiện phân xử quyền truy cập bộ nhớ thông qua bộ phân xử \textbf{Arbiter} và bộ định tuyến bus dữ liệu \textbf{Bus Controller}.
+    % Cores
+    \node[core] (c0) at (0, 1.2) {Core 0 (risc\_core)};
+    \node[core] (c1) at (0, 0.4) {Core 1 (risc\_core)};
+    \node[font=\bfseries] (cdot) at (0, -0.3) {\vdots};
+    \node[core] (c7) at (0, -1.0) {Core 7 (risc\_core)};
+
+    % Bus Controller
+    \node[bus] (busctrl) at (4.8, 0.1) {Bộ Điều Khiển Bus\\(\texttt{bus\_ctrl.v})};
+
+    % Arbiter
+    \node[arb] (arbiter) at (4.8, -1.4) {Arbiter (Round-Robin)\\(\texttt{arbiter.v})};
+
+    % Shared Memory
+    \node[mem] (sharedmem) at (9.6, 0.1) {Bộ nhớ dùng chung\\(Shared RAM 4KB)\\(\texttt{data\_mem.v})};
+
+    % Connections (Đã sửa lỗi cú pháp neo điểm cho tương thích babel tiếng Việt)
+    \draw[<->, >=stealth, thick, DeepBlue] (c0.east) -- (2.3, 1.2) -- (2.3, 0.5) -- (busctrl.west);
+    \draw[<->, >=stealth, thick, DeepBlue] (c1.east) -- (busctrl.west);
+    \draw[<->, >=stealth, thick, DeepBlue] (c7.east) -- (2.3, -1.0) -- (2.3, -0.3) -- (busctrl.west);
+
+    \draw[<->, >=stealth, thick, red!70!black] (arbiter) -- node[right, font=\tiny\bfseries] {req / grant} (busctrl);
+    \draw[<->, >=stealth, thick, green!60!black] (busctrl) -- node[above, font=\tiny\bfseries] {Shared Bus} (sharedmem);
+  \end{tikzpicture}
+
+  \vspace{0.2cm}
+  \scriptsize
+  Hệ thống kết nối đa nhân: \textbf{8 lõi CPU} hoạt động song song độc lập, thực hiện phân xử quyền truy cập bộ nhớ thông qua bộ phân xử \textbf{Arbiter} và bộ định tuyến bus dữ liệu \textbf{Bus Controller}.
 \end{frame}
 
-% \input{design/datapath.tex}
+\input{design/datapath.tex}
 \input{design/control_unit.tex}
 \input{design/pipeline_hazard.tex}
 \input{design/interconnect.tex}
-% \input{test.tex}
+\input{test.tex}
 
 \end{document}

@@ -164,20 +164,20 @@
             block/.style={draw, thick, fill=blue!10, draw=DeepBlue, minimum width=3.2cm, minimum height=2.2cm, rounded corners, font=\small\bfseries, align=center},
             bus/.style={->, >=stealth, double, double distance=1.5pt, thick, DeepBlue},
             ctrl/.style={->, >=stealth, thick, red!70!black},
-            w_in/.style={->, >=stealth, thick, DeepBlue},
-            w_out/.style={->, >=stealth, thick, green!50!black}
+            win/.style={->, >=stealth, thick, DeepBlue},
+            wout/.style={->, >=stealth, thick, green!50!black}
         ]
             \node[block] (reg) at (0, 0) {ID/EX Register};
             
             % Inputs (Trái)
-            \draw[bus] (-3.8, 0.6) -- node[above, font=\tiny\bfseries] {id\_rs1\_data / rs2\_data} (reg.160);
-            \draw[bus] (-3.8, 0.1) -- node[above, font=\tiny\bfseries] {id\_imm[31:0]} (reg.180);
-            \draw[w_in] (-3.8, -0.5) -- node[below, font=\tiny\bfseries] {id\_ctrl\_signals (reg\_write, alu\_op,\dots)} (reg.200);
+            \draw[bus] (-3.8, 0.6) -- node[above, font=\tiny\bfseries] {ex\_rs1\_data / rs2\_data} (reg.160);
+            \draw[bus] (-3.8, 0.1) -- node[above, font=\tiny\bfseries] {ex\_imm[31:0]} (reg.180);
+            \draw[win] (-3.8, -0.5) -- node[below, font=\tiny\bfseries] {id\_ctrl\_signals (reg\_write, alu\_op,\dots)} (reg.200);
             
             % Outputs (Phải)
             \draw[bus] (reg.20) -- node[above, font=\tiny\bfseries] {ex\_rs1\_data / rs2\_data} (3.8, 0.6);
             \draw[bus] (reg.0) -- node[above, font=\tiny\bfseries] {ex\_imm[31:0]} (3.8, 0.1);
-            \draw[w_out] (reg.340) -- node[below, font=\tiny\bfseries] {ex\_ctrl\_signals} (3.8, -0.5);
+            \draw[wout] (reg.340) -- node[below, font=\tiny\bfseries] {ex\_ctrl\_signals} (3.8, -0.5);
             
             % Điều khiển (Dưới)
             \draw[ctrl] (-0.6, -1.5) -- node[right, font=\tiny\bfseries] {hold} (-0.6, -1.1);
@@ -214,9 +214,7 @@
         \begin{tikzpicture}[
             block/.style={draw, thick, fill=blue!10, draw=DeepBlue, minimum width=3.2cm, minimum height=2.0cm, rounded corners, font=\small\bfseries, align=center},
             bus/.style={->, >=stealth, double, double distance=1.5pt, thick, DeepBlue},
-            ctrl/.style={->, >=stealth, thick, red!70!black},
-            w_in/.style={->, >=stealth, thick, DeepBlue},
-            w_out/.style={->, >=stealth, thick, green!50!black}
+            ctrl/.style={->, >=stealth, thick, red!70!black}
         ]
             \node[block] (reg) at (0, 0) {EX/MEM Register};
             

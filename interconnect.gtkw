@@ -1,0 +1,38 @@
+[*]
+[*] GTKWave Analyzer v3.3.111 (w)1999-2020 BSI
+[*]
+[*]
+[dumpfile] "c:/Users/X1 Yoga/hust/ktmt/risc_8core_project/interconnect_tb.vcd"
+[dumpfile_mtime] "Thu Jun 18 11:44:40 2026"
+[dumpfile_size] 16592
+[savefile] "c:/Users/X1 Yoga/hust/ktmt/risc_8core_project/interconnect.gtkw"
+[timestart] 0
+[size] 1000 600
+[pos] -1 -1
+*-24.000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] interconnect_tb.
+[sst_width] 220
+[signals_width] 200
+[sst_expanded] 1
+[sst_vpaned_height] 150
+@28
+interconnect_tb.clk
+interconnect_tb.reset
+@22
+interconnect_tb.core_mem_req[7:0]
+interconnect_tb.arb_request[7:0]
+interconnect_tb.arb_grant[7:0]
+@28
+interconnect_tb.arb_grant_valid
+@22
+interconnect_tb.arb_grant_id[2:0]
+@22
+interconnect_tb.dm_addr[31:0]
+interconnect_tb.dm_wdata[31:0]
+interconnect_tb.dm_rdata[31:0]
+@28
+interconnect_tb.dm_we
+interconnect_tb.dm_re
+@22
+interconnect_tb.core_ready[7:0]
+interconnect_tb.core_sc_result[7:0]
