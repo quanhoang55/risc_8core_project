@@ -2,171 +2,173 @@
 \headcommand {\beamer@framepages {1}{1}}
 \headcommand {\slideentry {0}{0}{2}{2/2}{}{0}}
 \headcommand {\beamer@framepages {2}{2}}
-\headcommand {\beamer@sectionpages {1}{2}}
-\headcommand {\beamer@subsectionpages {1}{2}}
-\headcommand {\sectionentry {1}{Giới Thiệu Đề Tài}{3}{Giới Thiệu Đề Tài}{0}}
-\headcommand {\beamer@subsectionpages {3}{2}}
-\headcommand {\beamer@subsectionentry {0}{1}{1}{3}{Bối cảnh nghiên cứu}}
-\headcommand {\slideentry {1}{1}{1}{3/3}{Bối cảnh nghiên cứu}{0}}
+\headcommand {\slideentry {0}{0}{3}{3/3}{}{0}}
 \headcommand {\beamer@framepages {3}{3}}
-\headcommand {\slideentry {1}{1}{2}{4/4}{Bối cảnh nghiên cứu}{0}}
+\headcommand {\beamer@sectionpages {1}{3}}
+\headcommand {\beamer@subsectionpages {1}{3}}
+\headcommand {\sectionentry {1}{Giới Thiệu Đề Tài}{4}{Giới Thiệu Đề Tài}{0}}
+\headcommand {\beamer@subsectionpages {4}{3}}
+\headcommand {\beamer@subsectionentry {0}{1}{1}{4}{Bối cảnh nghiên cứu}}
+\headcommand {\slideentry {1}{1}{1}{4/4}{Bối cảnh nghiên cứu}{0}}
 \headcommand {\beamer@framepages {4}{4}}
-\headcommand {\beamer@subsectionpages {3}{4}}
-\headcommand {\beamer@subsectionentry {0}{1}{2}{5}{Chủ đề của dự án}}
-\headcommand {\slideentry {1}{2}{1}{5/5}{Chủ đề của dự án}{0}}
+\headcommand {\slideentry {1}{1}{2}{5/5}{Bối cảnh nghiên cứu}{0}}
 \headcommand {\beamer@framepages {5}{5}}
-\headcommand {\slideentry {1}{2}{2}{6/6}{Chủ đề của dự án}{0}}
+\headcommand {\beamer@subsectionpages {4}{5}}
+\headcommand {\beamer@subsectionentry {0}{1}{2}{6}{Chủ đề của dự án}}
+\headcommand {\slideentry {1}{2}{1}{6/6}{Chủ đề của dự án}{0}}
 \headcommand {\beamer@framepages {6}{6}}
-\headcommand {\beamer@subsectionpages {5}{6}}
-\headcommand {\beamer@subsectionentry {0}{1}{3}{7}{Mục tiêu thiết kế}}
-\headcommand {\slideentry {1}{3}{1}{7/7}{Mục tiêu thiết kế}{0}}
+\headcommand {\slideentry {1}{2}{2}{7/7}{Chủ đề của dự án}{0}}
 \headcommand {\beamer@framepages {7}{7}}
-\headcommand {\slideentry {1}{3}{2}{8/8}{Mục tiêu thiết kế}{0}}
+\headcommand {\beamer@subsectionpages {6}{7}}
+\headcommand {\beamer@subsectionentry {0}{1}{3}{8}{Mục tiêu thiết kế}}
+\headcommand {\slideentry {1}{3}{1}{8/8}{Mục tiêu thiết kế}{0}}
 \headcommand {\beamer@framepages {8}{8}}
-\headcommand {\beamer@subsectionpages {7}{8}}
-\headcommand {\beamer@subsectionentry {0}{1}{4}{9}{Tại sao chọn Pipeline?}}
-\headcommand {\slideentry {1}{4}{1}{9/9}{Tại sao chọn Pipeline?}{0}}
+\headcommand {\slideentry {1}{3}{2}{9/9}{Mục tiêu thiết kế}{0}}
 \headcommand {\beamer@framepages {9}{9}}
-\headcommand {\slideentry {1}{4}{2}{10/10}{Tại sao chọn Pipeline?}{0}}
+\headcommand {\beamer@subsectionpages {8}{9}}
+\headcommand {\beamer@subsectionentry {0}{1}{4}{10}{Tại sao chọn Pipeline?}}
+\headcommand {\slideentry {1}{4}{1}{10/10}{Tại sao chọn Pipeline?}{0}}
 \headcommand {\beamer@framepages {10}{10}}
-\headcommand {\beamer@sectionpages {3}{10}}
-\headcommand {\beamer@subsectionpages {9}{10}}
-\headcommand {\sectionentry {2}{Kiến Trúc Tập Lệnh (ISA)}{11}{Kiến Trúc Tập Lệnh (ISA)}{0}}
-\headcommand {\beamer@subsectionpages {11}{10}}
-\headcommand {\beamer@subsectionentry {0}{2}{1}{11}{Tập lệnh cơ bản RV32I}}
-\headcommand {\slideentry {2}{1}{1}{11/11}{Tập lệnh cơ bản RV32I}{0}}
+\headcommand {\slideentry {1}{4}{2}{11/11}{Tại sao chọn Pipeline?}{0}}
 \headcommand {\beamer@framepages {11}{11}}
-\headcommand {\slideentry {2}{1}{2}{12/12}{Tập lệnh cơ bản RV32I}{0}}
+\headcommand {\beamer@sectionpages {4}{11}}
+\headcommand {\beamer@subsectionpages {10}{11}}
+\headcommand {\sectionentry {2}{Kiến Trúc Tập Lệnh (ISA)}{12}{Kiến Trúc Tập Lệnh (ISA)}{0}}
+\headcommand {\beamer@subsectionpages {12}{11}}
+\headcommand {\beamer@subsectionentry {0}{2}{1}{12}{Tập lệnh cơ bản RV32I}}
+\headcommand {\slideentry {2}{1}{1}{12/12}{Tập lệnh cơ bản RV32I}{0}}
 \headcommand {\beamer@framepages {12}{12}}
-\headcommand {\slideentry {2}{1}{3}{13/13}{Tập lệnh cơ bản RV32I}{0}}
+\headcommand {\slideentry {2}{1}{2}{13/13}{Tập lệnh cơ bản RV32I}{0}}
 \headcommand {\beamer@framepages {13}{13}}
-\headcommand {\slideentry {2}{1}{4}{14/14}{Tập lệnh cơ bản RV32I}{0}}
+\headcommand {\slideentry {2}{1}{3}{14/14}{Tập lệnh cơ bản RV32I}{0}}
 \headcommand {\beamer@framepages {14}{14}}
-\headcommand {\beamer@subsectionpages {11}{14}}
-\headcommand {\beamer@subsectionentry {0}{2}{2}{15}{Tập lệnh hiện thực trong dự án}}
-\headcommand {\slideentry {2}{2}{1}{15/15}{Tập lệnh hiện thực trong dự án}{0}}
+\headcommand {\slideentry {2}{1}{4}{15/15}{Tập lệnh cơ bản RV32I}{0}}
 \headcommand {\beamer@framepages {15}{15}}
-\headcommand {\slideentry {2}{2}{2}{16/16}{Tập lệnh hiện thực trong dự án}{0}}
+\headcommand {\beamer@subsectionpages {12}{15}}
+\headcommand {\beamer@subsectionentry {0}{2}{2}{16}{Tập lệnh hiện thực trong dự án}}
+\headcommand {\slideentry {2}{2}{1}{16/16}{Tập lệnh hiện thực trong dự án}{0}}
 \headcommand {\beamer@framepages {16}{16}}
-\headcommand {\beamer@sectionpages {11}{16}}
-\headcommand {\beamer@subsectionpages {15}{16}}
-\headcommand {\sectionentry {3}{Thiết Kế Hệ Thống (Design)}{17}{Thiết Kế Hệ Thống (Design)}{0}}
-\headcommand {\beamer@subsectionpages {17}{16}}
-\headcommand {\beamer@subsectionentry {0}{3}{1}{17}{Cấu trúc tổng thể}}
-\headcommand {\slideentry {3}{1}{1}{17/17}{Cấu trúc tổng thể}{0}}
+\headcommand {\slideentry {2}{2}{2}{17/17}{Tập lệnh hiện thực trong dự án}{0}}
 \headcommand {\beamer@framepages {17}{17}}
-\headcommand {\slideentry {3}{1}{2}{18/18}{Cấu trúc tổng thể}{0}}
+\headcommand {\beamer@sectionpages {12}{17}}
+\headcommand {\beamer@subsectionpages {16}{17}}
+\headcommand {\sectionentry {3}{Thiết Kế Hệ Thống (Design)}{18}{Thiết Kế Hệ Thống (Design)}{0}}
+\headcommand {\beamer@subsectionpages {18}{17}}
+\headcommand {\beamer@subsectionentry {0}{3}{1}{18}{Cấu trúc tổng thể}}
+\headcommand {\slideentry {3}{1}{1}{18/18}{Cấu trúc tổng thể}{0}}
 \headcommand {\beamer@framepages {18}{18}}
-\headcommand {\slideentry {3}{1}{3}{19/19}{Cấu trúc tổng thể}{0}}
+\headcommand {\slideentry {3}{1}{2}{19/19}{Cấu trúc tổng thể}{0}}
 \headcommand {\beamer@framepages {19}{19}}
-\headcommand {\beamer@subsectionpages {17}{19}}
-\headcommand {\beamer@subsectionentry {0}{3}{2}{20}{Các khối xử lý logic chức năng}}
-\headcommand {\slideentry {3}{2}{1}{20/20}{Các khối xử lý logic chức năng}{0}}
+\headcommand {\slideentry {3}{1}{3}{20/20}{Cấu trúc tổng thể}{0}}
 \headcommand {\beamer@framepages {20}{20}}
-\headcommand {\beamer@subsubsectionentry {0}{3}{2}{1}{21}{Bộ nhớ lệnh (Instruction Memory)}}
-\headcommand {\slideentry {3}{2}{2}{21/21}{Các khối xử lý logic chức năng}{0}}
+\headcommand {\beamer@subsectionpages {18}{20}}
+\headcommand {\beamer@subsectionentry {0}{3}{2}{21}{Các khối xử lý logic chức năng}}
+\headcommand {\slideentry {3}{2}{1}{21/21}{Các khối xử lý logic chức năng}{0}}
 \headcommand {\beamer@framepages {21}{21}}
-\headcommand {\beamer@subsubsectionentry {0}{3}{2}{2}{22}{Khối PC Logic}}
-\headcommand {\slideentry {3}{2}{3}{22/22}{Các khối xử lý logic chức năng}{0}}
+\headcommand {\beamer@subsubsectionentry {0}{3}{2}{1}{22}{Bộ nhớ lệnh (Instruction Memory)}}
+\headcommand {\slideentry {3}{2}{2}{22/22}{Các khối xử lý logic chức năng}{0}}
 \headcommand {\beamer@framepages {22}{22}}
-\headcommand {\slideentry {3}{2}{4}{23/23}{Các khối xử lý logic chức năng}{0}}
+\headcommand {\beamer@subsubsectionentry {0}{3}{2}{2}{23}{Khối PC Logic}}
+\headcommand {\slideentry {3}{2}{3}{23/23}{Các khối xử lý logic chức năng}{0}}
 \headcommand {\beamer@framepages {23}{23}}
-\headcommand {\slideentry {3}{2}{5}{24/24}{Các khối xử lý logic chức năng}{0}}
+\headcommand {\slideentry {3}{2}{4}{24/24}{Các khối xử lý logic chức năng}{0}}
 \headcommand {\beamer@framepages {24}{24}}
-\headcommand {\slideentry {3}{2}{6}{25/25}{Các khối xử lý logic chức năng}{0}}
+\headcommand {\slideentry {3}{2}{5}{25/25}{Các khối xử lý logic chức năng}{0}}
 \headcommand {\beamer@framepages {25}{25}}
-\headcommand {\slideentry {3}{2}{7}{26/26}{Các khối xử lý logic chức năng}{0}}
+\headcommand {\slideentry {3}{2}{6}{26/26}{Các khối xử lý logic chức năng}{0}}
 \headcommand {\beamer@framepages {26}{26}}
-\headcommand {\slideentry {3}{2}{8}{27/27}{Các khối xử lý logic chức năng}{0}}
+\headcommand {\slideentry {3}{2}{7}{27/27}{Các khối xử lý logic chức năng}{0}}
 \headcommand {\beamer@framepages {27}{27}}
-\headcommand {\beamer@subsubsectionentry {0}{3}{2}{3}{28}{Khối Tập thanh ghi (Register File)}}
-\headcommand {\slideentry {3}{2}{9}{28/28}{Các khối xử lý logic chức năng}{0}}
+\headcommand {\slideentry {3}{2}{8}{28/28}{Các khối xử lý logic chức năng}{0}}
 \headcommand {\beamer@framepages {28}{28}}
-\headcommand {\beamer@subsubsectionentry {0}{3}{2}{4}{29}{Khối Tính toán Số học \& Logic (ALU)}}
-\headcommand {\slideentry {3}{2}{10}{29/29}{Các khối xử lý logic chức năng}{0}}
+\headcommand {\beamer@subsubsectionentry {0}{3}{2}{3}{29}{Khối Tập thanh ghi (Register File)}}
+\headcommand {\slideentry {3}{2}{9}{29/29}{Các khối xử lý logic chức năng}{0}}
 \headcommand {\beamer@framepages {29}{29}}
-\headcommand {\slideentry {3}{2}{11}{30/30}{Các khối xử lý logic chức năng}{0}}
+\headcommand {\beamer@subsubsectionentry {0}{3}{2}{4}{30}{Khối Tính toán Số học \& Logic (ALU)}}
+\headcommand {\slideentry {3}{2}{10}{30/30}{Các khối xử lý logic chức năng}{0}}
 \headcommand {\beamer@framepages {30}{30}}
-\headcommand {\slideentry {3}{2}{12}{31/31}{Các khối xử lý logic chức năng}{0}}
+\headcommand {\slideentry {3}{2}{11}{31/31}{Các khối xử lý logic chức năng}{0}}
 \headcommand {\beamer@framepages {31}{31}}
-\headcommand {\slideentry {3}{2}{13}{32/32}{Các khối xử lý logic chức năng}{0}}
+\headcommand {\slideentry {3}{2}{12}{32/32}{Các khối xử lý logic chức năng}{0}}
 \headcommand {\beamer@framepages {32}{32}}
-\headcommand {\beamer@subsubsectionentry {0}{3}{2}{5}{33}{Bộ nhớ dữ liệu (Data Memory)}}
-\headcommand {\slideentry {3}{2}{14}{33/33}{Các khối xử lý logic chức năng}{0}}
+\headcommand {\slideentry {3}{2}{13}{33/33}{Các khối xử lý logic chức năng}{0}}
 \headcommand {\beamer@framepages {33}{33}}
-\headcommand {\beamer@subsectionpages {20}{33}}
-\headcommand {\beamer@subsectionentry {0}{3}{3}{34}{Kiến trúc Pipeline và Logic Điều khiển}}
-\headcommand {\slideentry {3}{3}{1}{34/34}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
+\headcommand {\beamer@subsubsectionentry {0}{3}{2}{5}{34}{Bộ nhớ dữ liệu (Data Memory)}}
+\headcommand {\slideentry {3}{2}{14}{34/34}{Các khối xử lý logic chức năng}{0}}
 \headcommand {\beamer@framepages {34}{34}}
-\headcommand {\beamer@subsubsectionentry {0}{3}{3}{1}{35}{Thanh ghi đệm Pipeline Registers và Control Unit}}
-\headcommand {\slideentry {3}{3}{2}{35/35}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
+\headcommand {\beamer@subsectionpages {21}{34}}
+\headcommand {\beamer@subsectionentry {0}{3}{3}{35}{Kiến trúc Pipeline và Logic Điều khiển}}
+\headcommand {\slideentry {3}{3}{1}{35/35}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {35}{35}}
-\headcommand {\slideentry {3}{3}{3}{36/36}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
+\headcommand {\beamer@subsubsectionentry {0}{3}{3}{1}{36}{Thanh ghi đệm Pipeline Registers và Control Unit}}
+\headcommand {\slideentry {3}{3}{2}{36/36}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {36}{36}}
-\headcommand {\slideentry {3}{3}{4}{37/37}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
+\headcommand {\slideentry {3}{3}{3}{37/37}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {37}{37}}
-\headcommand {\slideentry {3}{3}{5}{38/38}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
+\headcommand {\slideentry {3}{3}{4}{38/38}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {38}{38}}
-\headcommand {\slideentry {3}{3}{6}{39/39}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
+\headcommand {\slideentry {3}{3}{5}{39/39}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {39}{39}}
-\headcommand {\slideentry {3}{3}{7}{40/40}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
+\headcommand {\slideentry {3}{3}{6}{40/40}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {40}{40}}
-\headcommand {\slideentry {3}{3}{8}{41/41}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
+\headcommand {\slideentry {3}{3}{7}{41/41}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {41}{41}}
-\headcommand {\slideentry {3}{3}{9}{42/42}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
+\headcommand {\slideentry {3}{3}{8}{42/42}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {42}{42}}
-\headcommand {\slideentry {3}{3}{10}{43/43}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
+\headcommand {\slideentry {3}{3}{9}{43/43}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {43}{43}}
-\headcommand {\slideentry {3}{3}{11}{44/44}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
+\headcommand {\slideentry {3}{3}{10}{44/44}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {44}{44}}
-\headcommand {\slideentry {3}{3}{12}{45/45}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
+\headcommand {\slideentry {3}{3}{11}{45/45}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {45}{45}}
-\headcommand {\slideentry {3}{3}{13}{46/46}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
+\headcommand {\slideentry {3}{3}{12}{46/46}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {46}{46}}
-\headcommand {\slideentry {3}{3}{14}{47/47}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
+\headcommand {\slideentry {3}{3}{13}{47/47}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {47}{47}}
-\headcommand {\slideentry {3}{3}{15}{48/48}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
+\headcommand {\slideentry {3}{3}{14}{48/48}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {48}{48}}
-\headcommand {\beamer@subsubsectionentry {0}{3}{3}{2}{49}{Bộ phân xử và kết nối đa nhân (Interconnect)}}
-\headcommand {\slideentry {3}{3}{16}{49/49}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
+\headcommand {\slideentry {3}{3}{15}{49/49}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {49}{49}}
-\headcommand {\slideentry {3}{3}{17}{50/50}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
+\headcommand {\beamer@subsubsectionentry {0}{3}{3}{2}{50}{Bộ phân xử và kết nối đa nhân (Interconnect)}}
+\headcommand {\slideentry {3}{3}{16}{50/50}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {50}{50}}
-\headcommand {\slideentry {3}{3}{18}{51/51}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
+\headcommand {\slideentry {3}{3}{17}{51/51}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {51}{51}}
-\headcommand {\slideentry {3}{3}{19}{52/52}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
+\headcommand {\slideentry {3}{3}{18}{52/52}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {52}{52}}
-\headcommand {\slideentry {3}{3}{20}{53/53}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
+\headcommand {\slideentry {3}{3}{19}{53/53}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {53}{53}}
-\headcommand {\slideentry {3}{3}{21}{54/54}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
+\headcommand {\slideentry {3}{3}{20}{54/54}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {54}{54}}
-\headcommand {\slideentry {3}{3}{22}{55/55}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
+\headcommand {\slideentry {3}{3}{21}{55/55}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {55}{55}}
-\headcommand {\beamer@sectionpages {17}{55}}
-\headcommand {\beamer@subsectionpages {34}{55}}
-\headcommand {\sectionentry {4}{Chiến Lược Kiểm Thử (Testing)}{56}{Chiến Lược Kiểm Thử (Testing)}{0}}
-\headcommand {\beamer@subsectionpages {56}{55}}
-\headcommand {\beamer@subsectionentry {0}{4}{1}{56}{Kế hoạch \& Trạng thái kiểm thử}}
-\headcommand {\slideentry {4}{1}{1}{56/56}{Kế hoạch \& Trạng thái kiểm thử}{0}}
+\headcommand {\slideentry {3}{3}{22}{56/56}{Kiến trúc Pipeline và Logic Điều khiển}{0}}
 \headcommand {\beamer@framepages {56}{56}}
-\headcommand {\slideentry {4}{1}{2}{57/57}{Kế hoạch \& Trạng thái kiểm thử}{0}}
+\headcommand {\beamer@sectionpages {18}{56}}
+\headcommand {\beamer@subsectionpages {35}{56}}
+\headcommand {\sectionentry {4}{Chiến Lược Kiểm Thử (Testing)}{57}{Chiến Lược Kiểm Thử (Testing)}{0}}
+\headcommand {\beamer@subsectionpages {57}{56}}
+\headcommand {\beamer@subsectionentry {0}{4}{1}{57}{Kế hoạch \& Trạng thái kiểm thử}}
+\headcommand {\slideentry {4}{1}{1}{57/57}{Kế hoạch \& Trạng thái kiểm thử}{0}}
 \headcommand {\beamer@framepages {57}{57}}
-\headcommand {\beamer@subsectionpages {56}{57}}
-\headcommand {\beamer@subsectionentry {0}{4}{2}{58}{Kiểm thử Lõi đơn \& Đa nhân}}
-\headcommand {\slideentry {4}{2}{1}{58/58}{Kiểm thử Lõi đơn \& Đa nhân}{0}}
+\headcommand {\slideentry {4}{1}{2}{58/58}{Kế hoạch \& Trạng thái kiểm thử}{0}}
 \headcommand {\beamer@framepages {58}{58}}
-\headcommand {\slideentry {4}{2}{2}{59/59}{Kiểm thử Lõi đơn \& Đa nhân}{0}}
+\headcommand {\beamer@subsectionpages {57}{58}}
+\headcommand {\beamer@subsectionentry {0}{4}{2}{59}{Kiểm thử Lõi đơn \& Đa nhân}}
+\headcommand {\slideentry {4}{2}{1}{59/59}{Kiểm thử Lõi đơn \& Đa nhân}{0}}
 \headcommand {\beamer@framepages {59}{59}}
-\headcommand {\slideentry {4}{2}{3}{60/60}{Kiểm thử Lõi đơn \& Đa nhân}{0}}
+\headcommand {\slideentry {4}{2}{2}{60/60}{Kiểm thử Lõi đơn \& Đa nhân}{0}}
 \headcommand {\beamer@framepages {60}{60}}
-\headcommand {\beamer@subsectionpages {58}{60}}
-\headcommand {\beamer@subsectionentry {0}{4}{3}{61}{Phân tích Waveform}}
-\headcommand {\slideentry {4}{3}{1}{61/61}{Phân tích Waveform}{0}}
+\headcommand {\slideentry {4}{2}{3}{61/61}{Kiểm thử Lõi đơn \& Đa nhân}{0}}
 \headcommand {\beamer@framepages {61}{61}}
-\headcommand {\slideentry {4}{3}{2}{62/62}{Phân tích Waveform}{0}}
+\headcommand {\beamer@subsectionpages {59}{61}}
+\headcommand {\beamer@subsectionentry {0}{4}{3}{62}{Phân tích Waveform}}
+\headcommand {\slideentry {4}{3}{1}{62/62}{Phân tích Waveform}{0}}
 \headcommand {\beamer@framepages {62}{62}}
-\headcommand {\beamer@partpages {1}{62}}
-\headcommand {\beamer@subsectionpages {61}{62}}
-\headcommand {\beamer@sectionpages {56}{62}}
-\headcommand {\beamer@documentpages {62}}
-\headcommand {\gdef \inserttotalframenumber {62}}
+\headcommand {\slideentry {4}{3}{2}{63/63}{Phân tích Waveform}{0}}
+\headcommand {\beamer@framepages {63}{63}}
+\headcommand {\beamer@partpages {1}{63}}
+\headcommand {\beamer@subsectionpages {62}{63}}
+\headcommand {\beamer@sectionpages {57}{63}}
+\headcommand {\beamer@documentpages {63}}
+\headcommand {\gdef \inserttotalframenumber {63}}
