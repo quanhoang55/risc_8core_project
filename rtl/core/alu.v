@@ -6,7 +6,7 @@ module alu (
     output            zero
 );
 
-  // Định nghĩa các mã điều khiển (Dựa trên chuẩn thông dụng cho RV32I)
+  // Dinh nghia cac ma dieu khien (Dua tren chuan thong dung cho RV32I)
   localparam AND = 4'b0000;
   localparam OR = 4'b0001;
   localparam ADD = 4'b0010;
@@ -14,7 +14,7 @@ module alu (
   localparam XOR = 4'b0100;
   localparam SRL = 4'b0101;  // Shift Right Logical
   localparam SLL = 4'b0011;  // Shift Left Logical
-  localparam SLT = 4'b0111;  // Set Less Than (có dấu)
+  localparam SLT = 4'b0111;  // Set Less Than (co dau)
 
   always @(*) begin
     case (alu_control)
@@ -23,14 +23,14 @@ module alu (
       AND: result = a & b;
       OR: result = a | b;
       XOR: result = a ^ b;
-      SLL: result = a << b[4:0];  // Chỉ lấy 5 bit thấp của b để dịch
+      SLL: result = a << b[4:0];  // Chi lay 5 bit thap cua b de dich
       SRL: result = a >> b[4:0];
       SLT: result = ($signed(a) < $signed(b)) ? 32'd1 : 32'd0;
       default: result = 32'b0;
     endcase
   end
 
-  // Cờ Zero: bật lên 1 nếu kết quả bằng 0 (phục vụ lệnh BEQ, BNE...)
+  // Co Zero: bat len 1 neu ket qua bang 0 (phuc vu lenh BEQ, BNE...)
   assign zero = (result == 32'b0);
 
 endmodule

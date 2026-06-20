@@ -258,7 +258,7 @@ module bus_ctrl (
                         else if (core_re[bus_grant_id] && !core_lr[bus_grant_id]) begin
                             core_rdata[bus_grant_id] <= dm_rdata;
                             core_ready[bus_grant_id] <= 1'b1;
-                            // Giữ ở IDLE (1-cycle completion)
+                            // Giu o IDLE (1-cycle completion)
                         end
                         // =====================================================
                         // WRITE: dm_we is set in combinational -> write
