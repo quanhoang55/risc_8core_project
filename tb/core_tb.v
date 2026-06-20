@@ -68,43 +68,27 @@ module core_tb;
     );
 
     // =========================================================================
-    // Kết nối core ↔ data_mem đơn giản (bypass bus)
-    // Khi core gửi mem_req, chuyển tiếp tới data_mem, trả mem_ready sau 1 cycle
+    // Kết nối core ↔ data_mem (1-cycle completion giống bus_ctrl)
     // =========================================================================
-    assign mem_rdata = dm_rdata;
+    always @(*) begin
+        dm_addr  = mem_addr;
+        dm_re    = mem_re;
+        dm_we    = mem_we;
+        dm_wdata = mem_wdata;
+    end
 
-    reg mem_req_prev;
+    assign mem_rdata = dm_rdata;
 
     always @(posedge clk or posedge reset) begin
         if (reset) begin
-            dm_we        <= 1'b0;
-            dm_re        <= 1'b0;
-            dm_addr      <= 32'd0;
-            dm_wdata     <= 32'd0;
-            mem_ready    <= 1'b0;
-            mem_req_prev <= 1'b0;
+            mem_ready <= 1'b0;
         end
         else begin
-            mem_req_prev <= mem_req;
-            mem_ready    <= 1'b0;
-
-            if (mem_req && !mem_req_prev) begin
-                // Bắt đầu giao dịch: chuyển tiếp tới data_mem
-                dm_addr  <= mem_addr;
-                dm_wdata <= mem_wdata;
-                dm_we    <= mem_we;
-                dm_re    <= mem_re;
-            end
-            else if (mem_req && mem_req_prev) begin
-                // Cycle sau: giao dịch hoàn thành
+            // Trả ready = 1 ngay ở cycle tiếp theo (1-cycle completion)
+            if (mem_req && !mem_ready) begin
                 mem_ready <= 1'b1;
-                dm_we     <= 1'b0;
-                // Giữ dm_re=1 để data_mem async read vẫn trả dữ liệu hợp lệ
-                // khi core đọc mem_rdata ở cycle mem_ready=1
-            end
-            else begin
-                dm_we <= 1'b0;
-                dm_re <= 1'b0;
+            end else begin
+                mem_ready <= 1'b0;
             end
         end
     end

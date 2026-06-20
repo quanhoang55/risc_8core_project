@@ -1,157 +1,123 @@
-\chapter{Kết Quả Mô Phỏng Và Kiểm Chứng Chức Năng}
+\chapter{Hiện Thực Hóa RTL Đơn Nhân}
+\label{chap:implementation_core}
 
-Để xác minh tính đúng đắn và hiệu năng của hệ thống vi xử lý đơn nhân pipeline và đa lõi 8-Core chia sẻ RAM, các kịch bản kiểm thử (Testbench) đã được xây dựng và thực thi trên môi trường mô phỏng bằng công cụ \textbf{Icarus Verilog} \cite{icarus} kết hợp với phần mềm hiển thị dạng sóng \textbf{GTKWave} \cite{gtkwave}.
+Chương này trình bày chi tiết việc hiện thực hóa các thành phần của lõi vi xử lý RISC-V 5 tầng pipeline (\texttt{risc\_core}) ở mức RTL (Register Transfer Level). Mỗi module quan trọng sẽ được phân tích về mục đích, giao tiếp, thuật toán/FSM, kèm theo đoạn mã tiêu biểu, sơ đồ khối và biểu đồ thời gian.
 
-\section{Kết quả kiểm chứng đơn lõi (Single-Core Verification)}
-Mục tiêu của kịch bản này là xác minh khả năng thực thi đúng đắn tập chỉ thị RV32I của lõi đơn nhân pipeline 5 tầng (\texttt{risc\_core.v}) cùng với các cơ chế gỡ lỗi xung đột (stalls và flushes).
-
-\subsection{Kịch bản kiểm thử (\texttt{core\_tb.v})}
-Testbench đơn lõi nạp chương trình thử nghiệm chứa đầy đủ các nhóm chỉ thị tính toán số học, logic, lệnh load/store bộ nhớ dữ liệu và các lệnh rẽ nhánh nhảy điều hướng chương trình. Chương trình kiểm thử cố tình sắp xếp các cặp lệnh gây ra xung đột dữ liệu (data hazard) và xung đột điều khiển (control hazard) để thử nghiệm phản ứng của lõi phần cứng.
-
-\subsection{Kết quả mô phỏng ghi nhận}
-Kết quả chạy mô phỏng hiển thị trên console:
-\begin{verbatim}
-=========================================================
-CORE TEST RESULTS
-=========================================================
-x1 (expect 10) = 10  [PASS]
-x2 (expect 20) = 20  [PASS]
-x3 (expect 30) = 30  [PASS]
-x4 (expect 30) = 30  [PASS]
-x5 (expect 1)  = 1   [PASS]
-mem[0] (expect 30) = 30 [PASS]
-
-PIPELINE EVIDENCE
-retired=67 mem_stall=4 load_use_stall=1 flush=62
-
-SUMMARY: 7 PASSED, 0 FAILED
-=========================================================
-\end{verbatim}
-
-\subsection{Phân tích kết quả gỡ xung đột đơn lõi}
-Dựa trên các bộ đếm debug được tích hợp bên trong lõi \texttt{risc\_core.v}:
+\section{Tổ chức mã nguồn lõi xử lý}
+Toàn bộ mã nguồn RTL của lõi được tổ chức trong thư mục \texttt{rtl/core/}, tuân thủ nguyên tắc thiết kế module hóa.
 \begin{itemize}
-    \item \textbf{retired = 67:} Cho thấy 67 chỉ thị lệnh đã đi hết 5 tầng pipeline và được cam kết ghi nhận (commit) thành công vào tập thanh ghi hoặc bộ nhớ.
-    \item \textbf{load\_use\_stall = 1:} Cho thấy phần cứng đã phát hiện chính xác 1 tình huống xung đột Load-Use (lệnh tính toán ngay sau lệnh đọc bộ nhớ sử dụng chung thanh ghi đích) và đã tự động chèn 1 chu kỳ stall đóng băng pipeline để dữ liệu kịp nạp về.
-    \item \textbf{flush = 62:} Cho thấy cơ chế xóa lệnh rỗng (NOP) hoạt động chính xác khi có lệnh rẽ nhánh hoặc nhảy xảy ra, loại bỏ 62 chỉ thị được nạp sai hướng dự đoán của luồng chương trình.
+    \item \texttt{risc\_core.v}: Module đỉnh của lõi, ghép nối datapath, hazard controller và giao tiếp bộ nhớ.
+    \item \texttt{control\_unit.v}: Bộ điều khiển trung tâm, giải mã opcode.
+    \item \texttt{alu.v}, \texttt{reg\_file.v}: Đơn vị tính toán số học logic và tập 32 thanh ghi.
+    \item \texttt{pc\_logic.v}: Logic tính toán cập nhật Program Counter.
+    \item \texttt{pipeline\_register/}: Chứa 4 thanh ghi ranh giới (\texttt{if\_id.v}, \texttt{id\_ex.v}, \texttt{ex\_mem.v}, \texttt{mem\_wb.v}).
 \end{itemize}
 
----
+\section{Tập thanh ghi đa năng (Register File)}
+\textbf{Mục đích:} Lưu trữ 32 thanh ghi 32-bit theo chuẩn RV32I.
+\textbf{Giao tiếp:} Hai cổng đọc tổ hợp (\texttt{rs1\_addr}, \texttt{rs2\_addr}) và một cổng ghi đồng bộ (\texttt{rd\_addr}, \texttt{wdata}, \texttt{we}).
+\textbf{Đặc điểm hiện thực:} Thanh ghi \texttt{x0} được nối cứng bằng 0. Việc đọc được thực hiện bất đồng bộ để đảm bảo dữ liệu sẵn sàng ngay trong chu kỳ Decode.
 
-\section{Kết quả kiểm chứng hệ thống đa lõi 8-Core (Full-System Verification)}
-Mục tiêu là kiểm chứng tính năng giao tiếp đa nhân thông qua Bus Interconnect, tính công bằng của thuật toán phân xử Round-Robin trong bộ Arbiter, và tính đúng đắn của dữ liệu khi 8 lõi CPU chạy song song ghi nhận kết quả chéo vào một vùng RAM chia sẻ.
-
-\subsection{Chương trình phần mềm đa lõi (\texttt{system\_program.asm})}
-Tất cả 8 lõi CPU đều thực thi chung một chương trình mã máy được biên dịch từ mã nguồn Assembly dưới đây. Chương trình này thực hiện các giao dịch đọc và ghi chéo bộ nhớ để kiểm chứng khả năng serialize (tuần tự hóa) của bus:
-
-\begin{lstlisting}[caption={Chương trình Assembly kiểm thử hệ thống đa lõi (\texttt{system\_program.asm})}, label={lst:sys_prog}]
-    addi x1, x0, 42      # x1 = 42
-    sw   x1, 0(x0)       # Ghi gia tri 42 vao mem[0] (Yeu cau ghi RAM)
-    lw   x2, 0(x0)       # Doc gia tri tu mem[0] vao x2 (Yeu cau doc RAM)
-    addi x3, x0, 99      # x3 = 99 (Marker hoan thanh)
-    sw   x3, 4(x0)       # Ghi gia tri 99 vao mem[1] (Marker hoan thanh)
-halt:
-    jal  x0, halt        # Vong lap vo han dung chuong trinh
+\begin{lstlisting}[caption={Hiện thực Register File},label={lst:reg_file}]
+always @(posedge clk) begin
+    if (we && rd_addr != 5'd0) begin
+        registers[rd_addr] <= wdata;
+    end
+end
+assign rs1_data = (rs1_addr == 5'd0) ? 32'd0 : registers[rs1_addr];
+assign rs2_data = (rs2_addr == 5'd0) ? 32'd0 : registers[rs2_addr];
 \end{lstlisting}
 
-\subsection{Kịch bản kiểm thử tích hợp (\texttt{system\_tb.v})}
-Testbench khởi tạo hệ thống 8 lõi CPU kết nối qua Arbiter và Bus Controller. Kịch bản chạy mô phỏng trong 500 chu kỳ xung nhịp. Trong suốt thời gian chạy, testbench liên tục giám sát trạng thái cấp quyền bus (\texttt{grant}) và các bộ đếm trạng thái pipeline của từng lõi. Cuối cùng, testbench kiểm tra giá trị dữ liệu tại hai ô nhớ \texttt{mem[0]} và \texttt{mem[1]} để đưa ra kết luận.
+\section{Bộ điều khiển trung tâm (Control Unit)}
+\textbf{Mục đích:} Giải mã chỉ thị 32-bit, phát ra cờ điều khiển cho ALU, nhánh, và giao tiếp bộ nhớ.
+\textbf{Thuật toán/Logic:} Sử dụng câu lệnh \texttt{case} trên trường \texttt{opcode[6:0]} và \texttt{funct3}, \texttt{funct7} để thiết lập trạng thái. Nó cũng sinh ra giá trị mở rộng dấu \texttt{imm} phù hợp với định dạng lệnh.
 
-\subsection{Kết quả mô phỏng ghi nhận trên Console}
-\begin{verbatim}
-=========================================================
-BAT DAU MO PHONG HE THONG 8 LOI PIPELINE
-=========================================================
-Kiem tra mem[0] (Ky vong: 42) = 42
-[PASS] Shared memory data dung.
-Kiem tra mem[1] addr 4 (Ky vong: 99) = 99
-[PASS] 8 core hoan thanh chuong trinh khong deadlock.
+\section{Đơn vị số học logic (ALU)}
+\textbf{Mục đích:} Thực thi các phép toán số học (cộng, trừ), logic (AND, OR, XOR) và dịch bit.
+\textbf{Giao tiếp:} Nhận hai toán hạng 32-bit \texttt{a}, \texttt{b} và mã điều khiển \texttt{alu\_control[3:0]}. Trả về \texttt{result} 32-bit và cờ \texttt{zero}.
 
-PIPELINE / BUS EVIDENCE
-Core 0: grant=3 retired=163 mem_stall=13 load_use_stall=0 flush=159
-Core 1: grant=3 retired=163 mem_stall=14 load_use_stall=0 flush=159
-Core 2: grant=3 retired=163 mem_stall=15 load_use_stall=0 flush=158
-Core 3: grant=3 retired=162 mem_stall=16 load_use_stall=0 flush=158
-Core 4: grant=3 retired=162 mem_stall=17 load_use_stall=0 flush=158
-Core 5: grant=3 retired=162 mem_stall=18 load_use_stall=0 flush=157
-Core 6: grant=4 retired=161 mem_stall=19 load_use_stall=0 flush=157
-Core 7: grant=4 retired=161 mem_stall=20 load_use_stall=0 flush=157
+\section{Thiết kế Datapath và Pipeline 5 tầng}
+Đường truyền dữ liệu được chia làm 5 tầng: Fetch, Decode, Execute, Memory, Writeback. Các thanh ghi pipeline đóng vai trò chốt dữ liệu và tín hiệu điều khiển giữa các tầng.
 
-TONG KET: 10 PASSED, 0 FAILED
-=========================================================
-\end{verbatim}
+\subsection{Tầng Fetch và IF/ID}
+Bao gồm bộ đếm PC và mạch \texttt{pc\_logic}. PC được cập nhật dựa trên tín hiệu rẽ nhánh từ tầng EX hoặc stall từ hazard controller. Thanh ghi IF/ID chốt mã lệnh từ \texttt{instr\_mem}.
 
----
+\subsection{Tầng Decode và ID/EX}
+Thực hiện giải mã qua \texttt{control\_unit} và đọc \texttt{reg\_file}. Khi gặp stall, tín hiệu \texttt{id\_ex\_valid} bị ép về 0 (tạo NOP).
 
-\section{Thảo luận và phân tích hiệu năng hệ thống}
-Kết quả thống kê thực nghiệm từ mô phỏng đa nhân mang lại những nhận định giá trị về mặt kiến trúc máy tính:
-
-\subsection{Các chỉ số hiệu năng đo được từ \texttt{system\_tb.v}}
-Bảng \ref{tab:perf_summary} tổng hợp các chỉ số đo trực tiếp từ testbench hệ thống trong 500 chu kỳ mô phỏng. Các giá trị CPI và IPC dưới đây được hiểu là chỉ số thông lượng tổng hợp của workload kiểm thử hiện tại, không phải benchmark hiệu năng chuẩn. Do chương trình thử nghiệm có vòng lặp \texttt{halt} và chưa có workload song song có kích thước tăng theo số lõi, các số này chỉ dùng để chứng minh hệ thống có retire instruction, có tranh chấp bus và không deadlock.
+\subsection{Tầng Execute và Forwarding}
+Chứa ALU và mạch so sánh rẽ nhánh. Mạch Forwarding ưu tiên lấy dữ liệu mới nhất từ MEM hoặc WB để thay thế dữ liệu từ ID/EX nhằm tránh data hazard.
 
 \begin{table}[H]
 \centering
-\small
-\setlength{\tabcolsep}{5pt}
-\begin{tabularx}{\textwidth}{X r}
-\toprule
-\textbf{Chỉ số} & \textbf{Giá trị đo được} \\
-\midrule
-Tổng số chu kỳ mô phỏng & 500 \\
-Retired instruction từng core & 163, 163, 163, 162, 162, 162, 161, 161 \\
-Tổng retired instruction & 1297 \\
-CPI tổng hợp toàn hệ thống & $500 / 1297 \approx 0.385$ \\
-IPC tổng hợp toàn hệ thống & $1297 / 500 \approx 2.594$ \\
-Grant bus từng core & 3, 3, 3, 3, 3, 3, 4, 4 \\
-Tổng số grant bus & 26 \\
-Bus utilization theo grant pulse & $26 / 500 = 5.2\%$ \\
-Tổng số chu kỳ chờ bus/memory stall & 132 \\
-Trung bình memory stall mỗi core & $132 / 8 = 16.5$ \\
-\bottomrule
-\end{tabularx}
-\caption{Tổng hợp chỉ số hiệu năng đo được từ \texttt{system\_tb.v}}
-\label{tab:perf_summary}
+\begin{tabular}{|l|c|c|c|c|c|c|}
+\hline
+\textbf{Lệnh} & \textbf{C1} & \textbf{C2} & \textbf{C3} & \textbf{C4} & \textbf{C5} & \textbf{C6} \\
+\hline
+1: \texttt{ADD x3, x1, x2} & IF & ID & EX & MEM & \textbf{WB} & \\
+\hline
+2: \texttt{SUB x4, x3, x5} & & IF & ID & \textbf{EX*} & MEM & WB \\
+\hline
+\end{tabular}
+\caption{Biểu đồ thời gian minh họa cơ chế Forwarding (Từ EX/MEM về EX của lệnh sau)}
+\label{fig:forwarding_wave}
 \end{table}
 
-\subsection{So sánh theo số lượng core}
-Bảng \ref{tab:core_scaling} ghi rõ trạng thái dữ liệu hiện có. Phiên bản báo cáo này chỉ có số liệu đầy đủ cho cấu hình 8 core từ \texttt{system\_tb.v}; các cấu hình 1, 2 và 4 core chưa có testbench hoặc workload scale tương ứng trong repo hiện tại. Vì vậy chưa thể kết luận speedup và parallel efficiency một cách nghiêm túc.
+\subsection{Tầng Memory và MEM/WB}
+Giao tiếp với bus hệ thống. Nếu \texttt{mem\_ready=0}, lõi kéo tín hiệu \texttt{mem\_wait=1} để đóng băng pipeline (stall).
 
 \begin{table}[H]
 \centering
-\small
-\setlength{\tabcolsep}{4pt}
-\begin{tabularx}{\textwidth}{c X X X}
-\toprule
-\textbf{Số core} & \textbf{Trạng thái dữ liệu} & \textbf{Speedup} & \textbf{Parallel efficiency} \\
-\midrule
-1 & Chưa có baseline tương đương cho workload đa lõi hiện tại & Chưa kết luận & Chưa kết luận \\
-2 & Chưa có testbench riêng hoặc tham số hóa số core & Chưa kết luận & Chưa kết luận \\
-4 & Chưa có testbench riêng hoặc tham số hóa số core & Chưa kết luận & Chưa kết luận \\
-8 & Có số liệu: 500 cycle, 1297 retired, IPC $\approx 2.594$ & Chưa kết luận do thiếu baseline & Chưa kết luận do thiếu baseline \\
-\bottomrule
-\end{tabularx}
-\caption{Trạng thái so sánh hiệu năng theo số lượng core}
-\label{tab:core_scaling}
+\begin{tabular}{|l|c|c|c|c|c|c|}
+\hline
+\textbf{Lệnh} & \textbf{C1} & \textbf{C2} & \textbf{C3} & \textbf{C4} & \textbf{C5} & \textbf{C6} \\
+\hline
+1: \texttt{LW x3, 0(x1)} & IF & ID & EX & \textbf{MEM} (Wait) & \textbf{MEM} (Ready) & WB \\
+\hline
+2: \texttt{ADD x4, x3, x5} & & IF & ID & \textbf{EX} (Stall) & \textbf{EX} (Stall) & EX \\
+\hline
+\end{tabular}
+\caption{Biểu đồ thời gian minh họa Memory Stall khi truy cập RAM bị trễ}
+\label{fig:mem_stall_wave}
 \end{table}
 
-\begin{enumerate}
-    \item \textbf{Độ tin cậy của việc đồng bộ hóa dữ liệu:} 
-    Giá trị thu được tại địa chỉ \texttt{mem[0] = 42} và \texttt{mem[1] = 99} chứng minh các thao tác ghi của 8 lõi xử lý đều diễn ra thành công mà không gây ra hiện tượng deadlock hay ghi đè lỗi dữ liệu. Mặc dù 8 lõi cùng thực thi mã lệnh ghi vào các địa chỉ trùng nhau tại cùng các thời điểm, Bus Interconnect đã thực thi cơ chế phân lịch tuần tự hóa một cách chính xác.
-    
-    \item \textbf{Đặc tính xếp hàng và độ trễ Bus (Memory Stall Progression):} 
-    Quan sát thông số số chu kỳ đợi bộ nhớ (\texttt{mem\_stall}) của từng lõi, ta thấy một quy luật tăng tiến tuyến tính rõ rệt:
-    \begin{itemize}
-        \item Core 0: Chỉ bị stall \textbf{13 chu kỳ}.
-        \item Core 1: Bị stall \textbf{14 chu kỳ}.
-        \item Core 2: Bị stall \textbf{15 chu kỳ}.
-        \item ...
-        \item Core 7: Bị stall \textbf{20 chu kỳ}.
-    \end{itemize}
-    Quy luật này phản ánh chính xác hoạt động của bộ phân xử Arbiter Round-Robin. Tại chu kỳ khởi đầu khi tất cả 8 lõi cùng khởi phát yêu cầu truy cập bus đồng thời:
-    \begin{itemize}
-        \item Con trỏ \texttt{priority\_ptr} mặc định là 0, do đó Core 0 được cấp quyền truy cập trước tiên. Core 0 hoàn thành giao dịch sớm nhất nên số chu kỳ stall là nhỏ nhất.
-        \item Lượt cấp quyền dịch chuyển tuần tự từ Core 0 $\rightarrow$ Core 1 $\rightarrow$ Core 2 $\rightarrow$ ... $\rightarrow$ Core 7. 
-        \item Core 7 nằm ở cuối chu kỳ ưu tiên nên phải đợi các lõi trước hoàn thành giao dịch của mình, dẫn đến số chu kỳ tích lũy stall lớn nhất (20 chu kỳ).
-    \end{itemize}
-    Sự tăng đều đặn 1 chu kỳ stall cho mỗi mã định danh lõi (Core ID) là bằng chứng thực tế cho thấy tính đúng đắn của thuật toán Round-Robin trong mã nguồn RTL đã mô hình hóa chân thực hiện tượng nghẽn bus do chia sẻ tài nguyên vật lý ngoài thực tế.
-\end{enumerate}
+\section{Xử lý xung đột (Hazard Controller)}
+\textbf{Mục đích:} Phát hiện và xử lý Data Hazard (bằng Forwarding và Load-Use Stall) và Control Hazard (bằng Branch Flush).
+
+\subsection{Load-Use Stall}
+Xảy ra khi lệnh EX là lệnh Load và có thanh ghi đích trùng với nguồn của lệnh ID.
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|c|c|c|c|}
+\hline
+\textbf{Lệnh} & \textbf{C1} & \textbf{C2} & \textbf{C3} & \textbf{C4} & \textbf{C5} & \textbf{C6} & \textbf{C7} \\
+\hline
+1: \texttt{LW x3, 0(x1)} & IF & ID & EX & MEM & \textbf{WB} & & \\
+\hline
+2: \texttt{ADD x4, x3, x5} & & IF & ID & \textbf{Stall} & \textbf{EX*} & MEM & WB \\
+\hline
+\end{tabular}
+\caption{Biểu đồ thời gian minh họa Load-Use Stall (Chèn 1 chu kỳ NOP để đợi Load)}
+\label{fig:load_use_wave}
+\end{table}
+
+\subsection{Branch Flush}
+Khi nhánh được xác định là rẽ (Taken) ở tầng EX, hai lệnh đi sau ở IF và ID bị hủy (Flush).
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|c|c|c|}
+\hline
+\textbf{Lệnh} & \textbf{C1} & \textbf{C2} & \textbf{C3} & \textbf{C4} & \textbf{C5} & \textbf{C6} \\
+\hline
+1: \texttt{BEQ x1, x2, Target} & IF & ID & \textbf{EX} (Taken) & MEM & WB & \\
+\hline
+2: \texttt{Lệnh kế tiếp} & & IF & ID & \textbf{Flush} & & \\
+\hline
+3: \texttt{Lệnh kế tiếp 2} & & & IF & \textbf{Flush} & & \\
+\hline
+4: \texttt{Lệnh tại Target} & & & & \textbf{IF} & ID & EX \\
+\hline
+\end{tabular}
+\caption{Biểu đồ thời gian minh họa Branch Flush (Hủy bỏ 2 lệnh sai luồng)}
+\label{fig:branch_flush_wave}
+\end{table}
