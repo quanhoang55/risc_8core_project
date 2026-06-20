@@ -1,6 +1,6 @@
 \contentsline {lstlisting}{\numberline {3.1}{\ignorespaces Hiện thực Register File}}{18}{lstlisting.3.1}%
 \contentsline {lstlisting}{\numberline {4.1}{\ignorespaces Thuật toán Round-Robin trong Arbiter}}{21}{lstlisting.4.1}%
-\contentsline {lstlisting}{\numberline {4.2}{\ignorespaces Tính toán kết quả AMOADD trong FSM}}{22}{lstlisting.4.2}%
+\contentsline {lstlisting}{\numberline {4.2}{\ignorespaces Tính toán kết quả AMOADD trong FSM}}{23}{lstlisting.4.2}%
 \contentsline {lstlisting}{\numberline {5.1}{\ignorespaces Trích đoạn script biên dịch system\_tb trên Windows}}{24}{lstlisting.5.1}%
 \contentsline {lstlisting}{\numberline {5.2}{\ignorespaces Chương trình Assembly lõi đơn}}{25}{lstlisting.5.2}%
 \contentsline {lstlisting}{\numberline {5.3}{\ignorespaces Console log của \texttt {core\_tb}}}{25}{lstlisting.5.3}%

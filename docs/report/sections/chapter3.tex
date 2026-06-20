@@ -28,13 +28,13 @@ assign rs1_data = (rs1_addr == 5'd0) ? 32'd0 : registers[rs1_addr];
 assign rs2_data = (rs2_addr == 5'd0) ? 32'd0 : registers[rs2_addr];
 \end{lstlisting}
 
-\section{Bộ điều khiển trung tâm (Control Unit)}
-\textbf{Mục đích:} Giải mã chỉ thị 32-bit, phát ra cờ điều khiển cho ALU, nhánh, và giao tiếp bộ nhớ.
-\textbf{Thuật toán/Logic:} Sử dụng câu lệnh \texttt{case} trên trường \texttt{opcode[6:0]} và \texttt{funct3}, \texttt{funct7} để thiết lập trạng thái. Nó cũng sinh ra giá trị mở rộng dấu \texttt{imm} phù hợp với định dạng lệnh.
-
 \section{Đơn vị số học logic (ALU)}
 \textbf{Mục đích:} Thực thi các phép toán số học (cộng, trừ), logic (AND, OR, XOR) và dịch bit.
 \textbf{Giao tiếp:} Nhận hai toán hạng 32-bit \texttt{a}, \texttt{b} và mã điều khiển \texttt{alu\_control[3:0]}. Trả về \texttt{result} 32-bit và cờ \texttt{zero}.
+
+\section{Bộ điều khiển trung tâm (Control Unit)}
+\textbf{Mục đích:} Giải mã chỉ thị 32-bit, phát ra cờ điều khiển cho ALU, nhánh, và giao tiếp bộ nhớ.
+\textbf{Thuật toán/Logic:} Sử dụng câu lệnh \texttt{case} trên trường \texttt{opcode[6:0]} và \texttt{funct3}, \texttt{funct7} để thiết lập trạng thái. Nó cũng sinh ra giá trị mở rộng dấu \texttt{imm} phù hợp với định dạng lệnh.
 
 \section{Thiết kế Datapath và Pipeline 5 tầng}
 Đường truyền dữ liệu được chia làm 5 tầng: Fetch, Decode, Execute, Memory, Writeback. Các thanh ghi pipeline đóng vai trò chốt dữ liệu và tín hiệu điều khiển giữa các tầng.
