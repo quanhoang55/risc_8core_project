@@ -11,7 +11,6 @@ module system_tb;
     always #5 clk = ~clk; // 100 MHz
 
     top_8core #(
-        // CHÚ Ý: Đã sửa đường dẫn chuẩn chạy từ thư mục gốc của Project
         .PROGRAM_FILE("software/system_program.hex"),
         .PROGRAM_WORDS(6)
     ) dut (
@@ -30,7 +29,7 @@ module system_tb;
     wire [31:0] core_load_use_stall [0:7];
     wire [31:0] core_flush [0:7];
 
-    // Trích xuất dữ liệu Counters để làm Slide Evidence
+    // Extract counters data for Slide Evidence
     assign core_retired[0]        = dut.gen_core[0].u_core.retired_count;
     assign core_retired[1]        = dut.gen_core[1].u_core.retired_count;
     assign core_retired[2]        = dut.gen_core[2].u_core.retired_count;
