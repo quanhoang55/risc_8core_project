@@ -2,6 +2,7 @@
 
 % --- Cấu hình Tiếng Việt & Phông chữ ---
 \usepackage[utf8]{inputenc}
+\usepackage[T5]{fontenc}
 \usepackage[vietnamese]{babel}
 \usepackage[left=3.0cm, right=2.0cm, top=2.5cm, bottom=2.5cm]{geometry} % Chuẩn lề Việt Nam / APA
 \usepackage{mathptmx} % Font Times New Roman tương đương cho pdfLaTeX
@@ -21,6 +22,10 @@
 \usetikzlibrary{positioning}
 \usepackage{float} % Hỗ trợ định vị float chính xác bằng [H]
 \usepackage{makecell} % Hỗ trợ tạo ô nhiều dòng trong bảng
+\usepackage{longtable}
+\usepackage{array}
+% \usepackage{enumitem}
+\usepackage{caption}
 
 % --- Hệ màu sắc chuyên nghiệp từ Slide ---
 \definecolor{DeepBlue}{RGB}{0, 43, 77}
@@ -46,16 +51,27 @@
   showstringspaces=false,
   columns=flexible,
   basicstyle={\small\ttfamily},
-  numbers=none,
+  frame=tb,
+  language=Verilog,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=left,
   numberstyle=\tiny\color{gray},
   keywordstyle=\color{blue},
   commentstyle=\color{dkgreen},
   stringstyle=\color{mauve},
   breaklines=true,
   breakatwhitespace=true,
-  tabsize=4
+  tabsize=4,
+  extendedchars=false
 }
-
+\renewcommand{\lstlistingname}{Mã nguồn}
+\renewcommand{\lstlistlistingname}{Danh Mục Mã Nguồn}
+% \setlist[itemize]{topsep=3pt,itemsep=2pt,parsep=0pt}
+% \setlist[enumerate]{topsep=3pt,itemsep=2pt,parsep=0pt}
 % --- Định cấu trúc Header & Footer ---
 \pagestyle{fancy}
 \fancyhf{}
@@ -82,6 +98,7 @@
     pdfpagemode=FullScreen,
 }
 
+\sloppy
 \begin{document}
 
 % ==========================================
@@ -131,7 +148,11 @@
 \chapter*{Tóm Tắt Báo Cáo}
 \addcontentsline{toc}{chapter}{Tóm Tắt Báo Cáo}
 
-Báo cáo trình bày quá trình thiết kế và mô phỏng một hệ thống CPU 8 lõi sử dụng kiến trúc tập lệnh RISC-V ở mức RTL. Bài toán chính của đề tài là xây dựng một mô hình đa lõi có khả năng thực thi chương trình, chia sẻ bộ nhớ dữ liệu và xử lý tranh chấp khi nhiều lõi cùng truy cập tài nguyên chung. Thiết kế chính gồm 8 lõi RISC-V pipeline 5 tầng, bộ nhớ lệnh riêng cho từng lõi, bộ nhớ dữ liệu dùng chung 4 KB, bộ phân xử Round-Robin và bộ điều khiển bus hỗ trợ các giao dịch đọc, ghi, LR/SC và một số phép AMO primitive. Phạm vi ISA tập trung vào RV32I subset, kèm nhóm lệnh nguyên tử ở mức phục vụ kiểm chứng đồng bộ đa lõi cơ bản. Phương pháp kiểm thử sử dụng Icarus Verilog để biên dịch/chạy testbench và GTKWave để quan sát waveform. Các kết quả nổi bật gồm \texttt{core\_tb} đạt \texttt{7 PASSED, 0 FAILED}, \texttt{system\_tb} đạt \texttt{10 PASSED, 0 FAILED}, và \texttt{interconnect\_tb} kiểm chứng Round-Robin, LR/SC, AMOADD với \texttt{10 PASSED, 0 FAILED}. Hạn chế hiện tại là hệ thống chưa có cache, cache coherence, hệ điều hành, interrupt/exception/CSR đầy đủ và chưa có benchmark hiệu năng chuẩn cho nhiều mức số lõi.
+Báo cáo trình bày quá trình thiết kế và mô phỏng một hệ thống CPU 8 lõi sử dụng kiến trúc tập lệnh RISC-V ở mức RTL. Bài toán chính của đề tài là xây dựng một mô hình đa lõi có khả năng thực thi chương trình, chia sẻ bộ nhớ dữ liệu và xử lý tranh chấp khi nhiều lõi cùng truy cập tài nguyên chung. Thiết kế gồm 8 lõi RISC-V pipeline 5 tầng, bộ nhớ lệnh riêng cho từng lõi, bộ nhớ dữ liệu dùng chung 4 KB, bộ phân xử Round-Robin và bộ điều khiển bus hỗ trợ các giao dịch đọc, ghi, LR/SC và một số phép AMO. Phạm vi ISA tập trung vào một tập con RV32I, kèm nhóm lệnh nguyên tử phục vụ kiểm chứng đồng bộ đa lõi cơ bản.
+
+Quy trình kiểm chứng sử dụng Icarus Verilog để biên dịch và chạy testbench, đồng thời sử dụng GTKWave để quan sát dạng sóng. Trong lần tái kiểm chứng trên môi trường Windows ngày 20/06/2026, \texttt{system\_tb} đạt \texttt{10 PASSED, 0 FAILED}; \texttt{interconnect\_tb} đạt \texttt{10 PASSED, 0 FAILED} cho các kịch bản Round-Robin, LR/SC và AMOADD. Module \texttt{core\_tb} đã được sửa chữa triệt để lỗi Load-Use và nay đạt \texttt{7 PASSED, 0 FAILED}. Hạn chế hiện tại của hệ thống gồm chưa có cache, cache coherence, hệ điều hành, interrupt/exception/CSR đầy đủ và chưa có benchmark hiệu năng chuẩn cho nhiều mức số lõi.
+
+\textbf{Từ khóa:} RISC-V, RV32I, pipeline 5 tầng, CPU đa lõi, shared memory, Round-Robin, LR/SC, AMO, Verilog HDL, Icarus Verilog.
 
 \newpage
 
@@ -148,6 +169,18 @@ Báo cáo trình bày quá trình thiết kế và mô phỏng một hệ thốn
 \tableofcontents
 \newpage
 
+\listoffigures
+\addcontentsline{toc}{chapter}{Danh Mục Hình Vẽ}
+\newpage
+
+\listoftables
+\addcontentsline{toc}{chapter}{Danh Mục Bảng}
+\newpage
+
+\lstlistoflistings
+\addcontentsline{toc}{chapter}{Danh Mục Mã Nguồn}
+\newpage
+
 % ==========================================
 % CHƯƠNG 1: GIỚI THIỆU
 % ==========================================
@@ -161,19 +194,31 @@ Báo cáo trình bày quá trình thiết kế và mô phỏng một hệ thốn
 \newpage
 
 % ==========================================
-% CHƯƠNG 3: KẾT QUẢ MÔ PHỎNG VÀ THẢO LUẬN
+% CHƯƠNG 3: HIỆN THỰC HÓA RTL ĐƠN NHÂN
 % ==========================================
 \input{sections/chapter3}
 \newpage
 
 % ==========================================
-% CHƯƠNG 4: HẠN CHẾ VÀ HƯỚNG PHÁT TRIỂN
+% CHƯƠNG 4: HỆ THỐNG 8-CORE VÀ GIAO TIẾP ĐA LÕI
 % ==========================================
 \input{sections/chapter4}
 \newpage
 
 % ==========================================
-% CHƯƠNG 5: KẾT LUẬN
+% CHƯƠNG 5: KIỂM THỬ VÀ ĐÁNH GIÁ KẾT QUẢ MÔ PHỎNG
+% ==========================================
+\input{sections/chapter5}
+\newpage
+
+% ==========================================
+% CHƯƠNG 6: ĐÁNH GIÁ, HẠN CHẾ VÀ HƯỚNG PHÁT TRIỂN
+% ==========================================
+\input{sections/chapter6}
+\newpage
+
+% ==========================================
+% KẾT LUẬN
 % ==========================================
 \input{sections/conclusion}
 \newpage
@@ -182,5 +227,12 @@ Báo cáo trình bày quá trình thiết kế và mô phỏng một hệ thốn
 % TÀI LIỆU THAM KHẢO
 % ==========================================
 \input{sections/references}
+\newpage
+
+% ==========================================
+% PHỤ LỤC
+% ==========================================
+\appendix
+\input{sections/appendices}
 
 \end{document}

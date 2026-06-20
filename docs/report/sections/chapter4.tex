@@ -1,68 +1,75 @@
-\chapter{Hạn Chế Và Hướng Phát Triển}
+\chapter{Hệ Thống 8-Core và Giao Tiếp Đa Lõi}
+\label{chap:implementation_8core}
 
-\section{Hạn chế hiện tại của đề tài}
+Chương này trình bày kiến trúc kết nối 8 lõi xử lý thành một hệ thống đa nhân hoàn chỉnh chia sẻ một bộ nhớ RAM dữ liệu dủng chung. Hệ thống sử dụng bộ phân xử (Arbiter) và bộ điều khiển (Bus Controller) để quản lý tranh chấp và hỗ trợ cơ chế đồng bộ đa luồng.
+
+\section{Sơ đồ cấu trúc tổng thể}
+Tại top-level (\texttt{top\_8core.v}), 8 lõi \texttt{risc\_core} được khởi tạo song song thông qua cấu trúc \texttt{generate}. Mỗi lõi sở hữu một bộ nhớ lệnh cục bộ (1 KB) để loại bỏ xung đột nạp lệnh, nhưng chia sẻ chung bộ nhớ dữ liệu (4 KB) thông qua trục liên kết (Interconnect).
+
+\begin{figure}[H]
+    \centering
+    \caption{Sơ đồ cấu trúc tổng thể hệ thống 8-Core (Cần bổ sung hình)}
+    \label{fig:top_8core_diagram}
+\end{figure}
+
+\section{Bản đồ bộ nhớ (Memory Map)}
+Không gian địa chỉ chia sẻ được quy định đơn giản nhằm phục vụ mục đích kiểm thử. Địa chỉ truy cập được căn lề 32-bit (word-aligned).
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|p{6cm}|}
+\hline
+\textbf{Vùng nhớ} & \textbf{Địa chỉ vật lý} & \textbf{Chức năng} \\
+\hline
+\texttt{mem[0]} & \texttt{0x0000\_0000} & Biến chia sẻ dùng chung (shared counter) \\
+\hline
+\texttt{mem[1]} & \texttt{0x0000\_0004} & Cờ hoàn tất (Done marker) \\
+\hline
+\texttt{mem[2:1023]} & \texttt{0x0000\_0008} đến \texttt{0x0000\_0FFC} & Vùng nhớ tự do \\
+\hline
+\end{tabular}
+\caption{Bản đồ bộ nhớ dùng chung tối giản}
+\label{tab:memory_map}
+\end{table}
+
+\section{Bộ phân xử Round-Robin (\texttt{arbiter.v})}
+\textbf{Mục đích:} Cấp quyền truy cập bus cho 8 lõi một cách công bằng, ngăn chặn tình trạng đói bus (starvation).
+\textbf{Thuật toán:} Sử dụng con trỏ ưu tiên 3-bit xoay vòng. Khi có yêu cầu, arbiter tìm kiếm lõi có số thứ tự bằng hoặc lớn hơn con trỏ ưu tiên hiện tại. Chỉ cấp quyền (grant) đúng 1 chu kỳ để lõi đó bắt đầu giao dịch.
+
+\begin{lstlisting}[caption={Thuật toán Round-Robin trong Arbiter},label={lst:arbiter}]
+for (i = 0; i < 8; i = i + 1) begin
+    idx = (priority_ptr + i) % 8;
+    if (request[idx]) begin
+        grant_id = idx;
+        grant_valid = 1'b1;
+        break;
+    end
+end
+if (grant_valid) priority_ptr <= grant_id + 1;
+\end{lstlisting}
+
+\section{Bộ điều khiển Bus (\texttt{bus\_ctrl.v})}
+\textbf{Mục đích:} Định tuyến địa chỉ, dữ liệu và điều khiển RAM dùng chung. Quản lý trạng thái giao dịch (FSM) bao gồm đọc/ghi thông thường, LR/SC và AMO.
+\textbf{FSM:} Bus Controller duy trì máy trạng thái hữu hạn để xử lý tính nguyên tử.
 \begin{itemize}
-    \item \textbf{Hiệu năng kết nối:} Hệ thống chưa trang bị bộ nhớ đệm Cache riêng cho từng lõi CPU dẫn tới tần suất tranh chấp Bus rất cao, gây nghẽn băng thông nghiêm trọng khi chạy các chương trình phức tạp.
-    \item \textbf{Tính đầy đủ của tập lệnh:} Tập lệnh chưa hỗ trợ đầy đủ bộ xử lý RISC-V theo chuẩn công nghiệp (chưa có phép nhân chia phần cứng, CSR, hay ngắt ngoại lệ).
+    \item \textbf{IDLE:} Chờ \texttt{grant} từ Arbiter.
+    \item \textbf{ACTIVE:} Lõi được cấp quyền gửi dữ liệu. Với giao dịch thường, hoàn tất trong 1 chu kỳ. Với AMO, chuyển sang pha đọc.
+    \item \textbf{AMO\_READ:} Gửi địa chỉ đọc lên RAM.
+    \item \textbf{AMO\_WRITE:} Tính toán kết quả AMO (cộng, logic, max/min) và ghi lại RAM, hoàn tất giao dịch.
 \end{itemize}
 
-\section{Hướng phát triển đề tài}
-\begin{enumerate}
-    \item Thiết kế bộ nhớ đệm L1 Cache riêng cho từng core.
-    \item Hiện thực hóa bộ điều khiển tính nhất quán bộ nhớ đệm (Cache Coherence Controller) theo giao thức MESI hoặc Snooping \cite{mesi_coherence}.
-    \item Nâng cấp lõi CPU lên kiến trúc RV32IM hoàn chỉnh.
-\end{enumerate}
-
-\section{Khả năng tái lập}
-Để người đọc có thể tái lập kết quả mô phỏng, báo cáo sử dụng trạng thái mã nguồn tại commit \texttt{e7889c8}. Môi trường chạy hiện tại là Windows với PowerShell. Các phiên bản công cụ có thể kiểm tra bằng các lệnh:
-
-\begin{lstlisting}[language=bash, caption={Kiểm tra phiên bản công cụ mô phỏng}]
-iverilog -V
-vvp -V
-gtkwave --version
-\end{lstlisting}
-
-Cấu trúc thư mục chính của dự án gồm:
+\subsection{Cơ chế Load-Reserved / Store-Conditional (LR/SC)}
+Để hỗ trợ đồng bộ hóa, bộ điều khiển cấp phát 8 thanh ghi \texttt{reservation\_addr} và 8 cờ \texttt{reservation\_valid} cho 8 lõi.
 \begin{itemize}
-    \item \texttt{rtl/core}: các module lõi CPU, ALU, control unit, PC logic, register file và pipeline register.
-    \item \texttt{rtl/interconnect}: bộ phân xử \texttt{arbiter.v} và bộ điều khiển bus \texttt{bus\_ctrl.v}.
-    \item \texttt{rtl/memory}: bộ nhớ lệnh và bộ nhớ dữ liệu dùng chung.
-    \item \texttt{tb}: các testbench và file waveform sinh ra khi mô phỏng.
-    \item \texttt{software}: chương trình assembly và file machine code \texttt{.hex}.
-    \item \texttt{scripts}: script hỗ trợ biên dịch/chạy mô phỏng.
-    \item \texttt{docs}: tài liệu báo cáo, slide và bằng chứng mô phỏng.
+    \item Lệnh \textbf{LR} đặt cờ \texttt{valid=1} và ghi nhớ địa chỉ.
+    \item Lệnh \textbf{SC} kiểm tra nếu \texttt{valid==1} và địa chỉ trùng khớp thì cho phép ghi, trả về 0 (thành công). Ngược lại không ghi, trả về 1 (thất bại).
+    \item Mọi lệnh \textbf{Store} hoặc \textbf{AMO} hợp lệ chạm vào địa chỉ đang được reserve bởi một lõi khác sẽ xóa cờ \texttt{valid} của lõi đó.
 \end{itemize}
 
-Các lệnh biên dịch và chạy mô phỏng chính:
-
-\begin{lstlisting}[language=bash, caption={Chạy test lõi đơn}]
-iverilog -g2012 -o tb/core_test.vvp \
-  -I rtl/core -I rtl/interconnect -I rtl/memory \
-  rtl/core/alu.v rtl/core/control_unit.v rtl/core/pc_logic.v \
-  rtl/core/reg_file.v rtl/core/risc_core.v \
-  rtl/memory/data_mem.v rtl/memory/instr_mem.v \
-  tb/core_tb.v
-vvp tb/core_test.vvp
+\subsection{Cơ chế Atomic Memory Operations (AMO)}
+AMOADD là lệnh chủ lực dùng để kiểm tra việc cộng dồn biến đếm an toàn. Hardware tự động khóa bus trong quá trình đọc-cộng-ghi.
+\begin{lstlisting}[caption={Tính toán kết quả AMOADD trong FSM},label={lst:amoadd}]
+if (amo_op == AMO_ADD) begin
+    ram_wdata <= ram_rdata + active_wdata; // rdata (cũ) + rs2
+    core_rdata <= ram_rdata; // Trả về giá trị cũ cho core
+end
 \end{lstlisting}
-
-\begin{lstlisting}[language=bash, caption={Chạy test hệ thống 8 core}]
-iverilog -g2012 -o tb/system_test.vvp \
-  -I rtl/core -I rtl/interconnect -I rtl/memory \
-  rtl/core/alu.v rtl/core/control_unit.v rtl/core/pc_logic.v \
-  rtl/core/reg_file.v rtl/core/risc_core.v \
-  rtl/memory/data_mem.v rtl/memory/instr_mem.v \
-  rtl/interconnect/arbiter.v rtl/interconnect/bus_ctrl.v \
-  rtl/top_8core.v tb/system_tb.v
-vvp tb/system_test.vvp
-\end{lstlisting}
-
-\begin{lstlisting}[language=bash, caption={Chạy test interconnect}]
-iverilog -g2012 -o interconnect_test.vvp \
-  rtl/interconnect/arbiter.v rtl/interconnect/bus_ctrl.v \
-  rtl/memory/data_mem.v tb/interconnect_tb.v
-vvp interconnect_test.vvp
-\end{lstlisting}
-
-Output kỳ vọng lần lượt là \texttt{SUMMARY: 7 PASSED, 0 FAILED} với \texttt{core\_tb}, \texttt{TONG KET: 10 PASSED, 0 FAILED} với \texttt{system\_tb}, và \texttt{SUMMARY: 10 PASSED, 0 FAILED} với \texttt{interconnect\_tb}. Các file \texttt{.vcd} sinh ra có thể mở bằng GTKWave để quan sát tín hiệu pipeline, bus grant, request, ready và dữ liệu bộ nhớ.
-
-Các file \texttt{.hex} hiện được lưu sẵn cùng mã nguồn assembly trong thư mục \texttt{software}. Repo hiện chưa có assembler tự động từ \texttt{.asm} sang \texttt{.hex}; khi thay đổi chương trình assembly, cần tự chuyển sang machine code đúng định dạng \texttt{\$readmemh} rồi cập nhật file \texttt{.hex} tương ứng.

@@ -1,0 +1,47 @@
+\chapter{Đánh Giá, Hạn Chế Và Hướng Phát Triển}
+\label{chap:evaluation}
+
+\section{Đánh giá các kết quả đạt được}
+Đề tài đã tạo được một mô hình có đủ ba lớp quan trọng của hệ thống đa lõi: lõi pipeline 5 tầng, hệ thống liên kết phân xử Round-Robin và bộ nhớ dữ liệu chia sẻ. So với mô hình lõi đơn thuần túy, mô hình 8 lõi giúp tiếp cận trực diện với các vấn đề kiến trúc thực tế:
+\begin{itemize}
+    \item \textbf{Cơ chế phân xử (Arbitration) và Back-pressure:} Xử lý tình trạng nhiều lõi đồng loạt yêu cầu bus thông qua tín hiệu stall.
+    \item \textbf{Đồng bộ hóa đa luồng (Synchronization):} Xây dựng thành công cơ chế Atomic Read-Modify-Write (AMOADD) và Reservation (LR/SC) ở cấp độ phần cứng.
+    \item \textbf{Kiểm chứng tự động:} Việc duy trì các bộ đếm \texttt{retired}, \texttt{mem\_stall}, \texttt{load\_use\_stall} và \texttt{flush} bên trong từng lõi giúp quan sát độ trễ và sự công bằng một cách định lượng.
+\end{itemize}
+
+Lần tái kiểm chứng ngày 20/06/2026 đã ghi nhận lõi đơn đạt 7/0 PASSED (sửa thành công lỗi độ trễ bộ nhớ gây lệch kết quả Load-to-WB trước đây). Mô phỏng toàn hệ thống đạt 10/0 PASSED.
+
+\section{Hạn chế về tính đúng đắn chức năng và kiến trúc}
+Mặc dù hệ thống đã hoạt động chính xác với các chương trình kiểm thử cơ bản, mô hình này được thiết kế theo hướng tối giản (educational model) nên còn nhiều điểm giới hạn so với một vi xử lý thương mại:
+
+\subsection{Hạn chế kiến trúc vi mô (Microarchitecture)}
+\begin{itemize}
+    \item \textbf{Nút nghẽn Bus đơn:} Cả 8 lõi đều chia sẻ chung một bus và một bộ nhớ RAM một cổng. Khi tất cả các lõi đều thực hiện \texttt{Load}/\texttt{Store}, hiệu năng sẽ bị thắt cổ chai, không thể hiện được tính mở rộng (Scalability) tuyến tính của đa lõi.
+    \item \textbf{Thiếu bộ đệm (Cache):} Mỗi truy cập bộ nhớ đều phải đợi giao tiếp qua Bus chung, làm tăng số chu kỳ Stall. Một CPU thực tế cần có L1 Cache (Instruction \& Data) ở mỗi lõi.
+    \item \textbf{Thiếu giao thức nhất quán (Cache Coherence):} Mặc dù hiện tại không dùng Cache nên không có dữ liệu rác, nhưng để mở rộng trong tương lai, cần phải có Snooping Bus hoặc giao thức MESI/MOESI.
+\end{itemize}
+
+\subsection{Hạn chế về tệp lệnh (ISA) và phần mềm}
+\begin{itemize}
+    \item \textbf{Subset RV32I hạn chế:} Chỉ hỗ trợ một số lệnh cơ bản và thiết yếu nhất, chưa có các góc khuất (corner cases) như dịch bit số âm, so sánh unsigned, lỗi chia cho 0, hoặc ngắt/ngoại lệ (Exceptions \& Interrupts).
+    \item \textbf{Không có hệ điều hành (OS) và chế độ đặc quyền (Privilege Mode):} Chưa có các thanh ghi CSR, Machine/User mode, bộ định tuyến bộ nhớ ảo (MMU), nên không thể chạy hệ điều hành thực tế.
+    \item \textbf{Cố định số lõi:} Mã nguồn đang gán cứng 8 lõi bằng tham số và vòng lặp, thay vì hỗ trợ tự động định cỡ \texttt{NUM\_CORES}.
+\end{itemize}
+
+\section{Lộ trình phát triển đề xuất}
+
+\subsection{Giai đoạn 1: Hoàn thiện môi trường kiểm thử (Compliance Test)}
+Tích hợp GNU RISC-V Toolchain (GCC/GDB) để cho phép biên dịch mã C sang tệp Hex tự động. Triển khai bộ thử nghiệm kiến trúc chính thức của RISC-V (riscv-arch-test) để phát hiện và vá các góc khuất trong bộ giải mã lệnh.
+
+\subsection{Giai đoạn 2: Bổ sung thanh ghi hệ thống và ngắt (CSR/Interrupts)}
+Triển khai nhóm lệnh mở rộng \texttt{Zicsr} và \texttt{M-Extension} (nhân/chia). Thêm bộ đếm thời gian (Timer) và bộ điều khiển ngắt (PLIC/CLINT) để cấp phát định danh \texttt{Hart ID} cho từng lõi, giúp lập trình viên phân chia luồng (threads) linh hoạt hơn.
+
+\subsection{Giai đoạn 3: Hiện thực Cache đa cấp và Benchmark}
+\begin{itemize}
+    \item Chèn L1 Cache riêng biệt (I-Cache và D-Cache) vào mỗi lõi.
+    \item Hiện thực bộ điều khiển giao thức nhất quán Cache (Cache Coherence Controller).
+    \item Chạy các bài toán Benchmark đa luồng (như ma trận, sắp xếp, CoreMark) để đo lường IPC, Speedup ($S_N$) và Efficiency ($E_N$) khi tăng số lõi từ 1 lên 2, 4, 8.
+\end{itemize}
+
+\subsection{Giai đoạn 4: Tổng hợp FPGA và đo lường vật lý}
+Tiến hành tổng hợp (Synthesis) thiết kế RTL lên các bo mạch FPGA thực tế (như Xilinx Zybo, PYNQ hoặc Altera Cyclone). Phân tích báo cáo Timing (Slack, Fmax) và Resource (LUT, FF, BRAM) để xác định đường găng (Critical Path) và tối ưu hóa diện tích/năng lượng tiêu thụ.

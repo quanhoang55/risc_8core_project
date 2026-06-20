@@ -1,0 +1,242 @@
+\chapter{Hướng Dẫn Tái Lập Kết Quả}
+\label{app:reproduce}
+
+\section{Thông tin phiên bản}
+
+Các kết quả trong Chương \ref{chap:verification} được tái chạy tại commit \texttt{c0b0b305d8e11ab2eb0616e904fa726eaae395a9} trên Windows/PowerShell, ngày 20/06/2026. Trước khi tái lập, người đọc nên ghi lại phiên bản công cụ và xác nhận working tree để phân biệt lỗi mã nguồn với khác biệt môi trường.
+
+\begin{lstlisting}[language={},numbers=none,caption={Kiểm tra môi trường trước khi mô phỏng},label={lst:env_check}]
+git rev-parse HEAD
+git status --short
+iverilog -V
+vvp -V
+gtkwave --version
+\end{lstlisting}
+
+\section{Cấu trúc thư mục cần thiết}
+
+\begin{longtable}{p{0.31\textwidth} p{0.59\textwidth}}
+\caption{Cấu trúc artifact của dự án}\label{tab:repo_tree}\\
+\toprule
+\textbf{Đường dẫn} & \textbf{Nội dung} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Đường dẫn} & \textbf{Nội dung} \\
+\midrule
+\endhead
+\texttt{rtl/core/} & ALU, control unit, PC logic, register file, lõi pipeline \\
+\texttt{rtl/core/pipeline\_register/} & IF/ID, ID/EX, EX/MEM, MEM/WB, hazard controller \\
+\texttt{rtl/interconnect/} & Arbiter Round-Robin và bus controller \\
+\texttt{rtl/memory/} & Instruction ROM và data RAM \\
+\texttt{rtl/top\_8core.v} & Top-level tám lõi \\
+\texttt{software/} & Chương trình assembly và machine-code hex \\
+\texttt{tb/} & Testbench, VVP/VCD sinh ra trong mô phỏng \\
+\texttt{scripts/} & Script build hệ thống \\
+\texttt{docs/report/} & Mã nguồn LaTeX và PDF báo cáo \\
+\texttt{docs/slide/} & Slide và sơ đồ TikZ có thể tái sử dụng \\
+\bottomrule
+\end{longtable}
+
+\section{Biên dịch lõi đơn}
+
+Lệnh sau phải được chạy từ thư mục gốc. Danh sách pipeline register được ghi tường minh để tránh phụ thuộc wildcard giữa các shell.
+
+\begin{lstlisting}[language={},numbers=none,caption={Build và chạy \texttt{core\_tb}},label={lst:build_core_full}]
+iverilog -g2012 -o tb/core_test.vvp \
+  -I rtl/core -I rtl/core/pipeline_register -I rtl/memory \
+  rtl/core/alu.v rtl/core/control_unit.v \
+  rtl/core/pc_logic.v rtl/core/reg_file.v \
+  rtl/core/pipeline_register/if_id.v \
+  rtl/core/pipeline_register/id_ex.v \
+  rtl/core/pipeline_register/ex_mem.v \
+  rtl/core/pipeline_register/mem_wb.v \
+  rtl/core/pipeline_register/hazard_controller.v \
+  rtl/core/risc_core.v rtl/memory/data_mem.v \
+  rtl/memory/instr_mem.v tb/core_tb.v
+
+cd tb
+vvp core_test.vvp
+\end{lstlisting}
+
+Kết quả mong đợi hiện tại là \texttt{7 PASSED, 0 FAILED}. Toàn bộ lỗi liên quan đến truy cập bộ nhớ và Load-Use hazard đã được giải quyết.
+
+\section{Biên dịch hệ thống tám lõi}
+
+\begin{lstlisting}[language={},numbers=none,caption={Build và chạy \texttt{system\_tb}},label={lst:build_system_full}]
+iverilog -g2012 -o tb/system_test.vvp \
+  -I rtl/core -I rtl/core/pipeline_register \
+  -I rtl/interconnect -I rtl/memory \
+  rtl/core/alu.v rtl/core/control_unit.v \
+  rtl/core/pc_logic.v rtl/core/reg_file.v \
+  rtl/core/pipeline_register/if_id.v \
+  rtl/core/pipeline_register/id_ex.v \
+  rtl/core/pipeline_register/ex_mem.v \
+  rtl/core/pipeline_register/mem_wb.v \
+  rtl/core/pipeline_register/hazard_controller.v \
+  rtl/core/risc_core.v rtl/memory/data_mem.v \
+  rtl/memory/instr_mem.v rtl/interconnect/arbiter.v \
+  rtl/interconnect/bus_ctrl.v rtl/top_8core.v tb/system_tb.v
+
+cd tb
+vvp system_test.vvp
+\end{lstlisting}
+
+Điều kiện pass gồm \texttt{mem[0]=42}, \texttt{mem[1]=99}, tám core đều có grant/retired lớn hơn 0 và tổng kết 10/0.
+
+\section{Biên dịch interconnect}
+
+\begin{lstlisting}[language={},numbers=none,caption={Build và chạy \texttt{interconnect\_tb}},label={lst:build_interconnect_full}]
+iverilog -g2012 -o interconnect_test.vvp \
+  rtl/memory/data_mem.v \
+  rtl/interconnect/arbiter.v \
+  rtl/interconnect/bus_ctrl.v \
+  tb/interconnect_tb.v
+
+vvp interconnect_test.vvp
+\end{lstlisting}
+
+Test phải kết thúc với 10/0. Nếu chỉ kiểm tra tổng kết mà không xem từng nhóm, có thể bỏ sót việc một nhóm không được kích hoạt; do đó cần xác nhận log có đủ ba tiêu đề Round-Robin, LR/SC và AMO Atomic Add.
+
+\section{Biên dịch báo cáo}
+
+Từ thư mục \texttt{docs/report}, chạy pdfLaTeX ít nhất hai lần để cập nhật mục lục, danh mục và cross-reference:
+
+\begin{lstlisting}[language={},numbers=none,caption={Biên dịch báo cáo},label={lst:build_report}]
+cd docs/report
+pdflatex -interaction=nonstopmode -halt-on-error report.tex
+pdflatex -interaction=nonstopmode -halt-on-error report.tex
+\end{lstlisting}
+
+Sau build cần kiểm tra số trang, cảnh báo undefined reference, overfull box và render các trang có bảng/sơ đồ lớn.
+
+\chapter{Danh Sách Tín Hiệu Và Kịch Bản Quan Sát}
+\label{app:signals}
+
+\section{Tín hiệu lõi pipeline}
+
+\begin{longtable}{p{0.29\textwidth} p{0.17\textwidth} p{0.44\textwidth}}
+\caption{Tín hiệu dùng để debug lõi}\label{tab:core_debug_signals}\\
+\toprule
+\textbf{Tín hiệu} & \textbf{Dạng hiển thị} & \textbf{Mục đích} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Tín hiệu} & \textbf{Dạng hiển thị} & \textbf{Mục đích} \\
+\midrule
+\endhead
+\texttt{pc} & Hex & Địa chỉ lệnh đang fetch \\
+\texttt{instr\_from\_mem} & Hex & Mã lệnh tương ứng PC \\
+\texttt{if\_id\_valid} & Binary & Lệnh hợp lệ ở ID \\
+\texttt{ex\_valid}, \texttt{mem\_valid}, \texttt{wb\_valid} & Binary & Theo dõi lệnh qua EX/MEM/WB \\
+\texttt{forward\_a}, \texttt{forward\_b} & Binary & Nguồn operand: RF, MEM hay WB \\
+\texttt{load\_use\_stall} & Binary & Bubble do dữ liệu load chưa sẵn sàng \\
+\texttt{redirect\_taken} & Binary & Branch/jump đổi PC \\
+\texttt{mem\_req}, \texttt{mem\_ready} & Binary & Handshake với interconnect/memory \\
+\texttt{mem\_addr}, \texttt{mem\_rdata} & Hex/unsigned & Địa chỉ và dữ liệu load \\
+\texttt{wb\_rd\_addr} & Unsigned & Thanh ghi đích tại WB \\
+\texttt{wb\_write\_data} & Hex/unsigned & Dữ liệu chuẩn bị ghi register file \\
+\bottomrule
+\end{longtable}
+
+\section{Tín hiệu interconnect}
+
+\begin{longtable}{p{0.28\textwidth} p{0.18\textwidth} p{0.44\textwidth}}
+\caption{Tín hiệu dùng để debug bus}\label{tab:bus_debug_signals}\\
+\toprule
+\textbf{Tín hiệu} & \textbf{Dạng hiển thị} & \textbf{Mục đích} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Tín hiệu} & \textbf{Dạng hiển thị} & \textbf{Mục đích} \\
+\midrule
+\endhead
+\texttt{bus\_request[7:0]} & Binary & Các core đang yêu cầu bus \\
+\texttt{bus\_grant[7:0]} & Binary & Grant one-hot \\
+\texttt{bus\_grant\_id} & Unsigned & ID core được chọn \\
+\texttt{state} & Unsigned & Pha IDLE/AMO read/AMO calc \\
+\texttt{active\_core} & Unsigned & Core của giao dịch nhiều pha \\
+\texttt{dm\_addr} & Hex & Địa chỉ đi vào RAM \\
+\texttt{dm\_we}, \texttt{dm\_re} & Binary & Loại truy cập RAM \\
+\texttt{dm\_wdata}, \texttt{dm\_rdata} & Hex & Dữ liệu hai chiều \\
+\texttt{core\_ready[7:0]} & Binary & Core nhận phản hồi \\
+\texttt{core\_sc\_result[7:0]} & Binary & Kết quả SC của từng core \\
+\texttt{reservation\_valid[i]} & Binary & Trạng thái reservation LR/SC \\
+\bottomrule
+\end{longtable}
+
+\section{Marker waveform đề xuất}
+
+Đối với lỗi load, đặt marker tại năm thời điểm: lệnh LW vào EX; \texttt{mem\_req} lên; \texttt{mem\_ready} lên; \texttt{wb\_valid} lên; register file ghi \texttt{x4}. Đối với LR/SC thất bại, đặt marker tại LR core 0, store core 1, thời điểm reservation bị xóa, SC core 0 và phản hồi result=1. Đối với fairness, chọn một khoảng mà nhiều bit request cùng bằng 1 và ghi lại chuỗi \texttt{grant\_id}.
+
+\chapter{Kế Hoạch Thực Hiện Và Truy Vết Yêu Cầu}
+\label{app:plan}
+
+\section{Kế hoạch công việc tham khảo}
+
+\begin{longtable}{p{0.14\textwidth} p{0.20\textwidth} p{0.36\textwidth} p{0.20\textwidth}}
+\caption{Kế hoạch phát triển theo giai đoạn}\label{tab:work_plan}\\
+\toprule
+\textbf{Giai đoạn} & \textbf{Chủ đề} & \textbf{Công việc} & \textbf{Sản phẩm} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Giai đoạn} & \textbf{Chủ đề} & \textbf{Công việc} & \textbf{Sản phẩm} \\
+\midrule
+\endhead
+1 & ISA/datapath & Chọn subset, thiết kế ALU, RF, control và memory & Unit RTL + unit test \\
+2 & Pipeline & Tách năm tầng, thêm bốn register và valid bit & Core pipeline chạy chương trình nhỏ \\
+3 & Hazard & Forwarding, load-use, redirect, memory hold & Hazard test và waveform \\
+4 & Multicore & Nhân tám core, thiết kế bus/arbiter/shared RAM & Top-level và system test \\
+5 & Atomic & Reservation, SC result, AMO FSM & Interconnect test 10/0 \\
+6 & Regression & Build sạch, chạy toàn suite, lưu log & Báo cáo trạng thái pass/fail \\
+7 & Tài liệu & Sơ đồ, bảng, giải thích và hướng dẫn tái lập & Báo cáo và slide \\
+\bottomrule
+\end{longtable}
+
+\section{Truy vết yêu cầu sang mã nguồn và test}
+
+\begin{longtable}{p{0.10\textwidth} p{0.25\textwidth} p{0.31\textwidth} p{0.24\textwidth}}
+\caption{Ma trận truy vết yêu cầu}\label{tab:traceability}\\
+\toprule
+\textbf{ID} & \textbf{Yêu cầu} & \textbf{Module chính} & \textbf{Bằng chứng} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{ID} & \textbf{Yêu cầu} & \textbf{Module chính} & \textbf{Bằng chứng} \\
+\midrule
+\endhead
+R1 & Số học/logic RV32I subset & \texttt{alu}, \texttt{control\_unit} & \texttt{alu\_tb}, core x1--x3 \\
+R2 & Pipeline năm tầng & \texttt{risc\_core}, bốn pipeline register & Valid signals, retired counter \\
+R3 & Forwarding và load-use & \texttt{hazard\_controller} & Hazard test; load-use stall hoạt động tốt \\
+R4 & Branch/jump redirect & \texttt{branch\_checker}, IF/ID, ID/EX & Flush counter, PC waveform \\
+R5 & Shared data memory & \texttt{data\_mem}, \texttt{bus\_ctrl} & Memory marker 42/99 \\
+R6 & Round-Robin fairness & \texttt{arbiter} & Grant của tám core \\
+R7 & LR/SC & \texttt{bus\_ctrl} reservation arrays & Success/failure interconnect test \\
+R8 & AMOADD & AMO FSM và operator & RAM 42 rồi 100 \\
+R9 & Tái lập & scripts, testbench, software hex & Lệnh trong Phụ lục \ref{app:reproduce} \\
+\bottomrule
+\end{longtable}
+
+Ma trận giúp tránh tình trạng một yêu cầu chỉ xuất hiện trong văn bản mà không có module hoặc test tương ứng.
+
+\chapter{Mã Nguồn Verilog (Tham khảo)}
+\label{app:source_code}
+Phụ lục này trình bày toàn văn một số module quan trọng trong hệ thống để tham khảo.
+
+\section{Module \texttt{risc\_core.v}}
+\lstinputlisting[language=Verilog,caption={Mã nguồn \texttt{risc\_core.v}}]{../../rtl/core/risc_core.v}
+
+\section{Module \texttt{hazard\_controller.v}}
+\lstinputlisting[language=Verilog,caption={Mã nguồn \texttt{hazard\_controller.v}}]{../../rtl/core/pipeline_register/hazard_controller.v}
+
+\section{Module \texttt{arbiter.v}}
+\lstinputlisting[language=Verilog,caption={Mã nguồn \texttt{arbiter.v}}]{../../rtl/interconnect/arbiter.v}
+
+\section{Module \texttt{bus\_ctrl.v}}
+\lstinputlisting[language=Verilog,caption={Mã nguồn \texttt{bus\_ctrl.v}}]{../../rtl/interconnect/bus_ctrl.v}
+
+\section{Testbench \texttt{system\_tb.v}}
+\lstinputlisting[language=Verilog,caption={Mã nguồn \texttt{system\_tb.v}}]{../../tb/system_tb.v}
+
+

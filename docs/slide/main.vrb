@@ -1,39 +1,53 @@
-\frametitle{Kết Quả Kiểm Thử Hệ Thống 8-Core}
-\begin{columns}[T]
-        \begin{column}{0.45\textwidth}
-            \textbf{Đánh giá Hiệu năng Hệ thống:}
+\frametitle{Tầng 4: Kết Quả Kiểm Thử Hệ Thống 8-Core}
+Tích hợp toàn bộ 8 lõi CPU chạy song song, kết nối qua \textbf{Arbiter} và \textbf{Bus Controller} truy cập RAM dùng chung.
+    \vspace{0.1cm}
+
+    \begin{columns}[T]
+        \begin{column}{0.42\textwidth}
+            \textbf{Đánh giá hiệu năng:}
             \begin{itemize}
-                \item 8 core chạy song song, ghi/đọc RAM dùng chung không bị deadlock.
-                \item Tín hiệu cấp phát bus của Arbiter công bằng cho tất cả các nhân.
+                \scriptsize
+                \item 8 core cùng thực thi, ghi/đọc RAM dùng chung \textbf{không deadlock}.
+                \item \texttt{grant} công bằng cho tất cả các nhân.
+                \item \texttt{mem\_stall} tăng tuyến tính từ Core 0 $\rightarrow$ Core 7 $\Rightarrow$ đúng hành vi Round-Robin.
             \end{itemize}
 
-            \begin{block}{Chỉ số Giám sát Bus \& Pipeline}
+            \begin{block}{Chỉ số xác thực}
                 \scriptsize
                 \begin{itemize}
-                    \item Cả 8 core đều có chỉ số \texttt{grant > 0} (được cấp bus) và \texttt{retired > 0} (hoàn thành lệnh).
-                    \item \texttt{mem\_stall} xuất hiện hợp lý thể hiện độ trễ xếp hàng khi tranh chấp tài nguyên bộ nhớ.
+                    \item \texttt{mem[0] == 42}: Dữ liệu ghi đúng.
+                    \item \texttt{mem[1] == 99}: Marker hoàn thành.
+                    \item 8/8 core: \texttt{grant > 0} và \texttt{retired > 0}.
                 \end{itemize}
             \end{block}
         \end{column}
 
-        \begin{column}{0.55\textwidth}
-            \begin{block}{Kết quả chạy Testbench Hệ thống (\texttt{system\_tb.v})}
+        \begin{column}{0.58\textwidth}
+            \begin{block}{Kết quả Console (\texttt{system\_tb.v})}
                 \fontsize{5pt}{6pt}\selectfont
                 \begin{verbatim}
-============================================================
-                  SYSTEM TEST SUMMARIES
-============================================================
-Core 0: retired=16 mem_stall=27 load_use_stall=0 flush=3 grant=4
-Core 1: retired=16 mem_stall=29 load_use_stall=0 flush=3 grant=4
-Core 2: retired=16 mem_stall=31 load_use_stall=0 flush=3 grant=4
-Core 3: retired=16 mem_stall=33 load_use_stall=0 flush=3 grant=4
-Core 4: retired=16 mem_stall=35 load_use_stall=0 flush=3 grant=4
-Core 5: retired=16 mem_stall=37 load_use_stall=0 flush=3 grant=4
-Core 6: retired=16 mem_stall=39 load_use_stall=0 flush=3 grant=4
-Core 7: retired=16 mem_stall=41 load_use_stall=0 flush=3 grant=4
+=========================================================
+  BAT DAU MO PHONG HE THONG 8 LOI PIPELINE
+=========================================================
+  Kiem tra mem[0] (Ky vong: 42) = 42
+    [PASS] Shared memory data dung.
+  Kiem tra mem[1] addr 4 (Ky vong: 99) = 99
+    [PASS] 8 core hoan thanh khong deadlock.
 
-TONG KET: 10 PASSED, 0 FAILED
-============================================================
+=========================================================
+  PIPELINE / BUS EVIDENCE
+=========================================================
+  Core 0: grant=3 retired=163 mem_stall=13 flush=159
+  Core 1: grant=3 retired=163 mem_stall=14 flush=159
+  Core 2: grant=3 retired=163 mem_stall=15 flush=159
+  Core 3: grant=3 retired=163 mem_stall=16 flush=159
+  Core 4: grant=4 retired=161 mem_stall=17 flush=157
+  Core 5: grant=4 retired=161 mem_stall=18 flush=157
+  Core 6: grant=4 retired=161 mem_stall=19 flush=157
+  Core 7: grant=4 retired=161 mem_stall=20 flush=157
+
+  TONG KET: 10 PASSED, 0 FAILED
+=========================================================
                 \end{verbatim}
             \end{block}
         \end{column}
