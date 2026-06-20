@@ -1,11 +1,5 @@
 // =============================================================================
-// arbiter.v - Bộ phân xử Bus Round-Robin cho hệ thống 8 lõi RISC-V
-//
-// Thuật toán Round-Robin:
-//   - Quét 8 core bắt đầu từ priority_ptr, grant cho core đầu tiên có request.
-//   - Grant chỉ active 1 CYCLE (pulse), sau đó tự xóa.
-//   - Sau khi grant, priority_ptr = (granted_core + 1) % 8.
-//   - Một core phải deassert request và re-assert để được grant lần nữa.
+// arbiter.v
 // =============================================================================
 `timescale 1ns / 1ps
 
@@ -20,8 +14,7 @@ module arbiter (
 
     reg [2:0] priority_ptr;
 
-    // Đã grant cho core nào ở cycle trước? Dùng để tránh grant lại cùng request.
-    reg [7:0] last_granted;  // Bit mask: core nào đã được grant gần nhất
+    reg [7:0] last_granted;  // Bit mask
 
     // Round-Robin scan (combinational)
     reg [2:0] winner;
@@ -29,7 +22,7 @@ module arbiter (
     integer   i;
     reg [2:0] candidate;
 
-    // Tạo masked request: chỉ xét request MỚI (chưa được grant)
+    // Create masked request
     wire [7:0] new_request = request & ~last_granted;
 
     always @(*) begin
@@ -64,8 +57,8 @@ module arbiter (
                 grant        <= 8'b0;
                 grant_valid  <= 1'b0;
                 grant_id     <= 3'd0;
-                // Clear last_granted khi không còn request pending
-                // Cho phép core request lại
+                // Clear last_granted when it's not having request pending
+                // Allow core request 
                 last_granted <= last_granted & request;
             end
         end

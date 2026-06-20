@@ -1,16 +1,16 @@
 // =============================================================================
-// bus_ctrl.v - Bộ điều khiển Bus hệ thống cho 8 lõi RISC-V
+// bus_ctrl.v - System Bus Controller for 8-core RISC-V
 //
-// Chuyển đổi từ logic C++ (SystemBus.cpp + SyncManager.cpp) sang Verilog RTL.
+// Converted from C++ logic (SystemBus.cpp + SyncManager.cpp) to Verilog RTL.
 //
-// Thiết kế FSM 2 phase:
-//   IDLE    -> Nhận grant từ arbiter, gửi tín hiệu tới mem, chuyển sang DONE
-//   DONE    -> Lấy kết quả từ mem, trả về cho core, quay lại IDLE
-//   AMO_CALC -> Tính toán AMO, ghi kết quả, chuyển sang AMO_DONE
-//   AMO_DONE -> Trả kết quả AMO cho core
+// 2-phase FSM Design:
+//   IDLE     -> Receives grant from arbiter, sends signals to mem, transitions to DONE
+//   DONE     -> Fetches result from mem, returns it to core, returns to IDLE
+//   AMO_CALC -> Computes AMO, writes result, transitions to AMO_DONE
+//   AMO_DONE -> Returns AMO result to core
 //
-// Tín hiệu tới memory (dm_addr, dm_we, dm_re) là COMBINATIONAL
-// để data_mem async read hoạt động đúng trong cùng cycle.
+// Signals to memory (dm_addr, dm_we, dm_re) are COMBINATIONAL
+// to ensure async read of data_mem operates correctly within the same cycle.
 // =============================================================================
 `timescale 1ns / 1ps
 
@@ -19,7 +19,7 @@ module bus_ctrl (
     input  wire        reset,
 
     // =========================================================================
-    // Giao diện với Arbiter
+    // Arbiter
     // =========================================================================
     output wire [7:0]  bus_request,
     input  wire [7:0]  bus_grant,
@@ -27,7 +27,7 @@ module bus_ctrl (
     input  wire [2:0]  bus_grant_id,
 
     // =========================================================================
-    // Giao diện với 8 Core
+    // 8 Core
     // =========================================================================
     input  wire [7:0]  core_mem_req,
     input  wire [31:0] core_addr   [0:7],
@@ -41,13 +41,12 @@ module bus_ctrl (
     input  wire [7:0]  core_amo,
     input  wire [3:0]  core_amo_op [0:7],
 
-    // Phản hồi
     output reg  [31:0] core_rdata  [0:7],
     output reg  [7:0]  core_ready,
     output reg  [7:0]  core_sc_result,
 
     // =========================================================================
-    // Giao diện với Data Memory (COMBINATIONAL outputs)
+    // Data Memory (COMBINATIONAL outputs)
     // =========================================================================
     output reg  [31:0] dm_addr,
     output reg  [31:0] dm_wdata,
@@ -72,28 +71,28 @@ module bus_ctrl (
     // =========================================================================
     // FSM States
     // =========================================================================
-    localparam S_IDLE     = 3'd0;  // Chờ grant
-    localparam S_READ     = 3'd1;  // Đọc dữ liệu từ mem (1 cycle để mem trả data)
-    localparam S_WRITE    = 3'd1;  // Ghi dữ liệu (alias, xử lý cùng 1 cycle)
-    localparam S_LR       = 3'd1;  // Load Reserved
-    localparam S_SC       = 3'd1;  // Store Conditional
-    localparam S_AMO_READ = 3'd2;  // AMO phase 1: đọc giá trị cũ
-    localparam S_AMO_CALC = 3'd3;  // AMO phase 2: tính toán + ghi
+    localparam S_IDLE     = 3'd0;
+    localparam S_READ     = 3'd1;
+    localparam S_WRITE    = 3'd1;
+    localparam S_LR       = 3'd1;
+    localparam S_SC       = 3'd1;
+    localparam S_AMO_READ = 3'd2;
+    localparam S_AMO_CALC = 3'd3;
 
     reg [2:0] state;
 
     // =========================================================================
-    // Transaction register (lưu thông tin giao dịch đang xử lý)
+    // Transaction register
     // =========================================================================
-    reg [2:0]  active_core;       // Core đang được phục vụ
-    reg [31:0] active_addr;       // Địa chỉ giao dịch
-    reg [31:0] active_wdata;      // Dữ liệu ghi
-    reg        active_is_write;   // Là giao dịch ghi?
-    reg        active_is_read;    // Là giao dịch đọc?
+    reg [2:0]  active_core;
+    reg [31:0] active_addr;
+    reg [31:0] active_wdata;
+    reg        active_is_write;
+    reg        active_is_read;
     reg        active_is_lr;      // Load Reserved?
     reg        active_is_sc;      // Store Conditional?
     reg        active_is_amo;     // AMO?
-    reg [3:0]  active_amo_op;     // Loại AMO
+    reg [3:0]  active_amo_op;     // AMO type
 
     // =========================================================================
     // Reservation Station (LR/SC)
@@ -113,7 +112,7 @@ module bus_ctrl (
     assign bus_request = core_mem_req;
 
     // =========================================================================
-    // AMO tính toán (combinational)
+    // AMO combinational
     // =========================================================================
     reg [31:0] amo_computed;
     always @(*) begin
@@ -137,8 +136,8 @@ module bus_ctrl (
 
     // =========================================================================
     // Combinational Memory Interface
-    // Tín hiệu dm_addr, dm_re, dm_we, dm_wdata phải là combinational
-    // để data_mem async read có thể trả dm_rdata trong CÙNG cycle.
+    // Signals dm_addr, dm_re, dm_we, and dm_wdata must be combinational
+    // to allow data_mem async read to return dm_rdata within the SAME cycle.
     // =========================================================================
     always @(*) begin
         // Defaults
@@ -151,16 +150,16 @@ module bus_ctrl (
             S_IDLE: begin
                 if (bus_grant_valid) begin
                     dm_addr = core_addr[bus_grant_id];
-                    // READ hoặc LR: kích hoạt đọc
+                    // READ or LR
                     if (core_re[bus_grant_id] || core_lr[bus_grant_id]) begin
                         dm_re = 1'b1;
                     end
-                    // WRITE thường: kích hoạt ghi
+                    // WRITE
                     if (core_we[bus_grant_id] && !core_sc[bus_grant_id]) begin
                         dm_we    = 1'b1;
                         dm_wdata = core_wdata[bus_grant_id];
                     end
-                    // SC: chỉ ghi nếu reservation valid
+                    // SC
                     if (core_sc[bus_grant_id]) begin
                         if (reservation_valid[bus_grant_id] &&
                             reservation_addr[bus_grant_id] == core_addr[bus_grant_id]) begin
@@ -168,7 +167,7 @@ module bus_ctrl (
                             dm_wdata = core_wdata[bus_grant_id];
                         end
                     end
-                    // AMO: bắt đầu đọc
+                    // AMO
                     if (core_amo[bus_grant_id]) begin
                         dm_re = 1'b1;
                     end
@@ -176,13 +175,13 @@ module bus_ctrl (
             end
 
             S_AMO_READ: begin
-                // AMO phase 1: giữ đọc để lấy old value
+                // AMO phase 1
                 dm_addr = active_addr;
                 dm_re   = 1'b1;
             end
 
             S_AMO_CALC: begin
-                // AMO phase 2: ghi kết quả
+                // AMO phase 2
                 dm_addr  = active_addr;
                 dm_we    = 1'b1;
                 dm_wdata = amo_computed;
@@ -220,16 +219,15 @@ module bus_ctrl (
             end
         end
         else begin
-            // Mặc định: clear transient signals
+            // Default: clear transient signals
             core_ready <= 8'b0;
 
             case (state)
                 // =============================================================
-                // IDLE: Nhận grant, ghi nhận giao dịch, xử lý 1-cycle ops
+                // IDLE
                 // =============================================================
                 S_IDLE: begin
                     if (bus_grant_valid) begin
-                        // Lưu thông tin giao dịch
                         active_core    <= bus_grant_id;
                         active_addr    <= core_addr[bus_grant_id];
                         active_wdata   <= core_wdata[bus_grant_id];
@@ -241,11 +239,11 @@ module bus_ctrl (
                         active_amo_op   <= core_amo_op[bus_grant_id];
 
                         // =====================================================
-                        // AMO: chuyển sang FSM riêng
+                        // AMO
                         // =====================================================
                         if (core_amo[bus_grant_id]) begin
                             state <= S_AMO_READ;
-                            // Invalidate reservations tại addr
+                            // Invalidate reservations at addr
                             for (j = 0; j < 8; j = j + 1) begin
                                 if (reservation_valid[j] &&
                                     reservation_addr[j] == core_addr[bus_grant_id]) begin
@@ -254,8 +252,8 @@ module bus_ctrl (
                             end
                         end
                         // =====================================================
-                        // READ thường: dm_re đã set ở combinational block,
-                        // dm_rdata có sẵn ngay -> lấy kết quả ngay cycle này
+                        // READ: dm_re is already set in the combinational block,
+                        // dm_rdata is available immediately -> fetch the result in this same cycle
                         // =====================================================
                         else if (core_re[bus_grant_id] && !core_lr[bus_grant_id]) begin
                             core_rdata[bus_grant_id] <= dm_rdata;
@@ -263,7 +261,7 @@ module bus_ctrl (
                             // Giữ ở IDLE (1-cycle completion)
                         end
                         // =====================================================
-                        // WRITE thường: dm_we đã set ở combinational -> ghi ngay
+                        // WRITE: dm_we is set in combinational -> write
                         // =====================================================
                         else if (core_we[bus_grant_id] && !core_sc[bus_grant_id]) begin
                             core_ready[bus_grant_id] <= 1'b1;
@@ -282,7 +280,7 @@ module bus_ctrl (
                         else if (core_lr[bus_grant_id]) begin
                             core_rdata[bus_grant_id] <= dm_rdata;
                             core_ready[bus_grant_id] <= 1'b1;
-                            // Đặt reservation
+                            // Set reservation
                             reservation_valid[bus_grant_id] <= 1'b1;
                             reservation_addr[bus_grant_id]  <= core_addr[bus_grant_id];
                         end
@@ -316,7 +314,7 @@ module bus_ctrl (
                 end
 
                 // =============================================================
-                // AMO Phase 1: Đọc old value (dm_rdata có sẵn do async read)
+                // AMO Phase 1: Read old value
                 // =============================================================
                 S_AMO_READ: begin
                     amo_old_val <= dm_rdata;
@@ -324,10 +322,10 @@ module bus_ctrl (
                 end
 
                 // =============================================================
-                // AMO Phase 2: Ghi kết quả + trả old value cho core
+                // AMO Phase 2
                 // =============================================================
                 S_AMO_CALC: begin
-                    // dm_we + dm_wdata đã set ở combinational block
+                    // dm_we + dm_wdata is set in combinational block
                     core_rdata[active_core] <= amo_old_val;
                     core_ready[active_core] <= 1'b1;
                     state                   <= S_IDLE;
