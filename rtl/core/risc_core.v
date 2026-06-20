@@ -26,6 +26,7 @@ module risc_core #(
   reg  [31:0] pc;
   wire [31:0] instr_from_mem;
   
+  // IF/ID
   wire        if_id_valid;
   wire [31:0] if_id_pc;
   wire [31:0] if_id_instr;
@@ -51,6 +52,7 @@ module risc_core #(
   wire [4:0]  cu_rs2_addr;
   wire [4:0]  cu_rd_addr;
 
+  // ID/EX
   wire        ex_valid;
   wire        ex_reg_write;
   wire        ex_alu_src;
@@ -76,6 +78,7 @@ module risc_core #(
   wire [4:0]  ex_rs2_addr;
   wire [4:0]  ex_rd_addr;
 
+  // Optimize Hazard & Bypass
   wire [1:0]  forward_a;
   wire [1:0]  forward_b;
   wire        load_use_stall;
@@ -97,6 +100,7 @@ module risc_core #(
   wire        alu_zero;
   wire        redirect_taken;
 
+  // EX/MEM
   wire        mem_valid;
   wire        mem_reg_write;
   wire        mem_mem_read;
@@ -110,6 +114,7 @@ module risc_core #(
   wire [31:0] mem_store_data;
   wire [4:0]  mem_rd_addr;
 
+  // MEM/WB
   wire        wb_valid;
   wire        wb_reg_write;
   wire [4:0]  wb_rd_addr;
@@ -118,12 +123,14 @@ module risc_core #(
   wire [31:0] rs2_data;
   reg  [31:0] mem_wb_in_write_data;
 
+  // Performance analysis counters
   reg [31:0]  pipeline_cycle_count;
   reg [31:0]  retired_count;
   reg [31:0]  mem_stall_count;
   reg [31:0]  load_use_stall_count;
   reg [31:0]  flush_count;
 
+  // --- FETCH ---
   instr_mem #(.INIT_FILE(INIT_FILE), .PROGRAM_WORDS(PROGRAM_WORDS)) u_instr_mem (
       .addr(pc), .instruction(instr_from_mem)
   );
@@ -134,6 +141,7 @@ module risc_core #(
       .id_valid(if_id_valid), .id_pc(if_id_pc), .id_instr(if_id_instr)
   );
 
+  // --- DECODE ---
   control_unit u_cu (
       .instruction(if_id_instr), .reg_write(cu_reg_write), .alu_src(cu_alu_src), .alu_control(cu_alu_control),
       .mem_read(cu_mem_read), .mem_write(cu_mem_write), .mem_to_reg(cu_mem_to_reg), .branch(cu_branch),
@@ -164,6 +172,7 @@ module risc_core #(
       .ex_mem_sc(ex_mem_sc), .ex_mem_amo(ex_mem_amo)
   );
 
+  // --- EXECUTE ---
   wire mem_can_forward = mem_valid && mem_reg_write && (mem_rd_addr != 5'd0) && 
                          !(mem_mem_read || mem_mem_lr || mem_mem_sc || mem_mem_amo);
   wire wb_can_forward  = wb_valid && wb_reg_write && (wb_rd_addr != 5'd0);
@@ -194,6 +203,7 @@ module risc_core #(
       .mem_result(mem_result), .mem_store_data(mem_store_data), .mem_rd_addr(mem_rd_addr)
   );
 
+  // --- MEMORY ---
   wire mem_uses_bus = mem_valid && (mem_mem_read || mem_mem_write || mem_mem_lr || mem_mem_sc || mem_mem_amo);
   assign mem_wait   = mem_uses_bus && !mem_ready;
 
@@ -229,6 +239,7 @@ module risc_core #(
       .wb_write_data(wb_write_data)
   );
 
+  // --- HAZARD CONTROLLER ---
   hazard_controller u_hazard_center (
       .ex_valid(ex_valid), 
       .ex_reg_write(ex_reg_write), 
@@ -276,6 +287,7 @@ module risc_core #(
   end
 endmodule
 
+// --- Branch Checker Module ---
 module branch_checker (
     input wire [2:0] branch_type, 
     input wire [31:0] rs1, rs2, 
