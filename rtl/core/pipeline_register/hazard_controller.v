@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 module hazard_controller (
-    // Inputs phục vụ Forwarding
+    // Inputs For Forwarding
     input wire        ex_valid,
     input wire        ex_reg_write,
     input wire [ 4:0] ex_rs1_addr,
@@ -10,18 +10,18 @@ module hazard_controller (
     input wire        wb_can_forward,
     input wire [ 4:0] wb_rd_addr,
 
-    // Inputs phục vụ Load-Use Stall
+    // Inputs For Load-Use Stall
     input wire        id_valid,
     input wire [ 4:0] cu_rs1_addr,
     input wire [ 4:0] cu_rs2_addr,
     input wire        ex_load_like,
     input wire [ 4:0] ex_rd_addr,
 
-    // Inputs phục vụ Memory Stall & Control Flush
+    // Inputs For Memory Stall & Control Flush
     input wire        mem_wait,
     input wire        redirect_taken,
 
-    // Outputs điều khiển luồng dữ liệu & vách ngăn
+    // Outputs
     output reg [ 1:0] forward_a,
     output reg [ 1:0] forward_b,
     output wire       load_use_stall,
@@ -34,14 +34,13 @@ module hazard_controller (
 );
 
     // =========================================================================
-    // 1. Mạch Forwarding
+    // 1. Forwarding
     // =========================================================================
     always @* begin
-        // Mặc định dùng dữ liệu gốc từ Register File
         forward_a = 2'b00; 
         forward_b = 2'b00;
 
-        // Xử lý Forwarding cho Toán hạng A
+        // A
         if (mem_can_forward && (mem_rd_addr != 5'd0) && (mem_rd_addr == ex_rs1_addr)) begin
             forward_a = 2'b10; 
         end 
@@ -49,7 +48,7 @@ module hazard_controller (
             forward_a = 2'b01; 
         end
 
-        // Xử lý Forwarding cho Toán hạng B (Đã sửa ex_rs2_addr)
+        // Forwarding For B
         if (mem_can_forward && (mem_rd_addr != 5'd0) && (mem_rd_addr == ex_rs2_addr)) begin
             forward_b = 2'b10; 
         end 
@@ -59,13 +58,13 @@ module hazard_controller (
     end
 
     // =========================================================================
-    // 2. Mạch Load-Use Stall
+    // Load-Use Stall
     // =========================================================================
     assign load_use_stall = id_valid && ex_load_like && (ex_rd_addr != 5'd0) &&
                             ((ex_rd_addr == cu_rs1_addr) || (ex_rd_addr == cu_rs2_addr));
 
     // =========================================================================
-    // 3. Quản lý các chốt chặn (Hold / Clear) - Đã vá lỗi chặn Clear khi Memory Stall
+    // Hold / Clear
     // =========================================================================
     assign if_id_hold   = load_use_stall || mem_wait;
     assign if_id_clear  = redirect_taken && !mem_wait; 
