@@ -1,9 +1,18 @@
-\chapter*{Lời Cảm Ơn}
-\addcontentsline{toc}{chapter}{Lời Cảm Ơn}
+\chapter*{Lời Mở Đầu \& Lời Cảm Ơn}
+\addcontentsline{toc}{chapter}{Lời Mở Đầu \& Lời Cảm Ơn}
 
-Trong quá trình thực hiện dự án cuối kỳ môn Kiến Trúc Máy Tính (MI4344) với đề tài \textbf{"Mô phỏng CPU 8-Core với kiến trúc tập lệnh RISC-V"}, nhóm chúng em đã nhận được sự quan tâm, chỉ bảo và giúp đỡ tận tình từ thầy giáo hướng dẫn.
+Với sự bùng nổ của công nghệ vi mạch và nhu cầu xử lý lượng dữ liệu khổng lồ trong thế kỷ 21, kiến trúc máy tính đã chứng kiến một sự chuyển dịch mạnh mẽ từ việc tối ưu hóa vi xử lý đơn nhân sang thiết kế các hệ thống đa lõi (multi-core). Hệ thống đa lõi không chỉ phá vỡ rào cản về giới hạn vật lý của tần số xung nhịp mà còn mang lại hiệu năng tính toán song song vượt trội. Cùng với đó, sự xuất hiện của tập lệnh mã nguồn mở RISC-V đã mở ra một kỷ nguyên mới, giúp các nhà nghiên cứu và sinh viên có thể tự do tiếp cận, thiết kế và tối ưu hóa vi xử lý từ mức kiến trúc tập lệnh (ISA) cho đến thiết kế mức thanh ghi (RTL).
 
-Trước tiên, chúng em xin gửi lời cảm ơn sâu sắc nhất đến \textbf{PGS. TS Nguyễn Đình Hân}. Nhờ có những bài giảng chuyên sâu, sự định hướng rõ ràng và những lời góp ý quý báu của thầy trong suốt quá trình học tập, nhóm chúng em mới có đủ nền tảng kiến thức và động lực để hoàn thành đồ án này. Đề tài về CPU đa lõi là một đề tài khó và mang tính thử thách cao, nhưng nhờ sự khích lệ của thầy, nhóm đã từng bước vượt qua các rào cản kỹ thuật để hoàn thiện kiến trúc hệ thống mô phỏng.
+Nhận thức được tầm quan trọng của kiến trúc máy tính hiện đại, nhóm chúng em đã lựa chọn đề tài \textbf{"Mô phỏng CPU 8-Core với kiến trúc tập lệnh RISC-V (Kiến trúc pipeline 5 tầng)"} làm đồ án cuối kỳ môn học Kiến Trúc Máy Tính (MI4344). Mục tiêu cốt lõi của dự án là không chỉ xây dựng một lõi vi xử lý RISC-V đơn lẻ, mà là mở rộng ra một hệ thống gồm 8 lõi xử lý chạy song song, có khả năng giao tiếp và chia sẻ tài nguyên bộ nhớ thông qua cơ chế phân xử công bằng Round-Robin.
+
+Trong khuôn khổ báo cáo này, chúng em sẽ trình bày toàn bộ quy trình thiết kế từ việc xây dựng kiến trúc Datapath, thiết kế mạch xử lý xung đột (Hazard Unit), đến thiết kế bộ điều khiển Bus đa lõi và hoàn thiện các lệnh nguyên tử (AMO) nhằm phục vụ đồng bộ hóa phần cứng. Toàn bộ mã nguồn thiết kế được mô tả bằng ngôn ngữ Verilog HDL và kiểm chứng chặt chẽ bằng phần mềm Icarus Verilog kết hợp quan sát giản đồ sóng trên GTKWave.
+
+Chúng em hy vọng rằng kết quả nghiên cứu trong đồ án này sẽ không chỉ là một bài tập môn học, mà còn là nền tảng vững chắc để nhóm có thể tiếp tục tiến sâu hơn vào lĩnh vực vi mạch bán dẫn và thiết kế vi xử lý trong tương lai.
+
+\vspace{0.5cm}
+\textbf{Lời Cảm Ơn}
+
+Trong quá trình thực hiện dự án, nhóm chúng em đã nhận được sự quan tâm, chỉ bảo và giúp đỡ tận tình từ thầy giáo hướng dẫn. Chúng em xin gửi lời cảm ơn sâu sắc nhất đến \textbf{PGS. TS Nguyễn Đình Hân}. Nhờ có những bài giảng chuyên sâu, sự định hướng rõ ràng và những lời góp ý quý báu của thầy trong suốt quá trình học tập, nhóm chúng em mới có đủ nền tảng kiến thức và động lực để hoàn thành đồ án này. Đề tài về CPU đa lõi là một đề tài khó và mang tính thử thách cao, nhưng nhờ sự khích lệ của thầy, nhóm đã từng bước vượt qua các rào cản kỹ thuật để hoàn thiện kiến trúc hệ thống mô phỏng.
 
 Mặc dù nhóm đã nỗ lực hết mình để hoàn thành đề tài, nhưng do thời gian và kiến thức còn hạn chế, báo cáo khó tránh khỏi những thiếu sót. Chúng em rất mong nhận được thêm những ý kiến đóng góp từ thầy để có thể cải thiện và phát triển hệ thống tốt hơn trong tương lai.
 
@@ -12,5 +21,5 @@ Một lần nữa, chúng em xin chân thành cảm ơn thầy!
 \vspace{1cm}
 \begin{flushright}
 \textit{Hà Nội, tháng 06 năm 2026}\\
-\textbf{Nhóm sinh viên thực hiện}
+\textbf{Nhóm 10}
 \end{flushright}
