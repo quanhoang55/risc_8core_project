@@ -15,28 +15,19 @@ gtkwave --version
 
 \section{Cấu trúc thư mục cần thiết}
 
-\begin{longtable}{p{0.31\textwidth} p{0.59\textwidth}}
-\caption{Cấu trúc artifact của dự án}\label{tab:repo_tree}\\
-\toprule
-\textbf{Đường dẫn} & \textbf{Nội dung} \\
-\midrule
-\endfirsthead
-\toprule
-\textbf{Đường dẫn} & \textbf{Nội dung} \\
-\midrule
-\endhead
-\texttt{rtl/core/} & ALU, control unit, PC logic, register file, lõi pipeline \\
-\texttt{rtl/core/pipeline\_register/} & IF/ID, ID/EX, EX/MEM, MEM/WB, hazard controller \\
-\texttt{rtl/interconnect/} & Arbiter Round-Robin và bus controller \\
-\texttt{rtl/memory/} & Instruction ROM và data RAM \\
-\texttt{rtl/top\_8core.v} & Top-level tám lõi \\
-\texttt{software/} & Chương trình assembly và machine-code hex \\
-\texttt{tb/} & Testbench, VVP/VCD sinh ra trong mô phỏng \\
-\texttt{scripts/} & Script build hệ thống \\
-\texttt{docs/report/} & Mã nguồn LaTeX và PDF báo cáo \\
-\texttt{docs/slide/} & Slide và sơ đồ TikZ có thể tái sử dụng \\
-\bottomrule
-\end{longtable}
+\begin{itemize}
+    \item \textbf{\texttt{rtl/core/}}: ALU, control unit, PC logic, register file, lõi pipeline
+    \item \textbf{\texttt{rtl/core/pipeline\_register/}}: IF/ID, ID/EX, EX/MEM, MEM/WB, hazard controller
+    \item \textbf{\texttt{rtl/interconnect/}}: Arbiter Round-Robin và bus controller
+    \item \textbf{\texttt{rtl/memory/}}: Instruction ROM và data RAM
+    \item \textbf{\texttt{rtl/top\_8core.v}}: Top-level tám lõi
+    \item \textbf{\texttt{software/}}: Chương trình assembly và machine-code hex
+    \item \textbf{\texttt{tb/}}: Testbench, VVP/VCD sinh ra trong mô phỏng
+    \item \textbf{\texttt{scripts/}}: Script build hệ thống
+    \item \textbf{\texttt{docs/report/}}: Mã nguồn LaTeX và PDF báo cáo
+    \item \textbf{\texttt{docs/slide/}}: Slide và sơ đồ TikZ có thể tái sử dụng
+\end{itemize}
+
 
 \section{Biên dịch lõi đơn}
 
