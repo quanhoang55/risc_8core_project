@@ -14,7 +14,7 @@ Báo cáo cuối kỳ này ghi nhận kết quả nghiên cứu và thiết kế
 \midrule
 1 & \textbf{Nguyễn Minh Hoàng} & 
 - Thiết kế bộ điều khiển Bus (\texttt{bus\_ctrl.v}) và bộ phân xử Arbiter (\texttt{arbiter.v}).\newline
-- Tích hợp toàn hệ thống 8 lõi (\texttt{top\_8core.v}). & 30\% \\
+- Tích hợp toàn hệ thống 8 lõi (\texttt{top\_8core.v}). & 25\% \\
 \midrule
 2 & \textbf{Bùi Thị Mai Linh} & 
 - Xây dựng kịch bản kiểm thử tích hợp hệ thống (\texttt{system\_tb.v}) và đơn nhân (\texttt{core\_tb.v}).\newline
@@ -23,12 +23,12 @@ Báo cáo cuối kỳ này ghi nhận kết quả nghiên cứu và thiết kế
 3 & \textbf{Trương Tùng Dương} & 
 - Thiết kế các khối chức năng cơ bản của datapath: ALU số học/logic (\texttt{alu.v}).\newline
 - Thiết kế khối Tập thanh ghi (\texttt{reg\_file.v}) có cơ chế writeback bypass.\newline
-- Xây dựng bộ nhớ dữ liệu shared RAM (\texttt{data\_mem.v}) và các ROM chứa lệnh (\texttt{instr\_mem.v}). & 22\% \\
+- Xây dựng bộ nhớ dữ liệu shared RAM (\texttt{data\_mem.v}) và các ROM chứa lệnh (\texttt{instr\_mem.v}). & 25\% \\
 
 \midrule
 4 & \textbf{Hoàng Anh Quân} & 
-- Thiết kế khối giải mã chỉ thị (\texttt{control\_unit.v}).\newline
-- Thiết kế kiến trúc lõi đơn pipeline 5 tầng (\texttt{risc\_core.v}). & 23\% \\
+- Thiết kế và kiểm thử bộ giải mã chỉ thị (\texttt{control\_unit.v}).\newline
+- Thiết kế và kiểm thử kiến trúc lõi đơn (\texttt{risc\_core.v}) cùng 4 thanh ghi pipeline (\texttt{pipeline\_register.v}): IF/ID, ID/EX, EX/MEM, MEM/WB. & 25\% \\
 \bottomrule
 \end{tabularx}
 \caption{Bảng phân công nhiệm vụ và tỷ lệ đóng góp của thành viên}
