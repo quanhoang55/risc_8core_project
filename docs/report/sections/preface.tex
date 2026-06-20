@@ -1,0 +1,10 @@
+\chapter*{Lời Mở Đầu}
+\addcontentsline{toc}{chapter}{Lời Mở Đầu}
+
+Với sự bùng nổ của công nghệ vi mạch và nhu cầu xử lý lượng dữ liệu khổng lồ trong thế kỷ 21, kiến trúc máy tính đã chứng kiến một sự chuyển dịch mạnh mẽ từ việc tối ưu hóa vi xử lý đơn nhân sang thiết kế các hệ thống đa lõi (multi-core). Hệ thống đa lõi không chỉ phá vỡ rào cản về giới hạn vật lý của tần số xung nhịp mà còn mang lại hiệu năng tính toán song song vượt trội. Cùng với đó, sự xuất hiện của tập lệnh mã nguồn mở RISC-V đã mở ra một kỷ nguyên mới, giúp các nhà nghiên cứu và sinh viên có thể tự do tiếp cận, thiết kế và tối ưu hóa vi xử lý từ mức kiến trúc tập lệnh (ISA) cho đến thiết kế mức thanh ghi (RTL).
+
+Nhận thức được tầm quan trọng của kiến trúc máy tính hiện đại, nhóm chúng em đã lựa chọn đề tài \textbf{"Mô phỏng CPU 8-Core với kiến trúc tập lệnh RISC-V (Kiến trúc pipeline 5 tầng)"} làm đồ án cuối kỳ môn học. Mục tiêu cốt lõi của dự án là không chỉ xây dựng một lõi vi xử lý RISC-V đơn lẻ, mà là mở rộng ra một hệ thống gồm 8 lõi xử lý chạy song song, có khả năng giao tiếp và chia sẻ tài nguyên bộ nhớ thông qua cơ chế phân xử công bằng Round-Robin.
+
+Trong khuôn khổ báo cáo này, chúng em sẽ trình bày toàn bộ quy trình thiết kế từ việc xây dựng kiến trúc Datapath, thiết kế mạch xử lý xung đột (Hazard Unit), đến thiết kế bộ điều khiển Bus đa lõi và hoàn thiện các lệnh nguyên tử (AMO) nhằm phục vụ đồng bộ hóa phần cứng. Toàn bộ mã nguồn thiết kế được mô tả bằng ngôn ngữ Verilog HDL và kiểm chứng chặt chẽ bằng phần mềm Icarus Verilog kết hợp quan sát giản đồ sóng trên GTKWave.
+
+Chúng em hy vọng rằng kết quả nghiên cứu trong đồ án này sẽ không chỉ là một bài tập môn học, mà còn là nền tảng vững chắc để nhóm có thể tiếp tục tiến sâu hơn vào lĩnh vực vi mạch bán dẫn và thiết kế vi xử lý trong tương lai.
