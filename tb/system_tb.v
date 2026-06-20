@@ -88,7 +88,7 @@ module system_tb;
             @(posedge clk);
             cycle_count = cycle_count + 1;
 
-            // Giám sát trọng tài Round-Robin cấp quyền Bus
+            // Monitor Round-Robin arbiter bus granting
             if (dut.u_arbiter.grant_valid)
                 grant_count[dut.u_arbiter.grant_id] = grant_count[dut.u_arbiter.grant_id] + 1;
         end
@@ -97,7 +97,7 @@ module system_tb;
         $display("             KET QUA MO PHONG TAI CHU KY %0d", cycle_count);
         $display("=======================================================");
 
-        // Cách đọc mảng RAM an toàn theo cấu trúc ô nhớ tổ chức
+        // Safe RAM array read method based on the memory cell organization structure
         $display("  [RAM CHECK] Kiem tra mem[0] (Ky vong: 42) = %0d", dut.u_data_mem.mem[0]);
         if (dut.u_data_mem.mem[0] == 32'd42) begin
             $display("    --> [PASS] Thao tac ghi Shared Memory chinh xac!");
