@@ -24,6 +24,12 @@ Kiểm thử Unit Test tập trung vào việc cách ly các module tổ hợp v
 
 \subsection{ALU và Datapath}
 Testbench \texttt{alu\_tb.v} cấp các vector thử nghiệm bao phủ toán tử: ADD, SUB, AND, OR, XOR, SLL, SRL. Kết quả được kiểm tra bằng câu lệnh \texttt{\$error} nếu output không khớp. Module \texttt{pc\_logic\_tb.v} mô phỏng điều kiện rẽ nhánh và stall để theo dõi sự thay đổi của PC.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{../slide/design/test/alu_test.png}
+    \caption{Giản đồ sóng mô phỏng các phép toán của ALU}
+    \label{fig:alu_test}
+\end{figure}
 \subsection{Hazard Controller}
 Đóng vai trò cực kỳ quan trọng, \texttt{hazard\_controller\_tb.v} tạo ra giả lập tín hiệu từ các pipeline register để theo dõi các cờ \texttt{forward\_a}, \texttt{forward\_b}, \texttt{load\_use\_stall}.
 
@@ -77,6 +83,13 @@ Phân tích Pipeline Evidence cho thấy:
 - \textbf{load\_use\_stall = 1}: Phát hiện phụ thuộc lệnh LW \texttt{x4} và lệnh BEQ \texttt{x3, x4}. Lõi chèn thành công 1 NOP bubble.
 - \textbf{flush = 63}: Bao gồm các lần clear do branch và kết thúc vòng lặp.
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{../slide/design/test/risc_core.png}
+    \caption{Giản đồ sóng thực thi pipeline lõi đơn (\texttt{core\_tb})}
+    \label{fig:core_test_wave}
+\end{figure}
+
 \section{Kiểm thử Interconnect và Atomic}
 Kiểm thử này độc lập với lõi, sử dụng các Core giả (Stub) để bơm các request thẳng vào Arbiter và Bus Controller nhằm đánh giá năng lực giải quyết tranh chấp.
 
@@ -119,6 +132,13 @@ Mỗi lõi nạp giá trị 42 ghi vào \texttt{mem[0]}, và 99 ghi vào \texttt
 \subsection{Phân tích độ trễ và sự công bằng (Fairness)}
 Dựa vào bảng kết quả trên, Arbiter xoay vòng rất công bằng. Số \texttt{grant} nhận được của các lõi là 3 và 4 (chênh lệch tối đa là 1). Tuy nhiên, số \texttt{mem\_stall} (chu kỳ phải đợi bus) tăng dần từ Core 0 (15 stall) lên Core 7 (22 stall). Điều này là do Core 7 nằm cuối vòng xoay, phải đợi 7 core trước đó hoàn thành giao dịch bộ nhớ.
 Mỗi lõi đạt xấp xỉ 180 lệnh \texttt{retired} trong 500 chu kỳ, thể hiện IPC của một lõi dao động mức $0.36$. Số lượng \texttt{flush} lớn do khi hoàn thành, mỗi lõi kẹt trong vòng lặp vô hạn \texttt{jal x0, halt}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{../slide/design/test/top_8core.png}
+    \caption{Giản đồ sóng toàn hệ thống 8 lõi xử lý tranh chấp bus}
+    \label{fig:top_8core_wave}
+\end{figure}
 
 \section{Tổng kết và đánh giá mức độ đạt yêu cầu}
 Hệ thống xử lý đa nhân đã giải quyết được các bài toán quan trọng sau:

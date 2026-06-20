@@ -8,7 +8,29 @@ Tại top-level (\texttt{top\_8core.v}), 8 lõi \texttt{risc\_core} được kh�
 
 \begin{figure}[H]
     \centering
-    \caption{Sơ đồ cấu trúc tổng thể hệ thống 8-Core (Cần bổ sung hình)}
+    \begin{tikzpicture}[
+        core/.style={draw=DeepBlue, fill=blue!8, minimum width=2.0cm, minimum height=0.6cm, font=\scriptsize\bfseries, align=center},
+        bus/.style={draw=orange!80!black, fill=orange!13, minimum width=3.0cm, minimum height=1.1cm, font=\scriptsize\bfseries, align=center},
+        arb/.style={draw=AccentGreen!80!black, fill=AccentGreen!12, minimum width=3.0cm, minimum height=0.8cm, font=\scriptsize\bfseries, align=center},
+        mem/.style={draw=yellow!60!black, fill=yellow!16, minimum width=3.0cm, minimum height=1.1cm, font=\scriptsize\bfseries, align=center},
+        arrow/.style={->, >=stealth, thick, DeepBlue!85}
+    ]
+        \node[core] (c0) at (0, 1.5) {Core 0};
+        \node[core] (c1) at (0, 0.5) {Core 1};
+        \node[font=\bfseries] (dots) at (0, -0.3) {\vdots};
+        \node[core] (c7) at (0, -1.2) {Core 7};
+
+        \node[bus] (busctrl) at (4.5, 0.15) {\texttt{bus\_ctrl.v}\\Bus Controller};
+        \node[arb] (arbiter) at (4.5, -1.7) {\texttt{arbiter.v}\\Round-Robin};
+        \node[mem] (mem) at (9.0, 0.15) {\texttt{data\_mem.v}\\Shared RAM};
+
+        \draw[arrow] (c0.east) -- (1.8, 1.5) -- (1.8, 0.55) -- (busctrl.165);
+        \draw[arrow] (c1.east) -- (busctrl.180);
+        \draw[arrow] (c7.east) -- (1.8, -1.2) -- (1.8, -0.25) -- (busctrl.195);
+        \draw[<->, >=stealth, thick, red!70!black] (busctrl) -- node[right, font=\tiny\bfseries] {request/grant} (arbiter);
+        \draw[<->, >=stealth, thick, green!55!black] (busctrl) -- node[above, font=\tiny\bfseries] {addr/data/control} (mem);
+    \end{tikzpicture}
+    \caption{Sơ đồ cấu trúc tổng thể hệ thống 8-Core}
     \label{fig:top_8core_diagram}
 \end{figure}
 

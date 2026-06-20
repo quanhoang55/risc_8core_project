@@ -7,11 +7,28 @@ Chương này trình bày chi tiết việc hiện thực hóa các thành phầ
 Toàn bộ mã nguồn RTL của lõi được tổ chức trong thư mục \texttt{rtl/core/}, tuân thủ nguyên tắc thiết kế module hóa.
 \begin{itemize}
     \item \texttt{risc\_core.v}: Module đỉnh của lõi, ghép nối datapath, hazard controller và giao tiếp bộ nhớ.
+    \item \texttt{alu.v}: Đơn vị tính toán số học logic (ALU).
     \item \texttt{control\_unit.v}: Bộ điều khiển trung tâm, giải mã opcode.
-    \item \texttt{alu.v}, \texttt{reg\_file.v}: Đơn vị tính toán số học logic và tập 32 thanh ghi.
+    \item \texttt{reg\_file.v}: Tập 32 thanh ghi đa năng.
     \item \texttt{pc\_logic.v}: Logic tính toán cập nhật Program Counter.
     \item \texttt{pipeline\_register/}: Chứa 4 thanh ghi ranh giới (\texttt{if\_id.v}, \texttt{id\_ex.v}, \texttt{ex\_mem.v}, \texttt{mem\_wb.v}).
+    \item \texttt{instr\_mem.v}: Bộ nhớ lệnh (Instruction Memory).
+    \item \texttt{data\_mem.v}: Bộ nhớ dữ liệu (Data Memory).
 \end{itemize}
+
+\section{Bộ nhớ và cơ chế nạp chương trình}
+Trong hệ thống thực tế, bộ nhớ lệnh (Instruction Memory) và bộ nhớ dữ liệu (Data Memory) thường là các vi mạch SRAM hoặc Flash. Trong môi trường mô phỏng RTL, chúng được mô hình hóa bằng các mảng thanh ghi (array of registers) trong Verilog. 
+
+Để nạp chương trình vào bộ nhớ lệnh mà không cần phải mã hóa cứng từng dòng dữ liệu, dự án sử dụng hàm hệ thống \texttt{\$readmemh} (Read Memory Hex) của Verilog. Hàm này cho phép trình biên dịch đọc nội dung từ một tệp văn bản chứa các mã lệnh dưới dạng hệ thập lục phân (hexadecimal) và khởi tạo trực tiếp vào mảng bộ nhớ.
+\begin{lstlisting}[caption={Cơ chế nạp file .hex vào bộ nhớ},label={lst:readmemh}]
+reg [31:0] memory [0:255]; // Mang bo nho 256 tu 32-bit
+
+initial begin
+    // Nap noi dung tu file "program.hex" vao mang memory
+    $readmemh("program.hex", memory);
+end
+\end{lstlisting}
+Khi mô phỏng bắt đầu, khối \texttt{initial} sẽ được thực thi đầu tiên. Tệp \texttt{program.hex} được tạo ra từ việc biên dịch mã nguồn Assembly (hoặc C/C++) bằng công cụ RISC-V GNU Toolchain, sau đó trích xuất dưới dạng văn bản plain-text. Máy tính mô phỏng đọc từng dòng văn bản hex, chuyển đổi thành giá trị nhị phân và gán vào các phần tử tương ứng của mảng \texttt{memory}, từ đó lõi vi xử lý có thể fetch các lệnh này qua cổng \texttt{instr\_from\_mem}.
 
 \section{Tập thanh ghi đa năng (Register File)}
 \textbf{Mục đích:} Lưu trữ 32 thanh ghi 32-bit theo chuẩn RV32I.
